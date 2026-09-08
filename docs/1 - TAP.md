@@ -65,7 +65,7 @@ Existem restrições rígidas de projeto:
 | [⁠Laura](  ) |  |  |  |  |
 | [⁠Lucas](  ) |  |  |  |  |
 | [⁠Nicolai](  ) |  |  |  |  |
-| [⁠Rafael](  ) |  |  |  |  |
+| [⁠Rafael Gomes Pereira](https://github.com/rafgpereira) | 222015248 | Software | rafaelgomespereira123@gmail.com | Software |
 | [⁠Thomas](  ) |  |  |  |  |
 
 **Orientador:**
