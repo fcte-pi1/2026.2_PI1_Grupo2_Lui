@@ -57,11 +57,11 @@ Existem restrições rígidas de projeto:
 | [⁠Carolina](https://github.com/carolinabecker ) | 241038450 | Software | carolsmbecker@gmail.com | Energia |
 | [⁠Daniel](  ) |  |  |  |  |
 | [⁠Edson](https://github.com/EdsonToppzera) | 242015826 | Software | edsongabrielbb@gmail.com | Software |
-| [⁠Gabriel](  ) |  |  |  |  |
-| [⁠Giovana Rocha e Silva](https://github.com/GiovanaRocha16) | 242004715 | Software | giovanarocha160@gmail.com | Estrutura |
+| [⁠Gabriel Mota Oliveira](https://github.com/Gabro-MO) | 241011081 | Software | gabriel1990mota@gmail.com | Software | 
+| [⁠Giovana](https://github.com/GiovanaRocha16) | 242004715 | Software | giovanarocha160@gmail.com | Estrutura |
 | [Gustavo Gomes Fornaciari]( https://github.com/GUGOFO ) | 241032519 | Software | gugofogomes@gmail.com | Eletrônica |
 | [⁠Julia Japson](  ) |  |  |  |  |
-| [⁠Julia Patricio]( https://github.com/juliapat18 ) | 231027140 | Software | julia.patricio18@gmail.com | Estrutura |
+| [⁠Julia Patricio](  ) |  |  |  |  |
 | [⁠Laura](  ) |  |  |  |  |
 | [⁠Lucas](  ) |  |  |  |  |
 | [⁠Nicolai](  ) |  |  |  |  |
