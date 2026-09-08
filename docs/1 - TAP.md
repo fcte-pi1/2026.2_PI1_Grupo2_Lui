@@ -58,7 +58,7 @@ Existem restrições rígidas de projeto:
 | [⁠Daniel](  ) |  |  |  |  |
 | [⁠Edson](  ) |  |  |  |  |
 | [⁠Gabriel](  ) |  |  |  |  |
-| [⁠Giovana](  ) |  |  |  |  |
+| [⁠Giovana](https://github.com/GiovanaRocha16) | 242004715 | Software | giovanarocha160@gmail.com | Estrutura |
 | [Gustavo Gomes Fornaciari]( https://github.com/GUGOFO ) | 241032519 | Software | gugofogomes@gmail.com | Eletrônica |
 | [⁠Julia Japson](  ) |  |  |  |  |
 | [⁠Julia Patricio](  ) |  |  |  |  |
