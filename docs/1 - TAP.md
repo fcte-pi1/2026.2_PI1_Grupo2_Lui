@@ -56,7 +56,7 @@ Existem restrições rígidas de projeto:
 | [⁠Ana Caroline](  ) |  |  |  |  |
 | [⁠Carolina](https://github.com/carolinabecker ) | 241038450 | Software | carolsmbecker@gmail.com | Energia |
 | [⁠Daniel](  ) |  |  |  |  |
-| [⁠Edson](  ) |  |  |  |  |
+| [⁠Edson](https://github.com/EdsonToppzera) | 242015826 | Software | edsongabrielbb@gmail.com | Software |
 | [⁠Gabriel](  ) |  |  |  |  |
 | [⁠Giovana](https://github.com/GiovanaRocha16) | 242004715 | Software | giovanarocha160@gmail.com | Estrutura |
 | [Gustavo Gomes Fornaciari]( https://github.com/GUGOFO ) | 241032519 | Software | gugofogomes@gmail.com | Eletrônica |
