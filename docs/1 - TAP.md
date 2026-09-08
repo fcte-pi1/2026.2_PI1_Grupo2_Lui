@@ -6,29 +6,42 @@
 
 ### Dados do projeto
 
-- **Nome do Projeto:**
-- **Data de Início:**
-- **Data de Término:**
-- **Patrocinador:** Universidade de Brasília
-
+* **Nome do Projeto:** Robo Labirinto
+* **Data de Início:** 02/07
+* **Data de Término:** 04/12
+* **Patrocinador:** Universidade de Brasília
 
 ### Objetivos
 
-> O que a grupo pretende obter com a realização do projeto. Descrever o que se pretende realizar para resolver o problema central ou explorar a oportunidade identificada. Para a correta definição do objetivo siga a regra "SMART":
->
-> - **_Specific_ (específico):** Deve ser redigido de forma clara, concisa e compreensiva;
-> - **_Measurable_ (mensurável):** O objetivo específico deve ser mensurável, ou seja, possível de ser medido por meio de um ou mais indicadores;
-> - **_Agreed_ (acordado):** Deve ser acordado com as partes interessadas, ou seja, as áreas envolvidas na empresa: P&D, Produção, Comercial, Marketing, Financeira, Jurídica, Manutenção, ambiental, entre outras;
-> - **_Realistic_ (realista):** Deve estar centrado na realidade, no que é possível de ser feito considerando as premissas e restrições existentes, como: orçamento e tempo;
-> - **_Time Bound_ (Limitado no tempo):** Deve ter um prazo determinado para sua finalização.
+- **Specific:** Desenvolver um robô autônomo (*micromouse*) capaz de mapear e resolver 3 labirintos de formatos desconhecidos **( 4x4, 8x4 e 12x4 )**, além de construir uma plataforma web para exibição da telemetria em tempo real (trajeto, bateria, velocidade, tempo) e persistência em banco de dados.
+- **Measurable:**  
+    - Resolver cada labirinto dentro do limite máximo de 10 minutos.
+    - Obter a pontuação máxima de resolução (conclusão na 1ª tentativa para nota 10).
+    - Exibir todos os dados de telemetria no sistema web para garantir o fator multiplicador 1,0 na avaliação.
+    - Manter as dimensões físicas do robô estritamente abaixo do limite de **16,5cm x 16,5cm**.
+- **Agreed:** Alinhado e acordado entre todos os integrantes da equipe multidisciplinar e os professores orientadores das turmas de Projeto Integrador 1 (FCTE/UnB).
+- **Realistic:** Viável de ser executado com os conhecimentos integrados das engenharias da FCTE, contando com a construção prévia de uma pista de testes simplificada **4x4** para validação e ajuste do sistema antes das avaliações finais.
+- **Time Bound:** Finalizar o projeto e apresentar a solução completa na avaliação final até a data limite de **04/12**, cumprindo todas as entregas intermediárias agendadas (AP2 a AP20).
 
 ### Público-Alvo
 
-> Pessoas, empresas, instituições etc. que podem usufruir dos produtos, serviços e resultados gerados pelo projeto, cujos requisitos (tópico abaixo) devem atender as suas necessidades. Podem ser internas ou externas à organização, mas, merecem destaque especial, pois, o projeto está sendo feito para atendê-los de forma direta ou indireta.
+- **Professores e Avaliadores da FCTE/UnB:** Responsáveis por acompanhar o desenvolvimento, avaliar os entregáveis da disciplina e validar os testes de integração e a apresentação final.
+- **Membros da Equipe de Engenharia:** Estudantes dos cursos de engenharia da FCTE que aplicarão conhecimentos de estruturas, energia, hardware e software.
 
 ### Descrição do Problema
 
-> Informar o problema ou a oportunidade (necessidade) que justifica o porquê de o projeto ser realizado. Por exemplo: atende uma demanda específica do consumidor final; supre uma necessidade do mercado comercializador; é um diferencial X para o órgão regulamentador.
+A resolução autônoma de labirintos é um desafio clássico de engenharia que exige a integração multidisciplinar de engenharia de estruturas, energia, hardware e software. 
+
+O robô deve ser projetado para navegar em células de **18cm** de lado, com paredes brancas de **5cm** de altura **1,2cm** de espessura (com topo vermelho) e chão preto. O veículo parte de um beco sem saída em um canto até a área objetivo no canto oposto. 
+
+Existem restrições rígidas de projeto:
+
+- Dimensões máximas de **16,5cm** de largura e comprimento (sem limite de altura).
+- Proibição de voar, pular, escalar ou usar propulsão por combustão/foguetes.
+- Proibição de alterar o código de computador ou a memória do robô durante a resolução do trajeto.
+- Necessidade de transmitir dados de telemetria em tempo real para um sistema web próprio.
+
+![Imagem de Labirinto](./figs/TAP/Labirinto.png)
 
 ### Indicadores
 
@@ -38,18 +51,32 @@
 
 | **Nome** | **Matrícula** | **Curso** | **E-mail** | **Funções** |
 |----------|---------------|-----------|------------|-------------|
-| | | | | |
-| | | | | |
-| | | | | |
-| | | | | |
-| | | | | |
-| | | | | |
-| | | | | |
-| | | | | |
-| | | | | |
-| | | | | |
+| [⁠Angélica](  ) |  |  |  |  |
+| [⁠Ana Beatriz](  ) |  |  |  |  |
+| [⁠Ana Caroline](  ) |  |  |  |  |
+| [⁠Carolina](  ) |  |  |  |  |
+| [⁠Daniel](  ) |  |  |  |  |
+| [⁠Edson](  ) |  |  |  |  |
+| [⁠Gabriel](  ) |  |  |  |  |
+| [⁠Giovana](  ) |  |  |  |  |
+| [Gustavo Gomes Fornaciari]( https://github.com/GUGOFO ) | 241032519 | Software | gugofogomes@gmail.com | Eletrônica |
+| [⁠Julia Japson](  ) |  |  |  |  |
+| [⁠Julia Patricio](  ) |  |  |  |  |
+| [⁠Laura](  ) |  |  |  |  |
+| [⁠Lucas](  ) |  |  |  |  |
+| [⁠Nicolai](  ) |  |  |  |  |
+| [⁠Rafael](  ) |  |  |  |  |
+| [⁠Thomas](  ) |  |  |  |  |
 
 **Orientador:**
+
+| **Nome** | **Turma** |
+|----------|---------------|
+| Prof. Diogo C. Garcia | 01 |
+| Profa. Juliana P. Rodrigues | 02 |
+| Prof. Lui T. C. Habl | 03 |
+| Prof. Bruno L. Pereira | 04 |
+| Prof. Hilmer Rodrigues Neri | 05 |
 
 ### Orçamento estimado (R$)
 
@@ -58,19 +85,3 @@ Discutam dentro da equipe a verba possível disponível para o desenvolvimento d
 ### Duração estimada (horas)
 
 Estimem com sinceridade o tempo a ser despendido no desenvolvimento do projeto, com base na complexidade do projeto, na quantidade de membros e na realidade de cada um.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
