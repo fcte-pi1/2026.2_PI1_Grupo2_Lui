@@ -53,7 +53,7 @@ Existem restrições rígidas de projeto:
 |----------|---------------|-----------|------------|-------------|
 | [⁠Angel Daniel Grau Barreto](https://github.com/AngelDanielGrau) | 241025158 | Aeroespacial | angeldanielgrau@gmail.com | Estrutura |
 | [⁠Angélica](  ) |  |  |  |  |
-| [⁠Ana Beatriz](  ) |  |  |  |  |
+| [⁠Ana Beatriz Souza Araújo](https://github.com/AnnaBeatrizAraujo) | 241025891 | Software | ana.araujo4519@gmail.com | Software |
 | [⁠Ana Caroline](https://github.com/iicaroll) | 241025908 | Software | caroldantas211105@gmail.com | Energia |
 | [⁠Carolina](https://github.com/carolinabecker ) | 241038450 | Software | carolsmbecker@gmail.com | Energia |
 | [⁠Daniel](  ) |  |  |  |  |
