@@ -54,7 +54,7 @@ Existem restrições rígidas de projeto:
 | [⁠Angélica](  ) |  |  |  |  |
 | [⁠Ana Beatriz](  ) |  |  |  |  |
 | [⁠Ana Caroline](  ) |  |  |  |  |
-| [⁠Carolina](  ) |  |  |  |  |
+| [⁠Carolina](https://github.com/carolinabecker ) | 241038450 | Software | carolsmbecker@gmail.com | Energia |
 | [⁠Daniel](  ) |  |  |  |  |
 | [⁠Edson](  ) |  |  |  |  |
 | [⁠Gabriel](  ) |  |  |  |  |
