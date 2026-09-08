@@ -53,7 +53,7 @@ Existem restrições rígidas de projeto:
 |----------|---------------|-----------|------------|-------------|
 | [⁠Angélica](  ) |  |  |  |  |
 | [⁠Ana Beatriz](  ) |  |  |  |  |
-| [⁠Ana Caroline](  ) |  |  |  |  |
+| [⁠Ana Caroline](https://github.com/iicaroll) | 241025908 | Software | caroldantas211105@gmail.com | Energia |
 | [⁠Carolina](https://github.com/carolinabecker ) | 241038450 | Software | carolsmbecker@gmail.com | Energia |
 | [⁠Daniel](  ) |  |  |  |  |
 | [⁠Edson](https://github.com/EdsonToppzera) | 242015826 | Software | edsongabrielbb@gmail.com | Software |
