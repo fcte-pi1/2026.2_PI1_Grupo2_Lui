@@ -1,0 +1,64 @@
+site_name: Rush Hour - Grafos
+
+repo_url: https://github.com/projeto-de-algoritmos-2026/G15_Grafos_Rush_Hour
+repo_name: G15_Grafos_Rush_Hour
+
+site_url: https://projeto-de-algoritmos-2026.github.io/G15_Grafos_Rush_Hour/
+
+nav:
+  - Home: README.md
+  - 1 - TAP: 1 - TAP.md
+  - 2 - Requisitos: 2 - Requisitos.md
+  - 3 - EAP: 3 - EAP.md
+  - 4 - Projetos Conceituais:
+      - Estruturas: 4.1 - Projeto conceitual de estruturas.md
+      - Energia: 4.2 - Projeto conceitual de energia.md
+      - Hardware: 4.3 - Projeto conceitual de hardware.md
+      - Software: 4.4 - Projeto conceitual de software.md
+  - 5 - Cronograma: 5 - Cronograma.md
+  - 6 - Orçamento: 6 - Orçamento.md
+  - 7 - Testes:
+      - Estrutura: 7.1 - Testes de estrutura.md
+      - Energia: 7.2 - Testes de energia.md
+      - Hardware: 7.3 - Testes de hardware.md
+      - Software: 7.4 - Testes de software.md
+      - Integração: 7.5 - Testes de integração.md
+  - 8 - Avaliação de Desempenho: 8 - Avaliação de desempenho.md
+  - 9 - Relatório de Encerramento: 9 - Relatório de encerramento do projeto.md
+
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.tabs
+    - navigation.top
+    - search.suggest
+    - search.highlight
+  palette:
+    - scheme: default
+      primary: green
+      accent: green
+      toggle:
+        icon: material/weather-night
+        name: Modo Noturno
+    - scheme: slate
+      primary: green
+      accent: green
+      toggle:
+        icon: material/weather-sunny
+        name: Modo Claro
+
+markdown_extensions:
+  - pymdownx.emoji
+  - pymdownx.tasklist
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.highlight
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - toc:
+      permalink: true
+  - attr_list
