@@ -1,9 +1,9 @@
-site_name: Rush Hour - Grafos
+site_name: Projeto PI1 - Grupo 2 (Lui)
 
-repo_url: https://github.com/projeto-de-algoritmos-2026/G15_Grafos_Rush_Hour
-repo_name: G15_Grafos_Rush_Hour
+repo_url: https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui
+repo_name: 2026.2_PI1_Grupo2_Lui
 
-site_url: https://projeto-de-algoritmos-2026.github.io/G15_Grafos_Rush_Hour/
+site_url: https://fcte-pi1.github.io/2026.2_PI1_Grupo2_Lui/
 
 nav:
   - Home: README.md
