@@ -67,7 +67,7 @@ Existem restrições rígidas de projeto:
 | [⁠Lucas Fujimoto Tokunaga](https://github.com/Lucasft16) | 241025283 | Software | lucaasft16@gmail.com | Eletrônica |
 | [⁠Nicolai](  ) |  |  |  |  |
 | [⁠Rafael Gomes Pereira](https://github.com/rafgpereira) | 222015248 | Software | rafaelgomespereira123@gmail.com | Software |
-| [⁠Thomas](  ) |  |  |  |  |
+| [⁠Thomas Augusto Amorim de Araujo](https://github.com/Thomas4ugust0) | 251016027  | Software  | thomasgusto12@gmail.com | Eletrônica |
 
 **Orientador:**
 
