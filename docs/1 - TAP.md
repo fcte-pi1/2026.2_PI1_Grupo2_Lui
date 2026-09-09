@@ -56,7 +56,7 @@ Existem restrições rígidas de projeto:
 | [⁠Ana Beatriz Souza Araújo](https://github.com/AnnaBeatrizAraujo) | 241025891 | Software | ana.araujo4519@gmail.com | Software |
 | [⁠Ana Caroline](https://github.com/iicaroll) | 241025908 | Software | caroldantas211105@gmail.com | Energia |
 | [⁠Carolina](https://github.com/carolinabecker ) | 241038450 | Software | carolsmbecker@gmail.com | Energia |
-| [⁠Daniel](  ) |  |  |  |  |
+| [⁠Daniel  Henrique da Silva Rodrigues]( https://github.com/danielhdsrodrigues-pixel ) | 241038601 | Eletrônica | danielhdsrodrigues@gmail.com | Eletrônica |
 | [⁠Edson](https://github.com/EdsonToppzera) | 242015826 | Software | edsongabrielbb@gmail.com | Software |
 | [⁠Gabriel Mota Oliveira](https://github.com/Gabro-MO) | 241011081 | Software | gabriel1990mota@gmail.com | Software | 
 | [⁠Giovana Rocha e Silva](https://github.com/GiovanaRocha16) | 242004715 | Software | giovanarocha160@gmail.com | Estrutura |
