@@ -71,18 +71,53 @@ Existem restrições rígidas de projeto:
 
 **Orientador:**
 
-| **Nome** | **Turma** |z
+| **Nome** | **Turma** |
 |----------|---------------|
-| Prof. Diogo C. Garcia | 01 |
-| Profa. Juliana P. Rodrigues | 02 |
 | Prof. Lui T. C. Habl | 03 |
-| Prof. Bruno L. Pereira | 04 |
-| Prof. Hilmer Rodrigues Neri | 05 |
 
-### Orçamento estimado (R$)
+## Orçamento estimado (R$)
 
-Discutam dentro da equipe a verba possível disponível para o desenvolvimento do projeto, com base na complexidade do projeto, na quantidade de membros e na realidade de cada um.
+### 1.1 Tabela de Estimativa por Componente
 
-### Duração estimada (horas)
+As estimativas apresentadas foram elaboradas com base no levantamento histórico de custos de projetos de semestres anteriores, aliado a uma pesquisa de preços médios praticados no mercado atual. Cabe ressaltar que esta análise é preliminar e serve como uma diretriz inicial, uma estimativa orçamentária detalhada e específica para os requisitos do nosso projeto será desenvolvida em uma etapa posterior.
 
-Estimem com sinceridade o tempo a ser despendido no desenvolvimento do projeto, com base na complexidade do projeto, na quantidade de membros e na realidade de cada um.
+| Item / Serviço | Categoria | Preço Base (R$) | Intervalo Estimado (R$) |
+| :--- | :--- | :---: | :---: |
+| **ESP-32 WROOM-32** | Eletrônico | R$ 50,00 | R$ 45,00 – R$ 57,50 |
+| **Ponte H DRV8833** | Eletrônico | R$ 8,90 | R$ 8,00 – R$ 10,50 |
+| **Sensores Infravermelho Sharp20** | Eletrônico | R$ 283,00 | R$ 255,00 – R$ 310,00 |
+| **Giroscópio MPU6500** | Eletrônico | R$ 25,99 | R$ 23,00 – R$ 30,00 |
+| **Sensor VL53L0X** | Eletrônico | R$ 85,00 | R$ 75,00 – R$ 98,00 |
+| **Regulador de Tensão MP1584** | Elétrico | R$ 8,90 | R$ 8,00 – R$ 10,50 |
+| **Motores N20-6V (Par)** | Elétrico | R$ 151,80 | R$ 135,00 – R$ 170,00 |
+| **Bateria Li-ion 7.4V 2000mAh** | Elétrico | R$ 33,26 | R$ 30,00 – R$ 40,00 |
+| **Rodas S20 32mm** | Montagem | R$ 94,80 | R$ 85,00 – R$ 105,00 |
+| **Roda Boba Esferográfica** | Montagem | R$ 5,90 | R$ 5,00 – R$ 8,00 |
+| **Protoboard** | Montagem | R$ 8,50 | R$ 7,50 – R$ 12,00 |
+| **Filamento 3D** | Matéria-prima | R$ 90,00 | R$ 60,00 – R$ 100,00 |
+
+### 1.2 Resumo Financeiro
+* **Compra Integral (tudo novo):** R$ 844,21 *(Faixa: R$ 810,00 – R$ 920,00)*
+* **Custo Reduzido (reaproveitando Motores, ESP32 e Protoboard):** R$ 407,55
+* **Estimativa de Frete:** R$ 50,90
+* **Total Estimado com Frete (Cenário Reduzido):** R$ 458,45
+* **Valor por Integrante (dividido por 18):** **~R$ 25,47 por pessoa**
+
+---
+
+## 2. Duração Estimada (Horas)
+
+### 2.1 Carga Horária Semanal (Por Integrante)
+* **Aulas / Estudos:** 4h/semana (2 aulas de 2h)
+* **Trabalho Extraclasse:** 2h/semana
+* **Total Semanal por Pessoa:** 6 horas/semana
+
+### 2.2 Capacidade Total do Projeto (18 Integrantes x 14 Semanas)
+* **Por Integrante:** 6h/semana x 14 semanas = 84 horas
+* **Total do Grupo:** 84h x 18 integrantes = 1.512 x horas
+
+### 2.3 Divisão de Horas por Atividade
+1. **Estudos e Aulas (40%):** 604,8 horas
+2. **Programação / Firmware (25%):** 378,0 horas
+3. **Hardware e Modelagem 3D (20%):** 302,4 horas
+4. **Testes e Documentação (15%):** 226,8 horas
