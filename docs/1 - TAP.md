@@ -63,7 +63,7 @@ Existem restrições rígidas de projeto:
 | [Gustavo Gomes Fornaciari]( https://github.com/GUGOFO ) | 241032519 | Software | gugofogomes@gmail.com | Eletrônica |
 | [⁠Julia Japson Campos da Silveira]( https://github.com/juliajapson ) | 241011368 | Energia | juliajapson@gmail.com | Energia |
 | [⁠Julia Patricio]( https://github.com/juliapat18 ) | 231027140 | Software | julia.patricio18@gmail.com | Estrutura |
-| [⁠Laura](  ) |  |  |  |  |
+| [⁠Laura Pinheiro Sumienski]( https://github.com/LauraSumi ) | 241025962 | Energia | Laurasumienski1@gmail.com | Energia |
 | [⁠Lucas Fujimoto Tokunaga](https://github.com/Lucasft16) | 241025283 | Software | lucaasft16@gmail.com | Eletrônica |
 | [⁠Nicolai Bukvar Miketen](https://github.com/NBukvar) |241025345|Eletrônica|nbmiketen@hotmail.com|Estrutura|
 | [⁠Rafael Gomes Pereira](https://github.com/rafgpereira) | 222015248 | Software | rafaelgomespereira123@gmail.com | Software |
@@ -71,7 +71,7 @@ Existem restrições rígidas de projeto:
 
 **Orientador:**
 
-| **Nome** | **Turma** |
+| **Nome** | **Turma** |z
 |----------|---------------|
 | Prof. Diogo C. Garcia | 01 |
 | Profa. Juliana P. Rodrigues | 02 |
