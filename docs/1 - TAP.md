@@ -45,7 +45,10 @@ Existem restrições rígidas de projeto:
 
 ### Indicadores
 
-> Listar até 10 indicadores que determinam o mercado consumidor do produto desenvolvido: exemplo: 1) nº de alunos da FGA que utilizam ônibus às 18:00; 2) nº de usuários do restaurante universitários, 3) número de idosos classificados como público-alvo no DF e no estado de Goiás, 4) nº de empresas de segurança registradas no DF etc.
+1. **Estudantes de Engenharia da FCTE/UnB:** Alunos matriculados na disciplina de Projeto Integrador 1.
+2. **Equipes de Competitivos de Robótica (*Micromouse*) do DF:** Grupos interessados em plataformas de navegação autônoma e mapeamento.
+3. **Laboratórios e Instituições de Ensino no DF:** Ambientes acadêmicos com demanda por kits didáticos integrando hardware e software em tempo real.
+4. **Eventos e Feiras de Tecnologia Acadêmica:** Público técnico e visitantes interessados em aplicações de robótica móvel.
 
 ### Membros da Equipe
 
