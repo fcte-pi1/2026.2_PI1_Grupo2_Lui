@@ -58,6 +58,7 @@ Existem restrições rígidas de projeto:
 | [Angélica da Costa Campos]( https://github.com/angelicaccampos ) | 221031256 | Software | angelicadacostacampos@gmail.com | Software |
 | [⁠Ana Beatriz Souza Araújo](https://github.com/AnnaBeatrizAraujo) | 241025891 | Software | ana.araujo4519@gmail.com | Software |
 | [Ana Caroline Dantas da Silva](https://github.com/iicaroll) | 241025908 | Software | caroldantas211105@gmail.com | Energia |
+| [Augusto Campos Duarte](https://github.com/Augcamp) | 202045965 | Software | augustocampos41@gmail.com | Eletrônica |
 | [Carolina Souza de Moura Becker](https://github.com/carolinabecker ) | 241038450 | Software | carolsmbecker@gmail.com | Energia |
 | [⁠Daniel  Henrique da Silva Rodrigues]( https://github.com/danielhdsrodrigues-pixel ) | 241038601 | Eletrônica | danielhdsrodrigues@gmail.com | Eletrônica |
 | [Edson Gabriel Barbosa Brandão](https://github.com/EdsonToppzera) | 242015826 | Software | edsongabrielbb@gmail.com | Software |
