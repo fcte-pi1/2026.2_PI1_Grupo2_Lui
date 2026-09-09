@@ -55,17 +55,17 @@ Existem restrições rígidas de projeto:
 | **Nome** | **Matrícula** | **Curso** | **E-mail** | **Funções** |
 |----------|---------------|-----------|------------|-------------|
 | [⁠Angel Daniel Grau Barreto](https://github.com/AngelDanielGrau) | 241025158 | Aeroespacial | angeldanielgrau@gmail.com | Estrutura |
-| [⁠Angélica]( https://github.com/angelicaccampos ) | 221031256 | Software | angelicadacostacampos@gmail.com | Software |
+| [Angélica da Costa Campos]( https://github.com/angelicaccampos ) | 221031256 | Software | angelicadacostacampos@gmail.com | Software |
 | [⁠Ana Beatriz Souza Araújo](https://github.com/AnnaBeatrizAraujo) | 241025891 | Software | ana.araujo4519@gmail.com | Software |
-| [⁠Ana Caroline](https://github.com/iicaroll) | 241025908 | Software | caroldantas211105@gmail.com | Energia |
-| [⁠Carolina](https://github.com/carolinabecker ) | 241038450 | Software | carolsmbecker@gmail.com | Energia |
+| [Ana Caroline Dantas da Silva](https://github.com/iicaroll) | 241025908 | Software | caroldantas211105@gmail.com | Energia |
+| [Carolina Souza de Moura Becker](https://github.com/carolinabecker ) | 241038450 | Software | carolsmbecker@gmail.com | Energia |
 | [⁠Daniel  Henrique da Silva Rodrigues]( https://github.com/danielhdsrodrigues-pixel ) | 241038601 | Eletrônica | danielhdsrodrigues@gmail.com | Eletrônica |
-| [⁠Edson](https://github.com/EdsonToppzera) | 242015826 | Software | edsongabrielbb@gmail.com | Software |
+| [Edson Gabriel Barbosa Brandão](https://github.com/EdsonToppzera) | 242015826 | Software | edsongabrielbb@gmail.com | Software |
 | [⁠Gabriel Mota Oliveira](https://github.com/Gabro-MO) | 241011081 | Software | gabriel1990mota@gmail.com | Software | 
 | [⁠Giovana Rocha e Silva](https://github.com/GiovanaRocha16) | 242004715 | Software | giovanarocha160@gmail.com | Estrutura |
 | [Gustavo Gomes Fornaciari]( https://github.com/GUGOFO ) | 241032519 | Software | gugofogomes@gmail.com | Eletrônica |
 | [⁠Julia Japson Campos da Silveira]( https://github.com/juliajapson ) | 241011368 | Energia | juliajapson@gmail.com | Energia |
-| [⁠Julia Patricio]( https://github.com/juliapat18 ) | 231027140 | Software | julia.patricio18@gmail.com | Estrutura |
+| [Julia Oliveira Patricio]( https://github.com/juliapat18 ) | 231027140 | Software | julia.patricio18@gmail.com | Estrutura |
 | [⁠Laura Pinheiro Sumienski]( https://github.com/LauraSumi ) | 241025962 | Energia | Laurasumienski1@gmail.com | Energia |
 | [⁠Lucas Fujimoto Tokunaga](https://github.com/Lucasft16) | 241025283 | Software | lucaasft16@gmail.com | Eletrônica |
 | [⁠Nicolai Bukvar Miketen](https://github.com/NBukvar) |241025345|Eletrônica|nbmiketen@hotmail.com|Estrutura|
