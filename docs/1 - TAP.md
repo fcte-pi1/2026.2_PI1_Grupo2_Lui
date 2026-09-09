@@ -65,7 +65,7 @@ Existem restrições rígidas de projeto:
 | [⁠Julia Patricio]( https://github.com/juliapat18 ) | 231027140 | Software | julia.patricio18@gmail.com | Estrutura |
 | [⁠Laura](  ) |  |  |  |  |
 | [⁠Lucas Fujimoto Tokunaga](https://github.com/Lucasft16) | 241025283 | Software | lucaasft16@gmail.com | Eletrônica |
-| [⁠Nicolai](  ) |  |  |  |  |
+| [⁠Nicolai Bukvar Miketen](https://github.com/NBukvar) |241025345|Eletrônica|nbmiketen@hotmail.com|Estrutura|
 | [⁠Rafael Gomes Pereira](https://github.com/rafgpereira) | 222015248 | Software | rafaelgomespereira123@gmail.com | Software |
 | [⁠Thomas Augusto Amorim de Araujo](https://github.com/Thomas4ugust0) | 251016027  | Software  | thomasgusto12@gmail.com | Eletrônica |
 
