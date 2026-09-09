@@ -64,7 +64,7 @@ Existem restrições rígidas de projeto:
 | [⁠Julia Japson Campos da Silveira]( https://github.com/juliajapson ) | 241011368 | Energia | juliajapson@gmail.com | Energia |
 | [⁠Julia Patricio]( https://github.com/juliapat18 ) | 231027140 | Software | julia.patricio18@gmail.com | Estrutura |
 | [⁠Laura](  ) |  |  |  |  |
-| [⁠Lucas](  ) |  |  |  |  |
+| [⁠Lucas Fujimoto Tokunaga](https://github.com/Lucasft16) | 241025283 | Software | lucaasft16@gmail.com | Eletrônica |
 | [⁠Nicolai](  ) |  |  |  |  |
 | [⁠Rafael Gomes Pereira](https://github.com/rafgpereira) | 222015248 | Software | rafaelgomespereira123@gmail.com | Software |
 | [⁠Thomas](  ) |  |  |  |  |
