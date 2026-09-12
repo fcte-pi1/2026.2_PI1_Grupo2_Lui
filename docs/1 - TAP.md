@@ -6,7 +6,7 @@
 
 ### Dados do projeto
 
-* **Nome do Projeto:** Robo Labirinto
+* **Nome do Projeto:** Mickey Mouse
 * **Data de Início:** 02/07
 * **Data de Término:** 04/12
 * **Patrocinador:** Universidade de Brasília
@@ -27,6 +27,7 @@
 
 - **Professores e Avaliadores da FCTE/UnB:** Responsáveis por acompanhar o desenvolvimento, avaliar os entregáveis da disciplina e validar os testes de integração e a apresentação final.
 - **Membros da Equipe de Engenharia:** Estudantes dos cursos de engenharia da FCTE que aplicarão conhecimentos de estruturas, energia, hardware e software.
+- **Comunidade**: Comunidade da FCTE que participa de ações relacionadas ao Projeto
 
 ### Descrição do Problema
 
@@ -70,6 +71,7 @@ Existem restrições rígidas de projeto:
 | [⁠Laura Pinheiro Sumienski]( https://github.com/LauraSumi ) | 241025962 | Energia | Laurasumienski1@gmail.com | Energia |
 | [⁠Lucas Fujimoto Tokunaga](https://github.com/Lucasft16) | 241025283 | Software | lucaasft16@gmail.com | Eletrônica |
 | [⁠Nicolai Bukvar Miketen](https://github.com/NBukvar) |241025345|Eletrônica|nbmiketen@hotmail.com|Estrutura|
+| [Pedro Lock Martins](https://github.com/PedroLock) | 222006356 | Software |222006356@aluno.unb.br | Software |
 | [⁠Rafael Gomes Pereira](https://github.com/rafgpereira) | 222015248 | Software | rafaelgomespereira123@gmail.com | Software |
 | [⁠Thomas Augusto Amorim de Araujo](https://github.com/Thomas4ugust0) | 251016027  | Software  | thomasgusto12@gmail.com | Eletrônica |
 
@@ -81,7 +83,7 @@ Existem restrições rígidas de projeto:
 
 ## Orçamento estimado (R$)
 
-### 1.1 Tabela de Estimativa por Componente
+### Tabela de Estimativa por Componente
 
 As estimativas apresentadas foram elaboradas com base no levantamento histórico de custos de projetos de semestres anteriores, aliado a uma pesquisa de preços médios praticados no mercado atual. Cabe ressaltar que esta análise é preliminar e serve como uma diretriz inicial, uma estimativa orçamentária detalhada e específica para os requisitos do nosso projeto será desenvolvida em uma etapa posterior.
 
@@ -100,28 +102,28 @@ As estimativas apresentadas foram elaboradas com base no levantamento histórico
 | **Protoboard** | Montagem | R$ 8,50 | R$ 7,50 – R$ 12,00 |
 | **Filamento 3D** | Matéria-prima | R$ 90,00 | R$ 60,00 – R$ 100,00 |
 
-### 1.2 Resumo Financeiro
+### Resumo Financeiro
 * **Compra Integral (tudo novo):** R$ 844,21 *(Faixa: R$ 810,00 – R$ 920,00)*
 * **Custo Reduzido (reaproveitando Motores, ESP32 e Protoboard):** R$ 407,55
 * **Estimativa de Frete:** R$ 50,90
 * **Total Estimado com Frete (Cenário Reduzido):** R$ 458,45
-* **Valor por Integrante (dividido por 18):** **~R$ 25,47 por pessoa**
+* **Valor por Integrante:** **~R$ 24,13 por pessoa**
 
 ---
 
-## 2. Duração Estimada (Horas)
+## Duração Estimada
 
-### 2.1 Carga Horária Semanal (Por Integrante)
+### Carga Horária Semanal
 * **Aulas / Estudos:** 4h/semana (2 aulas de 2h)
 * **Trabalho Extraclasse:** 2h/semana
 * **Total Semanal por Pessoa:** 6 horas/semana
 
-### 2.2 Capacidade Total do Projeto (18 Integrantes x 14 Semanas)
+### Capacidade Total do Projeto
 * **Por Integrante:** 6h/semana x 14 semanas = 84 horas
-* **Total do Grupo:** 84h x 18 integrantes = 1.512 x horas
+* **Total do Grupo:** 84h x 19 integrantes = 1.596 horas
 
-### 2.3 Divisão de Horas por Atividade
-1. **Estudos e Aulas (40%):** 604,8 horas
-2. **Programação / Firmware (25%):** 378,0 horas
-3. **Hardware e Modelagem 3D (20%):** 302,4 horas
-4. **Testes e Documentação (15%):** 226,8 horas
+### Divisão de Horas por Atividade
+1. **Estudos e Aulas (40%):** 638,4 horas
+2. **Programação / Firmware (25%):** 399,0 horas
+3. **Hardware e Modelagem 3D (20%):** 319,2 horas
+4. **Testes e Documentação (15%):** 239,4 horas
