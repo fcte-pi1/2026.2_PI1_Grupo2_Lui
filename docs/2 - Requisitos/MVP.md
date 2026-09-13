@@ -23,23 +23,23 @@ A seleção dos requisitos integrantes do MVP baseou-se rigorosamente na metodol
 
 ## Requisitos Funcionais do MVP
 
-A tabela a seguir apresenta os Requisitos Funcionais essenciais selecionados para o MVP. O ID de cada requisito fornece um link direto para o arquivo de origem e a linha exata de sua declaração.
+A tabela a seguir apresenta os Requisitos Funcionais essenciais selecionados para o MVP. O ID de cada requisito fornece um link direto para o arquivo de origem.
 
-| **ID** | **Nome do Requisito** |
-|:------:|------------------------|
-| [RF01](RF.md#L14) | Mapear Labirinto |
-| [RF02](RF.md#L15) | Exibir dados do Labirinto |
-| [RF03](RF.md#L16) | Exibir dados do MicroMouse |
-| [RF04](RF.md#L17) | Identificar Paredes |
-| [RF05](RF.md#L18) | Monitorar Localização |
-| [RF06](RF.md#L19) | Transmitir dados |
-| [RF07](RF.md#L20) | Fazer giro completo |
-| [RF08](RF.md#L21) | Andar para frente |
-| [RF09](RF.md#L22) | Armazenar dados |
-| [RF10](RF.md#L23) | Garantir integridade |
-| [RF11](RF.md#L24) | Navegar labirinto |
-| [RF12](RF.md#L25) | Realizar telemetria |
-| [RF13](RF.md#L26) | Garantir autonomia |
+| **ID** | **Nome do Requisito** | **Descrição** |
+|:------:|------------------------|---------------|
+| [RF01](RF.md#rf-declarados) | Mapear Labirinto | Realizar o mapeamento contínuo da estrutura do labirinto à medida que o robô se desloca. |
+| [RF02](RF.md#rf-declarados) | Exibir dados do Labirinto | Apresentar em interface os dados estruturais e o mapa gerado do labirinto. |
+| [RF03](RF.md#rf-declarados) | Exibir dados do MicroMouse | Exibir em tempo real as informações de status, parâmetros e estado do robô MicroMouse. |
+| [RF04](RF.md#rf-declarados) | Identificar Paredes | Detectar a presença e a proximidade de paredes adjacentes ao robô. |
+| [RF05](RF.md#rf-declarados) | Monitorar Localização | Acompanhar e atualizar a posição exata do robô dentro da grade do labirinto. |
+| [RF06](RF.md#rf-declarados) | Transmitir dados | Enviar os dados coletados pelos sensores e sistema de bordo para a central de controle. |
+| [RF07](RF.md#rf-declarados) | Fazer giro completo | Executar a rotação controlada de retorno (giro completo/180°) no próprio eixo. |
+| [RF08](RF.md#rf-declarados) | Andar para frente | Executar o deslocamento linear para a frente ao longo das células do labirinto. |
+| [RF09](RF.md#rf-declarados) | Armazenar dados | Registrar e salvar localmente as informações operacionais coletadas durante a navegação. |
+| [RF10](RF.md#rf-declarados) | Garantir integridade | Assegurar que o robô se mantenha intacto no final do trajeto. |
+| [RF11](RF.md#rf-declarados) | Navegar labirinto | Executar os algoritmos de busca e tomada de decisão para percorrer autonomamente o labirinto. |
+| [RF12](RF.md#rf-declarados) | Realizar telemetria | Coletar e transmitir métricas de operação do sistema para acompanhamento contínuo. |
+| [RF13](RF.md#rf-declarados) | Garantir autonomia | Operar de forma 100% autônoma, sem necessidade de interferência humana externa durante o percurso. |
 
 ---
 
@@ -47,10 +47,10 @@ A tabela a seguir apresenta os Requisitos Funcionais essenciais selecionados par
 
 A tabela abaixo compõe as restrições técnicas, parâmetros elétricos e de desempenho que o MVP deve atender obrigatoriamente.
 
-| **ID** | **Requisito Não Funcionak** |
+| **ID** | **Requisito Não Funcional** |
 |:------:|---------------|
-| [RNF01](RNF.md#L13) | Os dados da execução devem ser armazenados de forma persistente para consultas posteriores. | 
-| [RNF02](RNF.md#L14) | A bateria deve ter uma capacidade suficiente para realizar $3$ trajetos ou $30\text{ minutos}$ de operação contínua. |
-| [RNF03](RNF.md#L15) | Deve ter uma bateria recarregável. |
-| [RNF04](RNF.md#L16) | O robô deve operar em corredores formados por células de $18\text{ cm}^2$. |
-| [RNF05](RNF.md#L17) | O sistema de controle de motores deve garantir que a velocidade e a frenagem impeçam o robô de colidir com as paredes com força suficiente para causar danos físicos à estrutura do labirinto. |
+| [RNF01](RNF.md#rnf-declarados) | Os dados da execução devem ser armazenados de forma persistente para consultas posteriores. |
+| [RNF02](RNF.md#rnf-declarados) | A bateria deve ter uma capacidade suficiente para realizar 3 trajetos ou 30 minutos de operação contínua. |
+| [RNF03](RNF.md#rnf-declarados) | Deve ter uma bateria recarregável. |
+| [RNF04](RNF.md#rnf-declarados) | O robô deve operar em corredores formados por células de 18 cm². |
+| [RNF05](RNF.md#rnf-declarados) | O sistema de controle de motores deve garantir que a velocidade e a frenagem impeçam o robô de colidir com as paredes com força suficiente para causar danos físicos à estrutura do labirinto. |
