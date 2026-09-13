@@ -1,12 +1,15 @@
 # Declaração de Requisitos
 
-A declaração de requisitos consiste no processo de identificação, análise e documentação das necessidades dos stakeholders para o desenvolvimento da solução proposta.
+A declaração de requisitos compreende o processo formal de identificação, elicitação, análise e documentação das necessidades, restrições e expectativas dos *stakeholders* para a concepção da solução robótica **MicroMouse**.
 
-Os requisitos apresentados nesta página foram levantados a partir das discuções com o Orientador do Projeto ( Professor Lui ), análise do contexto do projeto Micromouse e discussões conduzidas pela equipe ao longo do projeto.
+> **Origem dos Requisitos:**  
+> Os requisitos mapeados nesta seção foram formulados a partir de reuniões periódicas e alinhamentos com o orientador do projeto, **Prof. Lui**, aliados à análise técnica do domínio do ecossistema MicroMouse e discussões internas conduzidas pela equipe de desenvolvimento.
 
-Os requisitos foram divididos em duas categorias principais:
+---
 
-- Requisitos Funcionais (RF);
-- Requisitos Não Funcionais (RNF).
+## Categorização dos Requisitos
 
-Os requisitos funcionais descrevem os serviços e funcionalidades que o sistema deverá oferecer aos usuários. Já os requisitos não funcionais representam restrições, características de qualidade e critérios relacionados ao funcionamento da aplicação.
+Para garantir o rastreamento adequado e a priorização contínua durante o ciclo de desenvolvimento, os requisitos foram categorizados em duas frentes fundamentais:
+
+* **Requisitos Funcionais (RF):** Definem os comportamentos observáveis, operações e serviços diretos que o robô e suas interfaces de suporte devem executar (o *que* o sistema faz).
+* **Requisitos Não Funcionais (RNF):** Estabelecem os critérios de qualidade, restrições de *hardware*, parâmetros operacionais, métricas de desempenho e conformidades técnicas exigidas (como o sistema *deve operar*).

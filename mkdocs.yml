@@ -8,7 +8,10 @@ site_url: https://fcte-pi1.github.io/2026.2_PI1_Grupo2_Lui/
 nav:
   - Home: README.md
   - 1 - TAP: 1 - TAP.md
-  - 2 - Requisitos: 2 - Requisitos.md
+  - 2 - Requisitos:
+    - Declaração de Requisitos: 2 - Requisitos/Requisitos.md
+    - Requisitos Funcionais: 2 - Requisitos/RF.md
+    - Requisitos Não Funcionais: 2 - Requisitos/RNF.md
   - 3 - EAP: 3 - EAP.md
   - 4 - Projetos Conceituais:
       - Estruturas: 4.1 - Projeto conceitual de estruturas.md
