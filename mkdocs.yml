@@ -12,6 +12,8 @@ nav:
     - Declaração de Requisitos: 2 - Requisitos/Requisitos.md
     - Requisitos Funcionais: 2 - Requisitos/RF.md
     - Requisitos Não Funcionais: 2 - Requisitos/RNF.md
+    - MVP: 2 - Requisitos/MVP.md
+    - Matriz de Rastrabilidade: 2 - Requisitos/Matriz de Rastreabilidade.md
   - 3 - EAP: 3 - EAP.md
   - 4 - Projetos Conceituais:
       - Estruturas: 4.1 - Projeto conceitual de estruturas.md

@@ -16,19 +16,19 @@ Para manter a clareza e o padrão técnico, a declaração de um Requisito Funci
 
 | **ID** | **Nome do Requisito** | **Descrição** | **Prioridade** | **Responsáveis** | **Link Github Projects** |
 |:------:|------------------------|---------------|:--------------:|------------------|--------------------------|
-| **RF01** | Mapear Labirinto | Realizar o mapeamento contínuo da estrutura do labirinto à medida que o robô se desloca. | MustHave |  | - |
-| **RF02** | Exibir dados do Labirinto | Apresentar em interface os dados estruturais e o mapa gerado do labirinto. | MustHave |  | - |
-| **RF03** | Exibir dados do MicroMouse | Exibir em tempo real as informações de status, parâmetros e estado do robô MicroMouse. | MustHave |  | - |
-| **RF04** | Identificar Paredes | Detectar a presença e a proximidade de paredes adjacentes ao robô. | MustHave |  | - |
-| **RF05** | Monitorar Localização | Acompanhar e atualizar a posição exata do robô dentro da grade do labirinto. | MustHave |  | - |
-| **RF06** | Transmitir dados | Enviar os dados coletados pelos sensores e sistema de bordo para a central de controle. | MustHave |  | - |
-| **RF07** | Fazer giro completo | Executar a rotação controlada de retorno (giro completo/180°) no próprio eixo. | MustHave |  | - |
-| **RF08** | Andar para frente | Executar o deslocamento linear para a frente ao longo das células do labirinto. | MustHave |  | - |
-| **RF09** | Armazenar dados | Registrar e salvar localmente as informações operacionais coletadas durante a navegação. | MustHave |  | - |
-| **RF10** | Garantir integridade | Assegurar que o robô se mantenha intacto no final do trajeto. | MustHave |  | - |
-| **RF11** | Navegar labirinto | Executar os algoritmos de busca e tomada de decisão para percorrer autonomamente o labirinto. | MustHave |  | - |
-| **RF12** | Realizar telemetria | Coletar e transmitir métricas de operação do sistema para acompanhamento contínuo. | MustHave |  | - |
-| **RF13** | Garantir autonomia | Operar de forma 100% autônoma, sem necessidade de interferência humana externa durante o percurso. | MustHave |  | - |
+| **RF01** | Mapear Labirinto | Realizar o mapeamento contínuo da estrutura do labirinto à medida que o robô se desloca. | Must Have |  | - |
+| **RF02** | Exibir dados do Labirinto | Apresentar em interface os dados estruturais e o mapa gerado do labirinto. | Must Have |  | - |
+| **RF03** | Exibir dados do MicroMouse | Exibir em tempo real as informações de status, parâmetros e estado do robô MicroMouse. | Must Have |  | - |
+| **RF04** | Identificar Paredes | Detectar a presença e a proximidade de paredes adjacentes ao robô. | Must Have |  | - |
+| **RF05** | Monitorar Localização | Acompanhar e atualizar a posição exata do robô dentro da grade do labirinto. | Must Have |  | - |
+| **RF06** | Transmitir dados | Enviar os dados coletados pelos sensores e sistema de bordo para a central de controle. | Must Have |  | - |
+| **RF07** | Fazer giro completo | Executar a rotação controlada de retorno (giro completo/180°) no próprio eixo. | Must Have |  | - |
+| **RF08** | Andar para frente | Executar o deslocamento linear para a frente ao longo das células do labirinto. | Must Have |  | - |
+| **RF09** | Armazenar dados | Registrar e salvar localmente as informações operacionais coletadas durante a navegação. | Must Have |  | - |
+| **RF10** | Garantir integridade | Assegurar que o robô se mantenha intacto no final do trajeto. | Must Have |  | - |
+| **RF11** | Navegar labirinto | Executar os algoritmos de busca e tomada de decisão para percorrer autonomamente o labirinto. | Must Have |  | - |
+| **RF12** | Realizar telemetria | Coletar e transmitir métricas de operação do sistema para acompanhamento contínuo. | Must Have |  | - |
+| **RF13** | Garantir autonomia | Operar de forma 100% autônoma, sem necessidade de interferência humana externa durante o percurso. | Must Have |  | - |
 | **RF14** | Reconhecer Linha de Chegada | Identificar o momento exato de cruzamento ou chegada no objetivo/centro do labirinto. | ShouldHave |  | - |
 | **RF15** | Andar para trás | Executar a movimentação em marcha à ré. | ShouldHave |  | - |
 | **RF16** | Registrar Logs | Manter histórico ordenado de eventos, erros e diagnósticos do sistema. | ShouldHave |  | - |
