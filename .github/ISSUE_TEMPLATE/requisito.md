@@ -15,5 +15,5 @@ assignees: ''
 
 ---
 
-### 📝 Descrição
+### Descrição
 > Descreva de forma detalhada o que o requisito deve realizar ou garantir no sistema.
