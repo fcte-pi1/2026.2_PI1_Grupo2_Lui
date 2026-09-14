@@ -2,14 +2,6 @@
 
 Requisitos Funcionais definem as comportamentos observáveis, funcionalidades e ações diretas que o sistema deve executar. Em suma, representam o que o projeto deve fazer para atender às necessidades dos usuários e do negócio
 
-## Diretrizes de Escrita
-
-Para manter a clareza e o padrão técnico, a declaração de um Requisito Funcional deve iniciar preferencialmente com um verbo no infinitivo.
-
-## Estrutura Padrão
-
-[Verbo no Infinitivo] + [Objeto]
-
 ---
 
 ## RF Declarados
@@ -25,11 +17,10 @@ Para manter a clareza e o padrão técnico, a declaração de um Requisito Funci
 | **RF07** | Fazer giro completo | Executar a rotação controlada de retorno (giro completo/180°) no próprio eixo. | Must Have |  | - |
 | **RF08** | Andar para frente | Executar o deslocamento linear para a frente ao longo das células do labirinto. | Must Have |  | - |
 | **RF09** | Armazenar dados | Registrar e salvar localmente as informações operacionais coletadas durante a navegação. | Must Have |  | - |
-| **RF10** | Garantir integridade | Assegurar que o robô se mantenha intacto no final do trajeto. | Must Have |  | - |
-| **RF11** | Navegar labirinto | Executar os algoritmos de busca e tomada de decisão para percorrer autonomamente o labirinto. | Must Have |  | - |
-| **RF12** | Realizar telemetria | Coletar e transmitir métricas de operação do sistema para acompanhamento contínuo. | Must Have |  | - |
-| **RF13** | Garantir autonomia | Operar de forma 100% autônoma, sem necessidade de interferência humana externa durante o percurso. | Must Have |  | - |
-| **RF14** | Reconhecer Linha de Chegada | Identificar o momento exato de cruzamento ou chegada no objetivo/centro do labirinto. | ShouldHave |  | - |
-| **RF15** | Andar para trás | Executar a movimentação em marcha à ré. | ShouldHave |  | - |
-| **RF16** | Registrar Logs | Manter histórico ordenado de eventos, erros e diagnósticos do sistema. | ShouldHave |  | - |
-| **RF17** | Interromper motores | Cessar imediatamente a alimentação dos motores em caso de conclusão, parada ou falha. | ShouldHave |  | - |
+| **RF10** | Navegar labirinto | Executar os algoritmos de busca e tomada de decisão para percorrer autonomamente o labirinto. | Must Have |  | - |
+| **RF11** | Realizar telemetria | Coletar e transmitir métricas de operação do sistema para acompanhamento contínuo. | Must Have |  | - |
+
+| **RF12** | Reconhecer Linha de Chegada | Identificar o momento exato de cruzamento ou chegada no objetivo/centro do labirinto. | Should Have |  | - |
+| **RF13** | Andar para trás | Executar a movimentação em marcha à ré. | Should Have |  | - |
+| **RF14** | Registrar eventos | Manter histórico ordenado de eventos, erros e diagnósticos do sistema. | Should Have |  | - |
+| **RF15** | Interromper motores | Cessar imediatamente a alimentação dos motores em caso de conclusão, parada ou falha. | Should Have |  | - |

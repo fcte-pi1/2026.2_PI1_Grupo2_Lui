@@ -1,6 +1,6 @@
 # Declaração de Requisitos
 
-A declaração de requisitos compreende o processo formal de identificação, elicitação, análise e documentação das necessidades, restrições e expectativas dos *stakeholders* para a concepção da solução robótica **MicroMouse**.
+A declaração de requisitos é o processo formal compreendido por identificação, elicitação, análise e documentação de necessidades, restrições e expectativas dos *stakeholders*. Neste escopo, sendo utilizado para a concepção da solução robótica **MicroMouse**.
 
 > **Origem dos Requisitos:**  
 > Os requisitos mapeados nesta seção foram formulados a partir de reuniões periódicas e alinhamentos com o orientador do projeto, **Prof. Lui**, aliados à análise técnica do domínio do ecossistema MicroMouse e discussões internas conduzidas pela equipe de desenvolvimento.
@@ -18,12 +18,12 @@ Para garantir o rastreamento adequado e a priorização contínua durante o cicl
 
 ## Metodologia de Priorização: MoSCoW
 
-A priorização dos requisitos mapeados adota a técnica **MoSCoW**, uma estrutura amplamente empregada no gerenciamento ágil de projetos para alinhar expectativas, otimizar a alocação de recursos e gerenciar o escopo de entrega da solução robótica. 
+A priorização dos requisitos mapeados adota a técnica **MoSCoW**, uma metodologia amplamente empregada no gerenciamento ágil de projetos para alinhar expectativas, otimizar a alocação de recursos e gerenciar o escopo de entrega da solução robótica. 
 
 A sigla **MoSCoW** representa quatro categorias distintas de prioridade:
 
 ### 1. **Must Have** 
-São os requisitos **críticos e vitais** para a operação mínima viável do robô MicroMouse. Sem a implementação de um requisito *Must Have*, o projeto é considerado inviável ou incapaz de cumprir seu propósito básico.
+São os requisitos **críticos e vitais** para a operação mínima viável do robô MicroMouse. Sem a implementação total de requisitos categorizados como *Must Have*, o projeto é considerado incompleto ou incapaz de cumprir seu propósito básico.
 * **Impacto da ausência:** O robô não funciona ou a entrega falha completamente.
 
 ### 2. **Should Have** 

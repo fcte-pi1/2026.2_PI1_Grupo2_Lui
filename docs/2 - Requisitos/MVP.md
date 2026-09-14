@@ -6,7 +6,7 @@ Este documento descreve a conceituação, os critérios de inclusão e o conjunt
 
 ## O que é o MVP?
 
-O **MVP** é a versão mais enxuta de um produto que reúne o conjunto fundamental de funcionalidades necessárias para validar sua proposta de valor principal. No contexto da engenharia e da robótica do **MicroMouse**, o MVP representa o protótipo funcional capaz de percorrer e resolver o labirinto de forma autônoma, garantindo a coleta de dados e operando sob as restrições essenciais de *hardware* e segurança.
+O **MVP** é a versão básica de um produto que reúne o conjunto fundamental de funcionalidades necessárias para validar sua proposta de valor principal. No contexto da engenharia e da robótica do **MicroMouse**, o MVP representa o protótipo funcional capaz de percorrer e resolver o labirinto de forma autônoma, garantindo a coleta de dados e operando sob as restrições essenciais de *hardware* e segurança.
 
 O objetivo do MVP não é entregar a solução final com todas as otimizações possíveis, mas sim garantir uma base estável, testável e operacional para validações em cenários reais.
 
@@ -36,10 +36,8 @@ A tabela a seguir apresenta os Requisitos Funcionais essenciais selecionados par
 | [RF07](RF.md#rf-declarados) | Fazer giro completo | Executar a rotação controlada de retorno (giro completo/180°) no próprio eixo. |
 | [RF08](RF.md#rf-declarados) | Andar para frente | Executar o deslocamento linear para a frente ao longo das células do labirinto. |
 | [RF09](RF.md#rf-declarados) | Armazenar dados | Registrar e salvar localmente as informações operacionais coletadas durante a navegação. |
-| [RF10](RF.md#rf-declarados) | Garantir integridade | Assegurar que o robô se mantenha intacto no final do trajeto. |
-| [RF11](RF.md#rf-declarados) | Navegar labirinto | Executar os algoritmos de busca e tomada de decisão para percorrer autonomamente o labirinto. |
-| [RF12](RF.md#rf-declarados) | Realizar telemetria | Coletar e transmitir métricas de operação do sistema para acompanhamento contínuo. |
-| [RF13](RF.md#rf-declarados) | Garantir autonomia | Operar de forma 100% autônoma, sem necessidade de interferência humana externa durante o percurso. |
+| [RF10](RF.md#rf-declarados) | Navegar labirinto | Executar os algoritmos de busca e tomada de decisão para percorrer autonomamente o labirinto. |
+| [RF11](RF.md#rf-declarados) | Realizar telemetria | Coletar e transmitir métricas de operação do sistema para acompanhamento contínuo. |
 
 ---
 
@@ -49,8 +47,9 @@ A tabela abaixo compõe as restrições técnicas, parâmetros elétricos e de d
 
 | **ID** | **Requisito Não Funcional** |
 |:------:|---------------|
-| [RNF01](RNF.md#rnf-declarados) | Os dados da execução devem ser armazenados de forma persistente para consultas posteriores. |
-| [RNF02](RNF.md#rnf-declarados) | A bateria deve ter uma capacidade suficiente para realizar 3 trajetos ou 30 minutos de operação contínua. |
-| [RNF03](RNF.md#rnf-declarados) | Deve ter uma bateria recarregável. |
-| [RNF04](RNF.md#rnf-declarados) | O robô deve operar em corredores formados por células de 18 cm². |
-| [RNF05](RNF.md#rnf-declarados) | O sistema de controle de motores deve garantir que a velocidade e a frenagem impeçam o robô de colidir com as paredes com força suficiente para causar danos físicos à estrutura do labirinto. |
+| [RNF01](RNF.md#rnf-declarados) | Armmazenar os dados da execução de forma persistente para consultas posteriores. |
+| [RNF02](RNF.md#rnf-declarados) | Garantir que a bateria tenha capacidade suficiente para realizar 3 trajetos ou 30 minutos de operação contínua. |
+| [RNF03](RNF.md#rnf-declarados) | Possuir bateria recarregável. |
+| [RNF04](RNF.md#rnf-declarados) | Operar o robô em corredores formados por células de 18 cm². |
+| [RNF05](RNF.md#rnf-declarados) | Garantir por meio do sistema de controle de motores que a velocidade e a frenagem impeçam o robô de colidir com as paredes com força suficiente para causar danos físicos à estrutura do labirinto. |
+| [RNF06](RNF.md#rnf-declarados) | Assegurar que o robô se mantenha intacto no final do trajeto. |
