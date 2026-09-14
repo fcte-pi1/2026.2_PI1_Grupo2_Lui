@@ -19,7 +19,6 @@ Requisitos Funcionais definem as comportamentos observáveis, funcionalidades e 
 | **RF09** | Armazenar dados | Registrar e salvar localmente as informações operacionais coletadas durante a navegação. | Must Have |  | - |
 | **RF10** | Navegar labirinto | Executar os algoritmos de busca e tomada de decisão para percorrer autonomamente o labirinto. | Must Have |  | - |
 | **RF11** | Realizar telemetria | Coletar e transmitir métricas de operação do sistema para acompanhamento contínuo. | Must Have |  | - |
-
 | **RF12** | Reconhecer Linha de Chegada | Identificar o momento exato de cruzamento ou chegada no objetivo/centro do labirinto. | Should Have |  | - |
 | **RF13** | Andar para trás | Executar a movimentação em marcha à ré. | Should Have |  | - |
 | **RF14** | Registrar eventos | Manter histórico ordenado de eventos, erros e diagnósticos do sistema. | Should Have |  | - |
