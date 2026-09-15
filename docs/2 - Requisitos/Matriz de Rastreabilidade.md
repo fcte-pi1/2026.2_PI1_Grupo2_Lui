@@ -20,7 +20,7 @@ Aqui está a coleção de fotos detalhadas da matriz de rastreabilidade que fize
 
 ### MoSCoW
 
-![Requisitos Funcionais](../figs/Requisitos/MoSCoW.png)
+![Requisitos Funcionais](../figs/Requisitos/Moscow.png)
 
 ### Must Have
 
