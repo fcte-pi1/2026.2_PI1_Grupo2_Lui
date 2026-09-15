@@ -47,7 +47,7 @@ A tabela abaixo compõe as restrições técnicas, parâmetros elétricos e de d
 
 | **ID** | **Requisito Não Funcional** |
 |:------:|---------------|
-| [RNF01](RNF.md#rnf-declarados) | Armmazenar os dados da execução de forma persistente para consultas posteriores. |
+| [RNF01](RNF.md#rnf-declarados) | Armazenar os dados da execução de forma persistente para consultas posteriores. |
 | [RNF02](RNF.md#rnf-declarados) | Garantir que a bateria tenha capacidade suficiente para realizar 3 trajetos ou 30 minutos de operação contínua. |
 | [RNF03](RNF.md#rnf-declarados) | Possuir bateria recarregável. |
 | [RNF04](RNF.md#rnf-declarados) | Operar o robô em corredores formados por células de 18 cm². |

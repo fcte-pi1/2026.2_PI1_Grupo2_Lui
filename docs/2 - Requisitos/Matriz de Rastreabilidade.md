@@ -8,7 +8,7 @@ Este documento consolida o painel interativo do Figma e a galeria de evidências
 
 ## Painel de Fotos
 
-Aqui esta a colecao de fotos detalhadas da matriz de Rastreabilidade que fizemos no figma para que facilite a vizualizacão
+Aqui está a coleção de fotos detalhadas da matriz de rastreabilidade que fizemos no Figma para que facilite a visualização
 
 ### Requisitos Funcionais
 
@@ -18,9 +18,9 @@ Aqui esta a colecao de fotos detalhadas da matriz de Rastreabilidade que fizemos
 
 ![Requisitos Funcionais](../figs/Requisitos/Requisito%20Não%20Funcional.png)
 
-### Moscow
+### MoSCoW
 
-![Requisitos Funcionais](../figs/Requisitos/Moscow.png)
+![Requisitos Funcionais](../figs/Requisitos/MoSCoW.png)
 
 ### Must Have
 
