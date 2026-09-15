@@ -1,8 +1,8 @@
 ---
 name: "Issue Generica"
-about: 
+about: "Descrição curta do modelo de issue"
 title: 'X.Y Titulo'
-labels: 
+labels: ''
 assignees: ''
 ---
 
