@@ -8,7 +8,7 @@ Este documento consolida o painel interativo do Figma e a galeria de evidências
 
 ## Painel de Fotos
 
-Aqui está a coleção de fotos detalhadas da matriz de rastreabilidade que fizemos no Figma para que facilite a visualização
+Aqui está a coleção de fotos detalhadas da matriz de rastreabilidade que fizemos no Figma para que facilite a visualização.
 
 ### Requisitos Funcionais
 
