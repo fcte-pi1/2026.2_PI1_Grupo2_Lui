@@ -45,11 +45,11 @@ A tabela a seguir apresenta os Requisitos Funcionais essenciais selecionados par
 
 A tabela abaixo compõe as restrições técnicas, parâmetros elétricos e de desempenho que o MVP deve atender obrigatoriamente.
 
-| **ID** | **Requisito Não Funcional** |
-|:------:|---------------|
-| [RNF01](RNF.md#rnf-declarados) | Armazenar os dados da execução de forma persistente para consultas posteriores. |
-| [RNF02](RNF.md#rnf-declarados) | Garantir que a bateria tenha capacidade suficiente para realizar 3 trajetos ou 30 minutos de operação contínua. |
-| [RNF03](RNF.md#rnf-declarados) | Possuir bateria recarregável. |
-| [RNF04](RNF.md#rnf-declarados) | Operar o robô em corredores formados por células de 18 cm². |
-| [RNF05](RNF.md#rnf-declarados) | Garantir por meio do sistema de controle de motores que a velocidade e a frenagem impeçam o robô de colidir com as paredes com força suficiente para causar danos físicos à estrutura do labirinto. |
-| [RNF06](RNF.md#rnf-declarados) | Assegurar que o robô se mantenha intacto no final do trajeto. |
+| **ID** | **Nome do Requisito Não Funcional** | **Descrição** |
+|:------:|--------------------------------------|---------------|
+| [RNF01](RNF.md#rnf-declarados) | Persistência de Dados Operacionais | Armazenar os dados da execução de forma persistente para consultas posteriores. |
+| [RNF02](RNF.md#rnf-declarados) | Autonomia da Bateria | Garantir que a bateria tenha capacidade suficiente para realizar 3 trajetos ou 30 minutos de operação contínua. |
+| [RNF03](RNF.md#rnf-declarados) | Fonte de Energia Recarregável | Possuir bateria recarregável. |
+| [RNF04](RNF.md#rnf-declarados) | Compatibilidade de Dimensão Mecânica | Operar o robô em corredores formados por células de 18 cm². |
+| [RNF05](RNF.md#rnf-declarados) | Tolerância a Colisão e Controle Impacto | Garantir por meio do sistema de controle de motores que a velocidade e a frenagem impeçam o robô de colidir com as paredes com força suficiente para causar danos físicos à estrutura do labirinto. |
+| [RNF06](RNF.md#rnf-declarados) | Integridade Estrutural | Assegurar que o robô se mantenha intacto no final do trajeto. |

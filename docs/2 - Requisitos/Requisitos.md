@@ -24,16 +24,20 @@ A sigla **MoSCoW** representa quatro categorias distintas de prioridade:
 
 ### 1. **Must Have** 
 São os requisitos **críticos e vitais** para a operação mínima viável do robô MicroMouse. Sem a implementação total de requisitos categorizados como *Must Have*, o projeto é considerado incompleto ou incapaz de cumprir seu propósito básico.
+
 * **Impacto da ausência:** O robô não funciona ou a entrega falha completamente.
 
 ### 2. **Should Have** 
 Representam requisitos de **alta relevância** que agregam grande valor à solução, mas cuja ausência na primeira versão não impede completamente o funcionamento básico do robô. Podem existir soluções de contorno temporárias caso sua implementação precise ser postergada.
+
 * **Impacto da ausência:** A eficiência, precisão ou usabilidade do sistema é reduzida, mas a solução continua operacional.
 
 ### 3. **Could Have** 
 São requisitos **complementares ou diferenciais**, frequentemente categorizados como melhorias técnicas ou funcionalidades secundárias. Eles só serão desenvolvidos caso os requisitos *Must Have* e *Should Have* já estejam estabilizados e haja disponibilidade de tempo, orçamento e recursos.
+
 * **Impacto da ausência:** Nenhum impacto crítico no desempenho principal do robô; afeta apenas funcionalidades extras ou estéticas.
 
 ### 4. **Won't Have (this time)** 
 Trata-se de requisitos identificados e analisados, mas formalmente acordados como **fora do escopo** para o ciclo atual de desenvolvimento ou competição. Eles permanecem documentados no *backlog* para reavaliação em iterações ou gerações futuras do MicroMouse.
+
 * **Impacto da ausência:** Permite que a equipe mantenha o foco no escopo viável e respeite os prazos do projeto.
