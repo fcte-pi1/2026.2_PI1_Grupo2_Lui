@@ -1,0 +1,2918 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://fcte-pi1.github.io/2026.2_PI1_Grupo2_Lui/4.4%20-%20Projeto%20conceitual%20de%20software/">
+      
+      
+        <link rel="prev" href="../4.3%20-%20Projeto%20conceitual%20de%20hardware/">
+      
+      
+        <link rel="next" href="../5%20-%20Cronograma/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Software - Projeto PI1 - Grupo 2 (Lui)</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#projeto-conceitual-de-software" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Projeto PI1 - Grupo 2 (Lui)" class="md-header__button md-logo" aria-label="Projeto PI1 - Grupo 2 (Lui)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Projeto PI1 - Grupo 2 (Lui)
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Software
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green"  aria-label="Modo Noturno"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Modo Noturno" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="green" data-md-color-accent="green"  aria-label="Modo Claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Modo Claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    2026.2_PI1_Grupo2_Lui
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../1%20-%20TAP/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  1 - TAP
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../2%20-%20Requisitos/Requisitos/" class="md-tabs__link">
+          
+  
+  
+  2 - Requisitos
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../3%20-%20EAP/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  3 - EAP
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../4.1%20-%20Projeto%20conceitual%20de%20estruturas/" class="md-tabs__link">
+          
+  
+  
+  4 - Projetos Conceituais
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../5%20-%20Cronograma/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  5 - Cronograma
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../6%20-%20Or%C3%A7amento/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  6 - Orçamento
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../7.1%20-%20Testes%20de%20estrutura/" class="md-tabs__link">
+          
+  
+  
+  7 - Testes
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../8%20-%20Avalia%C3%A7%C3%A3o%20de%20desempenho/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  8 - Avaliação de Desempenho
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../9%20-%20Relat%C3%B3rio%20de%20encerramento%20do%20projeto/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  9 - Relatório de Encerramento
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Projeto PI1 - Grupo 2 (Lui)" class="md-nav__button md-logo" aria-label="Projeto PI1 - Grupo 2 (Lui)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Projeto PI1 - Grupo 2 (Lui)
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    2026.2_PI1_Grupo2_Lui
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../1%20-%20TAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 - TAP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 - Requisitos
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    2 - Requisitos
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2%20-%20Requisitos/Requisitos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Declaração de Requisitos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2%20-%20Requisitos/RF/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requisitos Funcionais
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2%20-%20Requisitos/RNF/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requisitos Não Funcionais
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2%20-%20Requisitos/MVP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MVP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2%20-%20Requisitos/Matriz%20de%20Rastreabilidade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Matriz de Rastrabilidade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3%20-%20EAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3 - EAP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4 - Projetos Conceituais
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    4 - Projetos Conceituais
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4.1%20-%20Projeto%20conceitual%20de%20estruturas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Estruturas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4.2%20-%20Projeto%20conceitual%20de%20energia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Energia
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4.3%20-%20Projeto%20conceitual%20de%20hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Software
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Software
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#diagrama-de-atividades" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagrama de Atividades
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#diagrama-de-atividades-no-figma" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagrama de Atividades no Figma
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Diagrama de Atividades no Figma">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requisitos-funcionais" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requisitos Funcionais
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rf01epico-01-mapear-labirinto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RF01/Épico-01: Mapear Labirinto
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RF01/Épico-01: Mapear Labirinto">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hu-00-construcao-continua-do-mapa-interno-do-labirinto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HU-00 — Construção contínua do mapa interno do labirinto
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rf02epico-02-exibir-dados-do-labirinto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RF02/Épico-02: Exibir dados do Labirinto
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RF02/Épico-02: Exibir dados do Labirinto">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hu-01-visualizacao-do-mapa-do-labirinto-em-tempo-real" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HU-01 — Visualização do mapa do labirinto em tempo real
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hu-02-consulta-historica-do-mapa-por-labirinto-ou-por-todos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HU-02 — Consulta histórica do mapa por labirinto ou por todos
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rf03epico-03-exibir-dados-do-micromouse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RF03/Épico-03: Exibir dados do MicroMouse
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RF03/Épico-03: Exibir dados do MicroMouse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hu-03-painel-de-status-do-micromouse-em-tempo-real" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HU-03 — Painel de status do MicroMouse em tempo real
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hu-04-consulta-historica-de-desempenho-do-micromouse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HU-04 — Consulta histórica de desempenho do MicroMouse
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rf04epico-04-identificar-paredes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RF04/Épico-04: Identificar Paredes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RF04/Épico-04: Identificar Paredes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hu-05-deteccao-de-paredes-adjacentes-por-sensores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HU-05 — Detecção de paredes adjacentes por sensores
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rf05epico-05-monitorar-localizacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RF05/Épico-05: Monitorar Localização
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RF05/Épico-05: Monitorar Localização">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hu-06-rastreamento-da-posicao-do-robo-na-grade" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HU-06 — Rastreamento da posição do robô na grade
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rf06epico-06-transmitir-dados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RF06/Épico-06: Transmitir dados
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RF06/Épico-06: Transmitir dados">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hu-07-envio-continuo-de-dados-do-robo-para-a-central-de-controle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HU-07 — Envio contínuo de dados do robô para a central de controle
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rf07epico-07-fazer-giro-completo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RF07/Épico-07: Fazer giro completo
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RF07/Épico-07: Fazer giro completo">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hu-08-execucao-de-giro-de-180-para-retorno" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HU-08 — Execução de giro de 180° para retorno
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rf08epico-08-andar-para-frente" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RF08/Épico-08: Andar para frente
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RF08/Épico-08: Andar para frente">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hu-09-deslocamento-linear-entre-celulas-adjacentes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HU-09 — Deslocamento linear entre células adjacentes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rf09epico-09-armazenar-dados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RF09/Épico-09: Armazenar dados
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RF09/Épico-09: Armazenar dados">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hu-10-registro-local-de-dados-operacionais-a-bordo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HU-10 — Registro local de dados operacionais a bordo
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rf10epico-10-navegar-labirinto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RF10/Épico-10: Navegar labirinto
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RF10/Épico-10: Navegar labirinto">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hu-11-resolucao-autonoma-do-labirinto-ate-o-objetivo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HU-11 — Resolução autônoma do labirinto até o objetivo
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rf11epico-11-realizar-telemetria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RF11/Épico-11: Realizar telemetria
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RF11/Épico-11: Realizar telemetria">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hu-12-coleta-e-transmissao-continua-de-metricas-de-operacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HU-12 — Coleta e transmissão contínua de métricas de operação
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-requisitos-nao-funcionais" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Requisitos Não-Funcionais
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5%20-%20Cronograma/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 - Cronograma
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../6%20-%20Or%C3%A7amento/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 - Orçamento
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7 - Testes
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    7 - Testes
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7.1%20-%20Testes%20de%20estrutura/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Estrutura
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7.2%20-%20Testes%20de%20energia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Energia
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7.3%20-%20Testes%20de%20hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7.4%20-%20Testes%20de%20software/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Software
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7.5%20-%20Testes%20de%20integra%C3%A7%C3%A3o/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integração
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../8%20-%20Avalia%C3%A7%C3%A3o%20de%20desempenho/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8 - Avaliação de Desempenho
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../9%20-%20Relat%C3%B3rio%20de%20encerramento%20do%20projeto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 - Relatório de Encerramento
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#diagrama-de-atividades" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagrama de Atividades
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#diagrama-de-atividades-no-figma" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagrama de Atividades no Figma
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Diagrama de Atividades no Figma">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requisitos-funcionais" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requisitos Funcionais
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rf01epico-01-mapear-labirinto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RF01/Épico-01: Mapear Labirinto
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RF01/Épico-01: Mapear Labirinto">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hu-00-construcao-continua-do-mapa-interno-do-labirinto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HU-00 — Construção contínua do mapa interno do labirinto
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rf02epico-02-exibir-dados-do-labirinto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RF02/Épico-02: Exibir dados do Labirinto
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RF02/Épico-02: Exibir dados do Labirinto">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hu-01-visualizacao-do-mapa-do-labirinto-em-tempo-real" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HU-01 — Visualização do mapa do labirinto em tempo real
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hu-02-consulta-historica-do-mapa-por-labirinto-ou-por-todos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HU-02 — Consulta histórica do mapa por labirinto ou por todos
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rf03epico-03-exibir-dados-do-micromouse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RF03/Épico-03: Exibir dados do MicroMouse
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RF03/Épico-03: Exibir dados do MicroMouse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hu-03-painel-de-status-do-micromouse-em-tempo-real" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HU-03 — Painel de status do MicroMouse em tempo real
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hu-04-consulta-historica-de-desempenho-do-micromouse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HU-04 — Consulta histórica de desempenho do MicroMouse
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rf04epico-04-identificar-paredes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RF04/Épico-04: Identificar Paredes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RF04/Épico-04: Identificar Paredes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hu-05-deteccao-de-paredes-adjacentes-por-sensores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HU-05 — Detecção de paredes adjacentes por sensores
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rf05epico-05-monitorar-localizacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RF05/Épico-05: Monitorar Localização
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RF05/Épico-05: Monitorar Localização">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hu-06-rastreamento-da-posicao-do-robo-na-grade" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HU-06 — Rastreamento da posição do robô na grade
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rf06epico-06-transmitir-dados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RF06/Épico-06: Transmitir dados
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RF06/Épico-06: Transmitir dados">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hu-07-envio-continuo-de-dados-do-robo-para-a-central-de-controle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HU-07 — Envio contínuo de dados do robô para a central de controle
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rf07epico-07-fazer-giro-completo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RF07/Épico-07: Fazer giro completo
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RF07/Épico-07: Fazer giro completo">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hu-08-execucao-de-giro-de-180-para-retorno" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HU-08 — Execução de giro de 180° para retorno
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rf08epico-08-andar-para-frente" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RF08/Épico-08: Andar para frente
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RF08/Épico-08: Andar para frente">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hu-09-deslocamento-linear-entre-celulas-adjacentes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HU-09 — Deslocamento linear entre células adjacentes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rf09epico-09-armazenar-dados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RF09/Épico-09: Armazenar dados
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RF09/Épico-09: Armazenar dados">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hu-10-registro-local-de-dados-operacionais-a-bordo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HU-10 — Registro local de dados operacionais a bordo
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rf10epico-10-navegar-labirinto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RF10/Épico-10: Navegar labirinto
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RF10/Épico-10: Navegar labirinto">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hu-11-resolucao-autonoma-do-labirinto-ate-o-objetivo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HU-11 — Resolução autônoma do labirinto até o objetivo
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rf11epico-11-realizar-telemetria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RF11/Épico-11: Realizar telemetria
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RF11/Épico-11: Realizar telemetria">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hu-12-coleta-e-transmissao-continua-de-metricas-de-operacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HU-12 — Coleta e transmissão contínua de métricas de operação
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-requisitos-nao-funcionais" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Requisitos Não-Funcionais
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="projeto-conceitual-de-software">Projeto Conceitual de Software<a class="headerlink" href="#projeto-conceitual-de-software" title="Permanent link">&para;</a></h1>
+<ul>
+<li><a href="https://drive.google.com/file/d/1WWIz6609c7Y7zAQRBWHSbX0t2vEJ2z1A/view?usp=sharing">Explicações adicionais</a></li>
+<li><a href="https://drive.google.com/file/d/1l1yt2ittHuRKIXVXYT76P1HriR07pK-t/view?usp=sharing">Noções de UML</a></li>
+<li><a href="https://engsoftmoderna.info/cap3.html">Requisitos</a></li>
+</ul>
+<h2 id="diagrama-de-atividades">Diagrama de Atividades<a class="headerlink" href="#diagrama-de-atividades" title="Permanent link">&para;</a></h2>
+<p>O diagrama abaixo descreve o fluxo de comportamento funcional do MicroMouse durante uma corrida,
+desde o início da execução até a chegada ao objetivo, evidenciando os três atores envolvidos
+(raias/<em>swimlanes</em>): o <strong>Robô</strong> (firmware embarcado), o <strong>Servidor</strong> (sistema web de telemetria +
+banco de dados) e o <strong>Usuário</strong> (que acompanha a corrida pelo dashboard).</p>
+<p><img alt="Diagrama de Atividades UML - Figma" src="../figs/Projeto_conceitual/PI1%20-%20Diagrama%20de%20Atividades.png" /></p>
+<h2 id="diagrama-de-atividades-no-figma">Diagrama de Atividades no Figma<a class="headerlink" href="#diagrama-de-atividades-no-figma" title="Permanent link">&para;</a></h2>
+<iframe style="border: 1px solid rgba(0, 0, 0, 0.1);" width="800" height="450" src="https://embed.figma.com/board/TayFIuY1BoFhklOIzuSOSx/PI1---Diagrama-de-Atividades?node-id=2-8&embed-host=share" allowfullscreen></iframe>
+
+<p><strong>Leitura do fluxo:</strong></p>
+<ul>
+<li><strong>Entradas:</strong> Leituras dos sensores de distância a cada célula percorrida e calibração inicial do sistema.</li>
+<li><strong>Atividades do Robô:</strong> Inicialização do sistema, mapeamento e atualização da localização do robô, decisão do próximo movimento e execução da navegação.</li>
+<li><strong>Ponto de decisão:</strong> "Atingiu a saída?" separa o ciclo de navegação e tomada de decisão da etapa de encerramento da corrida.</li>
+<li><strong>Sincronização e Paralelismo:</strong> A cada movimento executado, o robô dispara em segundo plano a transmissão de dados de telemetria para a Plataforma Web, mantendo o laço de navegação ativo de forma paralela.</li>
+<li><strong>Atividades da Plataforma Web:</strong> Recebimento dos pacotes de telemetria, salvamento dos dados no banco de dados e atualização da interface do dashboard em tempo real.</li>
+<li><strong>Atividades do Usuário:</strong> Acompanhamento da corrida ao vivo no dashboard e análise do relatório final de desempenho ao término do percurso.</li>
+<li><strong>Saídas:</strong> Dados da corrida armazenados localmente no MicroMouse, histórico completo persistido no banco de dados e relatório exibido no dashboard web.</li>
+</ul>
+<blockquote>
+<p><strong>Itens fundamentais:</strong></p>
+<ul>
+<li><strong>Diagrama Atividades UML:</strong> descrever e explicar o fluxo do comportamento funcional do produto proposto, evidenciando, de forma clara e estruturada, como as atividades são executadas, em que ordem e sob quais condições. Esse diagrama permite compreender o funcionamento dinâmico do sistema, destacando:</li>
+<li>os principais atores (usuários ou sistemas externos) envolvidos no processo;</li>
+<li>as atividades de negócio realizadas por cada ator ou pelo próprio sistema;</li>
+<li>os insumos (entradas) necessários para a execução das atividades;</li>
+<li>os resultados (saídas) gerados ao longo do fluxo;</li>
+<li>os pontos de decisão, paralelismo e sincronização das atividades;</li>
+<li>Entre as notações mais relevantes, destacam-se o estado inicial e final, atividades, nós de decisão e junção, barras de bifurcação, Raias (<em>swimlanes</em>) e Fluxos de controle.</li>
+<li><strong><em>Backlog</em> do Produto</strong></li>
+<li>Detalhar os requisitos funcionais (RF) com a técnica de documentação e especificação de história de usuário (HU);</li>
+<li>Protótipos de interface gráfica do <em>software</em> em alta fidelidade.<ul>
+<li><strong>Todas HUs devem conter sua descrição (Eu-Como-Para), critérios de aceitação e protótipos de interface, documentadas no github.</strong></li>
+</ul>
+</li>
+<li>Exporte as informações do Backlog do Produto no GitHub Projects <a href="https://docs.github.com/en/issues/planning-and-tracking-with-projects/managing-your-project/exporting-your-projects-data">em formato CSV</a>, e <a href="https://www.google.com/search?q=convert+CSV+file+to+Markdown+table">renderize em Markdown</a> no formato a seguir:</li>
+</ul>
+</blockquote>
+<h3 id="requisitos-funcionais">Requisitos Funcionais<a class="headerlink" href="#requisitos-funcionais" title="Permanent link">&para;</a></h3>
+<h3 id="rf01epico-01-mapear-labirinto">RF01/Épico-01: Mapear Labirinto<a class="headerlink" href="#rf01epico-01-mapear-labirinto" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">ID (Link Github Projects)</th>
+<th style="text-align: left;">Título</th>
+<th style="text-align: left;">Prioridade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">HU-00</td>
+<td style="text-align: left;">Construção contínua do mapa interno do labirinto</td>
+<td style="text-align: left;">Must</td>
+</tr>
+</tbody>
+</table>
+<h4 id="hu-00-construcao-continua-do-mapa-interno-do-labirinto">HU-00 — Construção contínua do mapa interno do labirinto<a class="headerlink" href="#hu-00-construcao-continua-do-mapa-interno-do-labirinto" title="Permanent link">&para;</a></h4>
+<p><strong>Eu, como</strong> Operador da Equipe,
+<strong>gostaria que</strong> o MicroMouse construa e atualize continuamente um mapa interno do labirinto à medida que se desloca,
+<strong>para que</strong> ele identifique caminhos livres, paredes e becos sem saída de forma autônoma, permitindo a navegação sem intervenção humana.</p>
+<p><strong>Critérios de aceitação:</strong>
+- Para cada célula visitada, o robô registra quais das 4 paredes foram identificadas (com base no RF04).
+- O mapa interno é atualizado célula a célula, em tempo real, sem necessidade de reiniciar a exploração.
+- Ao final do trajeto (com sucesso ou não), o mapa interno reflete corretamente a estrutura de paredes percebida pelos sensores até aquele ponto.
+- O mapa interno pode ser recuperado/consultado pelo sistema para ser transmitido e exibido no sistema web (RF02/RF06).</p>
+<p><strong>Protótipo de interface:</strong> Não se aplica. É processamento interno embarcado no MicroMouse, sem tela própria — o resultado (o mapa) é exibido pela interface descrita em RF02.</p>
+<hr />
+<h3 id="rf02epico-02-exibir-dados-do-labirinto">RF02/Épico-02: Exibir dados do Labirinto<a class="headerlink" href="#rf02epico-02-exibir-dados-do-labirinto" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">ID (Link Github Projects)</th>
+<th style="text-align: left;">Título</th>
+<th style="text-align: left;">Prioridade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">HU-01</td>
+<td style="text-align: left;">Visualização do mapa do labirinto em tempo real</td>
+<td style="text-align: left;">Should</td>
+</tr>
+<tr>
+<td style="text-align: left;">HU-02</td>
+<td style="text-align: left;">Consulta histórica do mapa por labirinto ou por todos</td>
+<td style="text-align: left;">Should</td>
+</tr>
+</tbody>
+</table>
+<h4 id="hu-01-visualizacao-do-mapa-do-labirinto-em-tempo-real">HU-01 — Visualização do mapa do labirinto em tempo real<a class="headerlink" href="#hu-01-visualizacao-do-mapa-do-labirinto-em-tempo-real" title="Permanent link">&para;</a></h4>
+<p><strong>Eu, como</strong> Operador da Equipe,
+<strong>gostaria de</strong> visualizar, em tempo real no sistema web, o mapa do labirinto sendo construído pelo MicroMouse durante a corrida,
+<strong>para que</strong> eu acompanhe visualmente o progresso da navegação e identifique rapidamente se o robô está com dificuldades.</p>
+<p><strong>Critérios de aceitação:</strong>
+- A tela exibe uma grade correspondente ao tipo de labirinto em disputa (4x4, 8x4 ou 12x4 células).
+- Paredes detectadas pelo robô aparecem no mapa conforme são identificadas, com latência máxima aceitável definida pela equipe (ex.: até 2 segundos).
+- A célula de início (canto de partida) e a célula de objetivo (canto diametralmente oposto) são destacadas visualmente e de forma diferenciada.
+- O trajeto já percorrido pelo robô é sobreposto ao mapa.
+- A tela indica claramente quando não há dados/conexão disponível (robô ainda não iniciou ou comunicação perdida).</p>
+<p><strong>Protótipo de interface (descrição textual):</strong>
+ <a href="">Tela</a> <strong>"Mapa do Labirinto"</strong>, componente central do sistema web. Cabeçalho com o tipo de labirinto ativo (ex.: "Labirinto 8x4") e um indicador de status "🟢 Ao vivo" / "🔴 Sem conexão". Corpo principal com a grade do labirinto renderizada dinamicamente célula a célula (linhas grossas simulando paredes brancas com topo vermelho, como no labirinto físico; piso escuro). A célula inicial é destacada em verde-claro e a célula de objetivo em rosa/vermelho-claro, reproduzindo as cores usadas nos slides do contrato. O trajeto percorrido é desenhado como uma linha pontilhada ou sequência de pontos sobre as células já visitadas. Uma legenda lateral explica as cores e símbolos usados. </p>
+<h4 id="hu-02-consulta-historica-do-mapa-por-labirinto-ou-por-todos">HU-02 — Consulta histórica do mapa por labirinto ou por todos<a class="headerlink" href="#hu-02-consulta-historica-do-mapa-por-labirinto-ou-por-todos" title="Permanent link">&para;</a></h4>
+<p><strong>Eu, como</strong> Integrante da Equipe (Analista),
+<strong>gostaria de</strong> consultar, após a conclusão de uma corrida, os dados estruturais e o mapa final de um labirinto específico ou de todos os labirintos já percorridos,
+<strong>para que</strong> eu possa analisar o desempenho de navegação do robô em execuções passadas.</p>
+<p><strong>Critérios de aceitação:</strong>
+- A tela lista as execuções/labirintos já persistidos no banco de dados (RNF01).
+- É possível filtrar/selecionar um labirinto específico (4x4, 8x4 ou 12x4) ou optar por visualizar todos.
+- O mapa final exibido corresponde exatamente aos dados persistidos ao final daquela execução.
+- Caso não existam execuções registradas, a tela informa isso de forma clara (estado vazio).</p>
+<p><strong>Protótipo de interface (descrição textual):</strong>
+<a href="">Tela</a> <strong>"Histórico de Labirintos"</strong>. No topo, um seletor (abas ou dropdown) com as opções "Todos / 4x4 / 8x4 / 12x4". Abaixo, uma lista/tabela de execuções, cada linha com data/hora, tipo de labirinto e resultado resumido (concluído/não concluído). Ao clicar em uma execução, abre o mapa final daquela corrida reutilizando o mesmo componente visual de grade da HU-01, porém em modo estático (sem indicador "ao vivo").</p>
+<hr />
+<h3 id="rf03epico-03-exibir-dados-do-micromouse">RF03/Épico-03: Exibir dados do MicroMouse<a class="headerlink" href="#rf03epico-03-exibir-dados-do-micromouse" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">ID (Link Github Projects)</th>
+<th style="text-align: left;">Título</th>
+<th style="text-align: left;">Prioridade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">HU-03</td>
+<td style="text-align: left;">Painel de status do MicroMouse em tempo real</td>
+<td style="text-align: left;">Should</td>
+</tr>
+<tr>
+<td style="text-align: left;">HU-04</td>
+<td style="text-align: left;">Consulta histórica de desempenho do MicroMouse</td>
+<td style="text-align: left;">Should</td>
+</tr>
+</tbody>
+</table>
+<h4 id="hu-03-painel-de-status-do-micromouse-em-tempo-real">HU-03 — Painel de status do MicroMouse em tempo real<a class="headerlink" href="#hu-03-painel-de-status-do-micromouse-em-tempo-real" title="Permanent link">&para;</a></h4>
+<p><strong>Eu, como</strong> Operador da Equipe,
+<strong>gostaria de</strong> visualizar, em tempo real no sistema web, os dados de status do MicroMouse (posição atual, velocidade, nível de bateria e tempo decorrido) durante a corrida,
+<strong>para que</strong> eu acompanhe o comportamento do robô e identifique rapidamente eventuais falhas ou mau funcionamento.</p>
+<p><strong>Critérios de aceitação:</strong>
+- O painel atualiza os valores em um intervalo curto e definido pela equipe (ex.: a cada 500 ms – 1 s).
+- São exibidos, no mínimo: posição atual (linha/coluna), velocidade instantânea e/ou média, percentual de bateria restante e tempo decorrido desde o início da corrida.
+- Há indicação visual clara (ex.: alerta) em caso de perda de comunicação com o robô (RF06).
+- Há indicação visual quando a bateria atinge níveis considerados críticos.</p>
+<p><strong>Protótipo de interface (descrição textual):</strong>
+<a href="">Painel</a> <strong>"Status do MicroMouse"</strong>, em formato de dashboard com cartões (cards): (1) indicador circular/barra de bateria (%), com cor mudando de verde → amarelo → vermelho conforme o nível cai; (2) velocímetro ou barra de velocidade atual; (3) cronômetro digital com o tempo decorrido; (4) indicador textual da posição atual (ex.: "C3"); (5) badge de status de conexão ("Conectado" / "Sem sinal"). O painel fica normalmente posicionado ao lado do mapa (HU-01), formando a tela principal de acompanhamento da corrida.</p>
+<h4 id="hu-04-consulta-historica-de-desempenho-do-micromouse">HU-04 — Consulta histórica de desempenho do MicroMouse<a class="headerlink" href="#hu-04-consulta-historica-de-desempenho-do-micromouse" title="Permanent link">&para;</a></h4>
+<p><strong>Eu, como</strong> Integrante da Equipe (Analista),
+<strong>gostaria de</strong> consultar o histórico de desempenho do MicroMouse (velocidade média, tempo de conclusão, consumo de bateria e se o desafio foi cumprido) de execuções passadas, filtrando por labirinto específico ou por todos,
+<strong>para que</strong> eu possa analisar a evolução do robô entre tentativas e embasar ajustes técnicos.</p>
+<p><strong>Critérios de aceitação:</strong>
+- A listagem exibe, por execução: tipo de labirinto, tempo de conclusão, velocidade média, consumo de bateria e status "Desafio Cumprido" (Sim/Não).
+- É possível filtrar por labirinto específico (4x4, 8x4, 12x4) ou visualizar todos.
+- Os dados exibidos correspondem exatamente aos dados persistidos no banco de dados (RNF01).</p>
+<p><strong>Protótipo de interface (descrição textual):</strong>
+<a href="">Tela</a> <strong>"Histórico do MicroMouse"</strong>, com o mesmo filtro superior da HU-02 ("Todos / 4x4 / 8x4 / 12x4"). Corpo principal em formato de tabela, com colunas: Data, Labirinto, Tempo de Conclusão, Velocidade Média, Bateria Consumida e Desafio Cumprido (ícone ✔/✘). Pode compartilhar a mesma tela de HU-02 (uma única tela "Histórico", com abas "Labirinto" e "MicroMouse") — decisão de composição de tela a ser validada na etapa de design.</p>
+<hr />
+<h3 id="rf04epico-04-identificar-paredes">RF04/Épico-04: Identificar Paredes<a class="headerlink" href="#rf04epico-04-identificar-paredes" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">ID (Link Github Projects)</th>
+<th style="text-align: left;">Título</th>
+<th style="text-align: left;">Prioridade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">HU-05</td>
+<td style="text-align: left;">Detecção de paredes adjacentes por sensores</td>
+<td style="text-align: left;">Must</td>
+</tr>
+</tbody>
+</table>
+<h4 id="hu-05-deteccao-de-paredes-adjacentes-por-sensores">HU-05 — Detecção de paredes adjacentes por sensores<a class="headerlink" href="#hu-05-deteccao-de-paredes-adjacentes-por-sensores" title="Permanent link">&para;</a></h4>
+<p><strong>Eu, como</strong> Operador da Equipe,
+<strong>gostaria que</strong> o MicroMouse detecte, por meio de seus sensores, a presença e a proximidade de paredes adjacentes (frontal, lateral esquerda e lateral direita) em cada célula,
+<strong>para que</strong> ele tome decisões seguras de navegação e evite colisões com a estrutura do labirinto.</p>
+<blockquote>
+<p>Nota: comportamento autônomo do robô.</p>
+</blockquote>
+<p><strong>Critérios de aceitação:</strong>
+- Os sensores identificam corretamente presença/ausência de parede em cada uma das direções adjacentes, considerando a dimensão da célula (18 cm de lado, incluindo espessura das paredes).
+- A detecção ocorre antes de o robô decidir seu próximo movimento (giro ou avanço).
+- A taxa de falsos positivos/negativos não impede a conclusão do trajeto dentro do limite de 3 tentativas por labirinto.</p>
+<p><strong>Protótipo de interface:</strong> Não se aplica. É funcionalidade de sensoriamento embarcado, sem interface própria — seu resultado é refletido no mapa exibido em RF02.</p>
+<hr />
+<h3 id="rf05epico-05-monitorar-localizacao">RF05/Épico-05: Monitorar Localização<a class="headerlink" href="#rf05epico-05-monitorar-localizacao" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">ID (Link Github Projects)</th>
+<th style="text-align: left;">Título</th>
+<th style="text-align: left;">Prioridade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">HU-06</td>
+<td style="text-align: left;">Rastreamento da posição do robô na grade</td>
+<td style="text-align: left;">Must</td>
+</tr>
+</tbody>
+</table>
+<h4 id="hu-06-rastreamento-da-posicao-do-robo-na-grade">HU-06 — Rastreamento da posição do robô na grade<a class="headerlink" href="#hu-06-rastreamento-da-posicao-do-robo-na-grade" title="Permanent link">&para;</a></h4>
+<p><strong>Eu, como</strong> Operador da Equipe,
+<strong>gostaria que</strong> o MicroMouse acompanhe e atualize sua posição exata (linha/coluna) dentro da grade do labirinto a cada movimento realizado,
+<strong>para que</strong> o algoritmo de navegação (RF10) e os dados exibidos em tempo real (RF03) estejam sempre corretos.</p>
+<blockquote>
+<p>Nota: comportamento autônomo do robô.</p>
+</blockquote>
+<p><strong>Critérios de aceitação:</strong>
+- Após cada movimento (avanço ou giro), a posição interna do robô é recalculada corretamente.
+- A posição atual pode ser consultada e transmitida para exibição em tempo real (RF06/RF03).
+- O robô nunca perde a referência da célula em que está durante uma tentativa válida (sem colisão/malfuncionamento).</p>
+<p><strong>Protótipo de interface:</strong> Não se aplica. É processamento interno embarcado, sem tela própria.</p>
+<hr />
+<h3 id="rf06epico-06-transmitir-dados">RF06/Épico-06: Transmitir dados<a class="headerlink" href="#rf06epico-06-transmitir-dados" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">ID (Link Github Projects)</th>
+<th style="text-align: left;">Título</th>
+<th style="text-align: left;">Prioridade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">HU-07</td>
+<td style="text-align: left;">Envio contínuo de dados do robô para a central de controle</td>
+<td style="text-align: left;">Should</td>
+</tr>
+</tbody>
+</table>
+<h4 id="hu-07-envio-continuo-de-dados-do-robo-para-a-central-de-controle">HU-07 — Envio contínuo de dados do robô para a central de controle<a class="headerlink" href="#hu-07-envio-continuo-de-dados-do-robo-para-a-central-de-controle" title="Permanent link">&para;</a></h4>
+<p><strong>Eu, como</strong> Operador da Equipe,
+<strong>gostaria que</strong> o MicroMouse envie continuamente, durante a corrida, os dados coletados pelos sensores e pelo sistema de bordo para a central de controle (sistema web),
+<strong>para que</strong> eu consiga acompanhar a corrida em tempo real pelas telas de RF02 e RF03.</p>
+<p><strong>Critérios de aceitação:</strong>
+- A comunicação entre o robô e o sistema web é estabelecida antes do início da corrida (handshake/conexão).
+- Os dados são enviados em um intervalo regular e definido pela equipe.
+- O sistema web sinaliza claramente perda de conexão/timeout de comunicação (consumido pela HU-03).
+- Em caso de falha temporária de transmissão, os dados continuam sendo armazenados localmente (RF09) até a reconexão.</p>
+<p><strong>Protótipo de interface:</strong> Não se aplica. É requisito de infraestrutura de comunicação (protocolo/canal robô ↔ sistema web); seu efeito é percebido indiretamente nas telas de RF02 e RF03.</p>
+<hr />
+<h3 id="rf07epico-07-fazer-giro-completo">RF07/Épico-07: Fazer giro completo<a class="headerlink" href="#rf07epico-07-fazer-giro-completo" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">ID (Link Github Projects)</th>
+<th style="text-align: left;">Título</th>
+<th style="text-align: left;">Prioridade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">HU-08</td>
+<td style="text-align: left;">Execução de giro de 180° para retorno</td>
+<td style="text-align: left;">Must</td>
+</tr>
+</tbody>
+</table>
+<h4 id="hu-08-execucao-de-giro-de-180-para-retorno">HU-08 — Execução de giro de 180° para retorno<a class="headerlink" href="#hu-08-execucao-de-giro-de-180-para-retorno" title="Permanent link">&para;</a></h4>
+<p><strong>Eu, como</strong> Operador da Equipe,
+<strong>gostaria que</strong> o MicroMouse execute um giro controlado de 180° em torno do próprio eixo ao identificar um beco sem saída ou necessidade de retorno,
+<strong>para que</strong> ele continue a exploração do labirinto sem ficar preso, sem intervenção humana.</p>
+<blockquote>
+<p>Nota: comportamento autônomo do robô.</p>
+</blockquote>
+<p><strong>Critérios de aceitação:</strong>
+- Ao concluir o giro, a orientação do robô é invertida corretamente (180°), sem deslocamento para outra célula.
+- O movimento não provoca colisão com paredes, respeitando o controle de velocidade/frenagem exigido em RNF05.
+- O giro é acionado apenas quando necessário pela lógica de navegação (RF10), evitando giros desnecessários.</p>
+<p><strong>Protótipo de interface:</strong> Não se aplica.</p>
+<hr />
+<h3 id="rf08epico-08-andar-para-frente">RF08/Épico-08: Andar para frente<a class="headerlink" href="#rf08epico-08-andar-para-frente" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">ID (Link Github Projects)</th>
+<th style="text-align: left;">Título</th>
+<th style="text-align: left;">Prioridade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">HU-09</td>
+<td style="text-align: left;">Deslocamento linear entre células adjacentes</td>
+<td style="text-align: left;">Must</td>
+</tr>
+</tbody>
+</table>
+<h4 id="hu-09-deslocamento-linear-entre-celulas-adjacentes">HU-09 — Deslocamento linear entre células adjacentes<a class="headerlink" href="#hu-09-deslocamento-linear-entre-celulas-adjacentes" title="Permanent link">&para;</a></h4>
+<p><strong>Eu, como</strong> Operador da Equipe,
+<strong>gostaria que</strong> o MicroMouse se desloque linearmente da célula atual para a célula adjacente à frente, de forma precisa e sem colisões,
+<strong>para que</strong> ele avance pelo labirinto em direção ao objetivo.</p>
+<blockquote>
+<p>Nota: comportamento autônomo do robô.</p>
+</blockquote>
+<p><strong>Critérios de aceitação:</strong>
+- O deslocamento cobre exatamente a distância de uma célula (18 cm), respeitando a dimensão mecânica compatível (RNF04).
+- A velocidade e a frenagem aplicadas respeitam o RNF05 (sem causar dano à estrutura do labirinto ou ao robô).
+- O robô finaliza o movimento corretamente alinhado na célula seguinte, pronto para a próxima decisão de navegação.</p>
+<p><strong>Protótipo de interface:</strong> Não se aplica.</p>
+<hr />
+<h3 id="rf09epico-09-armazenar-dados">RF09/Épico-09: Armazenar dados<a class="headerlink" href="#rf09epico-09-armazenar-dados" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">ID (Link Github Projects)</th>
+<th style="text-align: left;">Título</th>
+<th style="text-align: left;">Prioridade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">HU-10</td>
+<td style="text-align: left;">Registro local de dados operacionais a bordo</td>
+<td style="text-align: left;">Should</td>
+</tr>
+</tbody>
+</table>
+<h4 id="hu-10-registro-local-de-dados-operacionais-a-bordo">HU-10 — Registro local de dados operacionais a bordo<a class="headerlink" href="#hu-10-registro-local-de-dados-operacionais-a-bordo" title="Permanent link">&para;</a></h4>
+<p><strong>Eu, como</strong> Operador da Equipe,
+<strong>gostaria que</strong> o MicroMouse registre e salve localmente (a bordo) as informações operacionais coletadas durante a navegação,
+<strong>para que</strong> esses dados não se percam em caso de falha de comunicação e possam ser posteriormente sincronizados com a central de controle.</p>
+<p><strong>Critérios de aceitação:</strong>
+- Os dados operacionais (posição, sensores, métricas) são gravados em memória não volátil a bordo durante toda a execução.
+- Em caso de queda de comunicação com o sistema web, o registro local continua ocorrendo normalmente.
+- Os dados armazenados localmente podem ser recuperados e reenviados/sincronizados após o reestabelecimento da comunicação.</p>
+<p><strong>Protótipo de interface:</strong> Não se aplica. É armazenamento embarcado, sem interface própria — distinto da persistência central em banco de dados (RNF01), que é responsabilidade do sistema web.</p>
+<hr />
+<h3 id="rf10epico-10-navegar-labirinto">RF10/Épico-10: Navegar labirinto<a class="headerlink" href="#rf10epico-10-navegar-labirinto" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">ID (Link Github Projects)</th>
+<th style="text-align: left;">Título</th>
+<th style="text-align: left;">Prioridade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">HU-11</td>
+<td style="text-align: left;">Resolução autônoma do labirinto até o objetivo</td>
+<td style="text-align: left;">Must</td>
+</tr>
+</tbody>
+</table>
+<h4 id="hu-11-resolucao-autonoma-do-labirinto-ate-o-objetivo">HU-11 — Resolução autônoma do labirinto até o objetivo<a class="headerlink" href="#hu-11-resolucao-autonoma-do-labirinto-ate-o-objetivo" title="Permanent link">&para;</a></h4>
+<p><strong>Eu, como</strong> Operador da Equipe,
+<strong>gostaria que</strong> o MicroMouse execute autonomamente algoritmos de busca e tomada de decisão para percorrer o labirinto, desde o ponto de partida até a área de objetivo, sem intervenção humana,
+<strong>para que</strong> a equipe cumpra o desafio da competição dentro das regras do contrato.</p>
+<blockquote>
+<p>Nota: Este é o épico mais amplo, que orquestra RF04, RF05, RF07, RF08 e RF01.</p>
+</blockquote>
+<p><strong>Critérios de aceitação:</strong>
+- O robô inicia sempre no beco sem saída do canto de partida e para ao alcançar a célula de objetivo (canto diametralmente oposto).
+- Nenhuma intervenção humana ocorre durante a resolução, exceto em caso de malfuncionamento ou colisão (conforme permitido pelo contrato).
+- O robô detecta corretamente quando alcançou a área de objetivo e encerra a tentativa.
+- O algoritmo é capaz de resolver os três tipos de labirinto da competição (4x4, 8x4 e 12x4) dentro do limite de até 3 tentativas e 10 minutos por desafio.
+- O código e a memória sobre o labirinto não são alterados manualmente durante a resolução do trajeto (regra do contrato).</p>
+<p><strong>Protótipo de interface:</strong> Não se aplica.</p>
+<hr />
+<h3 id="rf11epico-11-realizar-telemetria">RF11/Épico-11: Realizar telemetria<a class="headerlink" href="#rf11epico-11-realizar-telemetria" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">ID (Link Github Projects)</th>
+<th style="text-align: left;">Título</th>
+<th style="text-align: left;">Prioridade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">HU-12</td>
+<td style="text-align: left;">Coleta e transmissão contínua de métricas de operação</td>
+<td style="text-align: left;">Should</td>
+</tr>
+</tbody>
+</table>
+<h4 id="hu-12-coleta-e-transmissao-continua-de-metricas-de-operacao">HU-12 — Coleta e transmissão contínua de métricas de operação<a class="headerlink" href="#hu-12-coleta-e-transmissao-continua-de-metricas-de-operacao" title="Permanent link">&para;</a></h4>
+<p><strong>Eu, como</strong> Operador da Equipe,
+<strong>gostaria que</strong> o MicroMouse colete e transmita continuamente métricas de operação (velocidade, tempo decorrido, consumo de bateria e status do desafio) para a central de controle,
+<strong>para que</strong> seja possível o acompanhamento contínuo do desempenho do robô durante a corrida.</p>
+<p><strong>Critérios de aceitação:</strong>
+- As métricas coletadas incluem, no mínimo: velocidade instantânea/média, tempo decorrido, percentual de bateria consumida e status da tentativa (em andamento / concluída / falha).
+- As métricas são transmitidas junto com os demais dados de RF06, em intervalo regular definido pela equipe.
+- As métricas coletadas ficam disponíveis para exibição em tempo real nas telas de RF03 (HU-03) e, após a corrida, no histórico (HU-04).</p>
+<p><strong>Protótipo de interface:</strong> Não se aplica. É o mecanismo de coleta/transmissão de métricas; a visualização propriamente dita ocorre via RF03.</p>
+<hr />
+<h2 id="2-requisitos-nao-funcionais">2. Requisitos Não-Funcionais<a class="headerlink" href="#2-requisitos-nao-funcionais" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">ID (Link Github Projects)</th>
+<th style="text-align: left;">Título</th>
+<th style="text-align: left;">Prioridade</th>
+<th style="text-align: left;">Rastreabilidade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">RNF-01</td>
+<td style="text-align: left;">Persistência de Dados Operacionais</td>
+<td style="text-align: left;">Should</td>
+<td style="text-align: left;">RF09/HU-10; RF02/HU-02; RF03/HU-04</td>
+</tr>
+<tr>
+<td style="text-align: left;">RNF-02</td>
+<td style="text-align: left;">Autonomia da Bateria (3 trajetos / 30 min)</td>
+<td style="text-align: left;">Must</td>
+<td style="text-align: left;">RF10/HU-11; RF03/HU-03</td>
+</tr>
+<tr>
+<td style="text-align: left;">RNF-03</td>
+<td style="text-align: left;">Fonte de Energia Recarregável</td>
+<td style="text-align: left;">Should</td>
+<td style="text-align: left;">RF10/HU-11 (enabler geral, sem tela própria)</td>
+</tr>
+<tr>
+<td style="text-align: left;">RNF-04</td>
+<td style="text-align: left;">Compatibilidade de Dimensão Mecânica (célula 18 cm)</td>
+<td style="text-align: left;">Must</td>
+<td style="text-align: left;">RF08/HU-09; RF07/HU-08</td>
+</tr>
+<tr>
+<td style="text-align: left;">RNF-05</td>
+<td style="text-align: left;">Tolerância a Colisão e Controle de Impacto</td>
+<td style="text-align: left;">Must</td>
+<td style="text-align: left;">RF07/HU-08; RF08/HU-09</td>
+</tr>
+<tr>
+<td style="text-align: left;">RNF-06</td>
+<td style="text-align: left;">Integridade Estrutural</td>
+<td style="text-align: left;">Must</td>
+<td style="text-align: left;">RF07/HU-08; RF08/HU-09; RF10/HU-11</td>
+</tr>
+</tbody>
+</table>
+<h1 id="arquitetura-de-software-solucao-micromouse">Arquitetura de Software: Solução MicroMouse<a class="headerlink" href="#arquitetura-de-software-solucao-micromouse" title="Permanent link">&para;</a></h1>
+<p>Este documento apresenta a especificação arquitetural do sistema embarcado e da central de monitoramento para o robô <strong>MicroMouse</strong>, estruturado de acordo com o modelo de <strong>Visões Arquiteturais (4+1)</strong> do Processo Unificado (UP). Em conformidade com as diretrizes do projeto, a tradicional <em>Visão de Casos de Uso</em> foi substituída pela <strong>Visão de Dados</strong>.</p>
+<hr />
+<h2 id="1-visao-geral-e-proposito-do-software">1. Visão Geral e Propósito do Software<a class="headerlink" href="#1-visao-geral-e-proposito-do-software" title="Permanent link">&para;</a></h2>
+<h3 id="11-proposito-do-software">1.1 Propósito do Software<a class="headerlink" href="#11-proposito-do-software" title="Permanent link">&para;</a></h3>
+<p>O software possui o papel de atuar como o <strong>sistema de controle autônomo e telemetria de bordo</strong> do robô MicroMouse. Ele é responsável por:</p>
+<ul>
+<li>
+<p>Processar sinais de sensores em tempo real para identificação de paredes, localização e orientação.</p>
+</li>
+<li>
+<p>Executar algoritmos de navegação e mapeamento dinâmico do labirinto.</p>
+</li>
+<li>
+<p>Controlar os atuadores (motores via controle PID e odometria) para movimentação precisa.</p>
+</li>
+<li>
+<p>Persistir e transmitir dados de telemetria, logs de execução e a topologia do labirinto para uma central de controle via Wi-Fi em tempo real.</p>
+</li>
+</ul>
+<hr />
+<h2 id="2-visao-logica">2. Visão Lógica<a class="headerlink" href="#2-visao-logica" title="Permanent link">&para;</a></h2>
+<p>A Visão Lógica descreve a organização conceitual e a estruturação das classes e módulos do sistema.</p>
+<h3 id="21-padroes-arquiteturais-adotados-e-justificativa">2.1 Padrões Arquiteturais Adotados e Justificativa<a class="headerlink" href="#21-padroes-arquiteturais-adotados-e-justificativa" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Firmware Embarcado (Robô): Arquitetura em Camadas (Layered Architecture) orientada a Eventos/Tarefas.</li>
+<li>
+<p><strong>Justificativa:</strong> O software de bordo lida diretamente com o hardware do microcontrolador ESP32. A divisão em camadas garante o desacoplamento entre os drivers de baixo nível (I2C, PWM, GPIO), a lógica de controle PID/Navegação e a camada de comunicação de alto nível.</p>
+</li>
+<li>
+<p>Dashboard (Central de Controle): Padrão MVC (Model-View-Controller).</p>
+</li>
+<li><strong>Justificativa:</strong> Permite a separação entre a interface visual que renderiza o labirinto e métricas do robô (<strong>View</strong>), os serviços que processam as mensagens WebSockets recebidas (<strong>Controller</strong>) e os modelos de dados da sessão e estado (<strong>Model</strong>).</li>
+</ul>
+<h3 id="22-divisao-em-modulos-do-sistema">2.2 Divisão em Módulos do Sistema<a class="headerlink" href="#22-divisao-em-modulos-do-sistema" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Módulo HAL / Drivers de Hardware (Baixo Nível):</li>
+<li>
+<p><em>Driver IMU (MPU6500):</em> Leitura do giroscópio e acelerômetro via I2C para estimativa de orientação.</p>
+</li>
+<li>
+<p><em>Driver Ultrassônico (US-100):</em> Leitura contínua da distância de paredes via UART/GPIO.</p>
+</li>
+<li>
+<p><em>Driver Ponte H (DRV8833):</em> Controle PWM para acionamento dos motores N20.</p>
+</li>
+<li>
+<p><em>Driver de Odometria (Encoders N20):</em> Contagem de pulsos por interrupção para cálculo de deslocamento.</p>
+</li>
+<li>
+<p><em>Driver de Potência (INA226):</em> Monitoramento de tensão e corrente da bateria via I2C.</p>
+</li>
+<li>
+<p>Módulo de Controle e Navegação (Médio Nível):</p>
+</li>
+<li>
+<p><em>Malha de Controle PID:</em> Mantém o robô centralizado e estabilizado durante a locomoção.</p>
+</li>
+<li>
+<p><em>Mapeador e Buscador (Floodfill):</em> Atualiza a matriz do labirinto e calcula as ações de rotação e avanço.</p>
+</li>
+<li>
+<p>Módulo de Comunicação e Armazenamento (Alto Nível):</p>
+</li>
+<li>
+<p><em>Gerenciador NVS/Flash:</em> Armazena configurações e histórico de logs localmente.</p>
+</li>
+<li>
+<p><em>Servidor WebSockets/Wi-Fi:</em> Transmite a telemetria do robô e atualizações do mapa.</p>
+</li>
+</ol>
+<hr />
+<h2 id="3-visao-de-processos">3. Visão de Processos<a class="headerlink" href="#3-visao-de-processos" title="Permanent link">&para;</a></h2>
+<p>A Visão de Processos trata da concorrência, tempo real e distribuição do processamento entre as tarefas do sistema.</p>
+<p>O microcontrolador <strong>ESP32</strong> conta com dois núcleos de processamento (Core 0 e Core 1) e executa o sistema operacional de tempo real <strong>FreeRTOS</strong>. As tarefas (<em>Tasks</em>) são distribuídas entre os núcleos para garantir resposta imediata aos sensores sem bloquear as rotinas de comunicação:</p>
+<p><img alt="Tabela da Visão de Processo" src="../figs/Projeto_conceitual/VisaoDeProcessos.png" /></p>
+<ul>
+<li><strong>Processo 1: <code>Task_Sensors</code> (Periódico - 10ms | Prioridade Alta):</strong></li>
+<li>
+<p>Executa a amostragem do giroscópio MPU6500 e a leitura dos 4 sensores US-100 para identificação imediata de obstáculos/paredes.</p>
+</li>
+<li>
+<p><strong>Processo 2: <code>Task_PID_Control</code> (Periódico - 5ms | Prioridade Máxima):</strong></p>
+</li>
+<li>
+<p>Processa interrupções dos leitores de encoder dos motores N20, calcula os erros de trajetória e atualiza o ciclo de trabalho PWM da ponte H DRV8833.</p>
+</li>
+<li>
+<p><strong>Processo 3: <code>Task_Navigation</code> (Baseado em Eventos | Prioridade Média):</strong></p>
+</li>
+<li>
+<p>Disparada quando o robô alcança o centro de uma célula. Executa a lógica de atualização da grade de navegação e decide a próxima direção.</p>
+</li>
+<li>
+<p><strong>Processo 4: <code>Task_Comm</code> (Assíncrono | Prioridade Baixa):</strong></p>
+</li>
+<li>Formata os dados no formato JSON e envia pacotes de telemetria e o estado do labirinto para a central de controle via WebSockets.</li>
+</ul>
+<hr />
+<h2 id="4-visao-de-implementacao">4. Visão de Implementação<a class="headerlink" href="#4-visao-de-implementacao" title="Permanent link">&para;</a></h2>
+<p>A Visão de Implementação especifica as tecnologias, linguagens, frameworks e bibliotecas escolhidas para a solução.</p>
+<h3 id="41-tecnologias-adotadas">4.1 Tecnologias Adotadas<a class="headerlink" href="#41-tecnologias-adotadas" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Camada</th>
+<th>Tecnologia / Linguagem</th>
+<th>Frameworks e Bibliotecas</th>
+<th>Justificativa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Firmware (Embarcado)</strong></td>
+<td><strong>C++ / C</strong><br></td>
+<td>FreeRTOS, Arduino ESP32 Core, <code>Wire.h</code> (I2C), <code>ESPAsyncWebServer</code>, <code>ArduinoJson</code><br></td>
+<td>Permite controle rigoroso de baixo nível, acesso direto aos registradores e periféricos da ESP32 com altíssimo desempenho de tempo real.</td>
+</tr>
+<tr>
+<td><strong>Dashbord (Backend/Server)</strong></td>
+<td><strong>TypeScript / Node.js</strong></td>
+<td>Express.js, <code>ws</code> (WebSockets), TypeORM / Prisma</td>
+<td>Plataforma leve e eficiente em I/O assíncrono para manipulação da transmissão contínua de dados de telemetria.</td>
+</tr>
+<tr>
+<td><strong>Dashbord (Frontend/Dashboard)</strong></td>
+<td><strong>TypeScript / JavaScript</strong></td>
+<td>React.js, TailwindCSS, Chart.js, HTML5 Canvas API</td>
+<td>Permite renderização fluida da grade do labirinto em tempo real e atualização gráfica das métricas do robô.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="5-visao-de-implantacao">5. Visão de Implantação<a class="headerlink" href="#5-visao-de-implantacao" title="Permanent link">&para;</a></h2>
+<p>A Visão de Implantação descreve a arquitetura física e a topologia de hardware da solução.</p>
+<p><img alt="Diagrama de Visão de Implantação" src="../figs/Projeto_conceitual/VisaoDeImplanta%C3%A7ao.png" /></p>
+<h3 id="componentes-de-hardware-utilizados-e-conexoes">Componentes de Hardware Utilizados e Conexões:<a class="headerlink" href="#componentes-de-hardware-utilizados-e-conexoes" title="Permanent link">&para;</a></h3>
+<ol>
+<li>
+<p><strong>ESP32 DevKit 30 Pinos:</strong> Unidade Central de Processamento.</p>
+</li>
+<li>
+<p><strong>Ponte H DRV8833:</strong> Conectada às saídas PWM da ESP32 para controle bidirecional dos Motores N20-6V.</p>
+</li>
+<li>
+<p><strong>2x Motores N20 com Encoders:</strong> Conectados a pino de interrupção da ESP32 para feedback de malha fechada.</p>
+</li>
+<li>
+<p><strong>4x Sensores Ultrassônicos US-100:</strong> Dispostos nas posições frontal, traseira, esquerda e direita para mapeamento de paredes.</p>
+</li>
+<li>
+<p><strong>IMU MPU6500:</strong> Conectado via barramento I2C para estimativa de ângulo e giros precisos de 180°.</p>
+</li>
+<li>
+<p><strong>Sensor INA226:</strong> Conectado via I2C para leitura de corrente e tensão da bateria.</p>
+</li>
+<li>
+<p><strong>Regulador Buck MP1584:</strong> Regula a tensão de alimentação dos módulos lógicos.</p>
+</li>
+</ol>
+<hr />
+<h2 id="6-visao-de-dados">6. Visão de Dados<a class="headerlink" href="#6-visao-de-dados" title="Permanent link">&para;</a></h2>
+<p>A Visão de Dados descreve a modelagem e a estrutura de persistência das informações manipuladas e gravadas pelo sistema.</p>
+<h3 id="61-escolha-da-tecnologia-de-banco-de-dados-relacional-sqlite-postgresql">6.1 Escolha da Tecnologia de Banco de Dados: <strong>Relacional (SQLite / PostgreSQL)</strong><a class="headerlink" href="#61-escolha-da-tecnologia-de-banco-de-dados-relacional-sqlite-postgresql" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><strong>Justificativa:</strong> Os dados manipulados pelo sistema possuem um alto grau de estruturação e esquemas rígidos (ex: coordenadas $X,Y$ fixas em uma matriz, leituras periódicas de telemetria vinculadas a uma sessão de execução e registros tabulares de erros).</p>
+</li>
+<li>
+<p>No <strong>Dashbord</strong>, adota-se um <strong>Banco de Dados Relacional</strong> (SQLite para execução local simples ou PostgreSQL para diagnósticos avançados).</p>
+</li>
+<li>
+<p>No <strong>Robô (ESP32)</strong>, utiliza-se a memória Flash interna (via biblioteca <code>Preferences</code> ou sistema de arquivos <code>LittleFS</code>) configurada estruturalmente em formato relacional/tabelar binário para armazenamento offline caso ocorra perda do link Wi-Fi.</p>
+</li>
+</ul>
+<hr />
+<h3 id="62-modelo-entidade-relacionamento-mer">6.2 Modelo Entidade-Relacionamento (MER)<a class="headerlink" href="#62-modelo-entidade-relacionamento-mer" title="Permanent link">&para;</a></h3>
+<h4 id="entidades-e-atributos">Entidades e Atributos:<a class="headerlink" href="#entidades-e-atributos" title="Permanent link">&para;</a></h4>
+<ol>
+<li>
+<p><strong>SESSAO_NAVEGACAO:</strong></p>
+</li>
+<li>
+<p><code>id_sessao</code> (PK, Inteiro): Identificador único do percurso.</p>
+</li>
+<li>
+<p><code>data_inicio</code> (DateTime): Registro do momento do início da corrida.</p>
+</li>
+<li>
+<p><code>status_conclusao</code> (Texto): Status do percurso (Em andamento, Concluído, Interrompido por Falha).</p>
+</li>
+<li>
+<p><code>tempo_total_segundos</code> (Float): Tempo transcorrido até o reconhecimento da linha de chegada.</p>
+</li>
+<li>
+<p><strong>CELULA_LABIRINTO:</strong></p>
+</li>
+<li>
+<p><code>id_celula</code> (PK, Inteiro): Identificador da célula.</p>
+</li>
+<li>
+<p><code>id_sessao</code> (FK, Inteiro): Referência à sessão atual.</p>
+</li>
+<li>
+<p><code>pos_x</code> (Inteiro): Coordenada $X$ da célula na grade do labirinto.</p>
+</li>
+<li>
+<p><code>pos_y</code> (Inteiro): Coordenada $Y$ da célula na grade do labirinto.</p>
+</li>
+<li>
+<p><code>parede_norte</code> (Booleano): Presença de parede ao Norte.</p>
+</li>
+<li>
+<p><code>parede_sul</code> (Booleano): Presença de parede ao Sul.</p>
+</li>
+<li>
+<p><code>parede_leste</code> (Booleano): Presença de parede ao Leste.</p>
+</li>
+<li>
+<p><code>parede_oeste</code> (Booleano): Presença de parede ao Oeste.</p>
+</li>
+<li>
+<p><code>visitada</code> (Booleano): Flag indicando se o robô passou pela célula.</p>
+</li>
+<li>
+<p><strong>REGISTRO_TELEMETRIA:</strong></p>
+</li>
+<li>
+<p><code>id_telemetria</code> (PK, BigInt): Identificador único da amostra.</p>
+</li>
+<li>
+<p><code>id_sessao</code> (FK, Inteiro): Sessão associada.</p>
+</li>
+<li>
+<p><code>timestamp_ms</code> (BigInt): Milissegundos transcorridos desde o boot.</p>
+</li>
+<li>
+<p><code>tensao_bateria</code> (Float): Leitura do sensor INA226 em Volts.</p>
+</li>
+<li>
+<p><code>corrente_bateria</code> (Float): Leitura do sensor INA226 em Amperes.</p>
+</li>
+<li>
+<p><code>velocidade_esq</code> (Float): Velocidade calculada do motor esquerdo em mm/s.</p>
+</li>
+<li>
+<p><code>velocidade_dir</code> (Float): Velocidade calculada do motor direito em mm/s.</p>
+</li>
+<li>
+<p><code>angulo_orientacao</code> (Float): Leitura de orientação Yaw da IMU MPU6500.</p>
+</li>
+<li>
+<p><strong>LOG_EVENTO:</strong></p>
+</li>
+<li>
+<p><code>id_log</code> (PK, Inteiro): Identificador do registro.</p>
+</li>
+<li>
+<p><code>id_sessao</code> (FK, Inteiro): Sessão associada.</p>
+</li>
+<li>
+<p><code>timestamp_ms</code> (BigInt): Horário do evento.</p>
+</li>
+<li>
+<p><code>tipo_evento</code> (Texto): Categoria (INFO, WARN, ERROR, SUCCESS).</p>
+</li>
+<li>
+<p><code>descricao</code> (Texto): Detalhamento do evento (ex: "Linha de Chegada Reconhecida", "Motores Interrompidos").</p>
+</li>
+</ol>
+<h4 id="relacionamentos-e-cardinalidades">Relacionamentos e Cardinalidades:<a class="headerlink" href="#relacionamentos-e-cardinalidades" title="Permanent link">&para;</a></h4>
+<ul>
+<li>
+<p>Uma <strong>SESSAO_NAVEGACAO</strong> possui $1:N$ <strong>CELULA_LABIRINTO</strong> (Uma sessão gera o mapeamento de várias células do labirinto).</p>
+</li>
+<li>
+<p>Uma <strong>SESSAO_NAVEGACAO</strong> possui $1:N$ <strong>REGISTRO_TELEMETRIA</strong> (Uma sessão coleta continuadamente múltiplos pacotes de telemetria).</p>
+</li>
+<li>
+<p>Uma <strong>SESSAO_NAVEGACAO</strong> possui $1:N$ <strong>LOG_EVENTO</strong> (Uma sessão registra diversos logs operacionais).</p>
+</li>
+</ul>
+<hr />
+<h3 id="63-diagrama-entidade-relacionamento-der">6.3 Diagrama Entidade-Relacionamento (DER)<a class="headerlink" href="#63-diagrama-entidade-relacionamento-der" title="Permanent link">&para;</a></h3>
+<pre class="mermaid"><code>erDiagram
+    SESSAO_NAVEGACAO ||--|{ CELULA_LABIRINTO : "mapeia"
+    SESSAO_NAVEGACAO ||--|{ REGISTRO_TELEMETRIA : "registra"
+    SESSAO_NAVEGACAO ||--|{ LOG_EVENTO : "gera"
+
+    SESSAO_NAVEGACAO {
+        int id_sessao PK
+        datetime data_inicio
+        string status_conclusao
+        float tempo_total_segundos
+    }
+
+    CELULA_LABIRINTO {
+        int id_celula PK
+        int id_sessao FK
+        int pos_x
+        int pos_y
+        boolean parede_norte
+        boolean parede_sul
+        boolean parede_leste
+        boolean parede_oeste
+        boolean visitada
+    }
+
+    REGISTRO_TELEMETRIA {
+        bigint id_telemetria PK
+        int id_sessao FK
+        bigint timestamp_ms
+        float tensao_bateria
+        float corrente_bateria
+        float velocidade_esq
+        float velocidade_dir
+        float angulo_orientacao
+    }
+
+    LOG_EVENTO {
+        int id_log PK
+        int id_sessao FK
+        bigint timestamp_ms
+        string tipo_evento
+        string descricao
+    }
+</code></pre>
+<hr />
+<blockquote>
+<ul>
+<li><strong>Roteiro de testes funcionais:</strong></li>
+<li>Código do caso de teste;</li>
+<li>Nome do caso de teste;</li>
+<li>Rastreabilidade: Link do(a) RF/HU associado(a);</li>
+<li>Objetivo do caso de teste;</li>
+<li>Pré-condições do sistema para o teste ser realizado, quando se aplicar;</li>
+<li>Descrição dos procedimentos a serem executados para o teste;</li>
+<li>Resultado esperado para o teste ser aprovado (pós-condição após realizado o teste);</li>
+</ul>
+</blockquote>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tabs", "navigation.top", "search.suggest", "search.highlight"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
