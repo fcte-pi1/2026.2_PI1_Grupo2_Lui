@@ -23,3 +23,11 @@ Requisitos Funcionais definem os comportamentos observáveis, funcionalidades e 
 | **RF13** | Andar para trás | Executar a movimentação em marcha à ré. | Should Have | Estruturas | [#30](https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui/issues/30) |
 | **RF14** | Registrar eventos | Manter histórico ordenado de eventos, erros e diagnósticos do sistema. | Should Have | Software | [#31](https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui/issues/31) |
 | **RF15** | Interromper motores | Cessar imediatamente a alimentação dos motores em caso de conclusão, parada ou falha. | Should Have | Energia | [#32](https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui/issues/32) |
+| **RF16** | Fixar o sistema motriz | Chassi deve prover pontos de fixação rígidos para motores/atuadores, capazes de transmitir torque sem deformação, viabilizando deslocamento frontal e reverso. | Must Have | Estruturas |  |
+| **RF17** | Completar giro | Wheelbase (distância entre os eixos traseiro e dianteiro) e dimensões externas do chassi devem permitir rotação de 180° dentro do espaço livre da célula (18 cm, descontando as paredes). | Must have | Estruturas |  |
+| **RF18** | Suportar módulo de sensoriamento | Pontos de fixação para sensores de parede, posicionados sem obstruir o campo de detecção e sem folga/vibração que degrade a leitura. | Must have | Estruturas |  |
+| **RF19** | Permitir modificações no compartimento de bateria | Bateria acessível e substituível entre tentativas, sem desmontagem completa do robô. | Must Have | Estruturas |  |
+| **RF20** | Acessar conector de recarga | Abertura/porta que permita recarga sem desmontar o robô. | Must Have | Estruturas |  |
+| **RF21** | Alojar interface de controle | O chassi deve prover um encaixe acessível para a fixação do botão de start e do LED de status. | Should Have | Estruturas |  |
+| **RF22** | Suportar compartimento anti-inversão de polaridade | Encaixe mecânico que só permite montar a bateria em uma polaridade. | Could Have | Estruturas |  |
+| **RF23** | Amortecer impactos | Bordas/para-choque com amortecimento nas zonas de maior risco de colisão com paredes. | Could Have | Estruturas |  |
