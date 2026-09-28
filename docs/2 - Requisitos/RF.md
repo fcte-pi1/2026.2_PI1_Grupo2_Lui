@@ -9,25 +9,10 @@ Requisitos Funcionais definem os comportamentos observáveis, funcionalidades e 
 | **ID** | **Nome do Requisito** | **Descrição** | **Prioridade** | **Responsáveis** | **Link Github Projects** |
 |:------:|------------------------|---------------|:--------------:|------------------|--------------------------|
 | **RF01** | Mapear Labirinto | Realizar o mapeamento contínuo da estrutura do labirinto à medida que o robô se desloca. | Must Have | Software | [#18](https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui/issues/18) |
-| **RF02** | Exibir dados do Labirinto | Apresentar em interface os dados estruturais e o mapa gerado do labirinto. | Must Have | Software | [#19](https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui/issues/19) |
-| **RF03** | Exibir dados do MicroMouse | Exibir em tempo real as informações de status, parâmetros e estado do robô MicroMouse. | Must Have | Software | [#20](https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui/issues/20) |
-| **RF04** | Identificar Paredes | Detectar a presença e a proximidade de paredes adjacentes ao robô. | Must Have | Eletrônica | [#21](https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui/issues/21) |
-| **RF05** | Monitorar Localização | Acompanhar e atualizar a posição exata do robô dentro da grade do labirinto. | Must Have | Software | [#22](https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui/issues/22) |
-| **RF06** | Transmitir dados | Enviar os dados coletados pelos sensores e sistema de bordo para a central de controle. | Must Have | Eletrônica | [#23](https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui/issues/23) |
-| **RF07** | Fazer giro completo | Executar a rotação controlada de retorno (giro completo/180°) no próprio eixo. | Must Have | Estruturas | [#24](https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui/issues/24) |
-| **RF08** | Andar para frente | Executar o deslocamento linear para a frente ao longo das células do labirinto. | Must Have | Estruturas | [#25](https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui/issues/25) |
-| **RF09** | Armazenar dados | Registrar e salvar localmente as informações operacionais coletadas durante a navegação. | Must Have | Software | [#26](https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui/issues/26) |
-| **RF10** | Navegar labirinto | Executar os algoritmos de busca e tomada de decisão para percorrer autonomamente o labirinto. | Must Have | Software | [#27](https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui/issues/27) |
-| **RF11** | Realizar telemetria | Coletar e transmitir métricas de operação do sistema para acompanhamento contínuo. | Must Have | Eletrônica | [#28](https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui/issues/28) |
-| **RF12** | Reconhecer Linha de Chegada | Identificar o momento exato de cruzamento ou chegada no objetivo/centro do labirinto. | Should Have | Eletrônica | [#29](https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui/issues/29) |
-| **RF13** | Andar para trás | Executar a movimentação em marcha à ré. | Should Have | Estruturas | [#30](https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui/issues/30) |
-| **RF14** | Registrar eventos | Manter histórico ordenado de eventos, erros e diagnósticos do sistema. | Should Have | Software | [#31](https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui/issues/31) |
-| **RF15** | Interromper motores | Cessar imediatamente a alimentação dos motores em caso de conclusão, parada ou falha. | Should Have | Energia | [#32](https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui/issues/32) |
-| **RF16** | Fixar o sistema motriz | Chassi deve prover pontos de fixação rígidos para motores/atuadores, capazes de transmitir torque sem deformação, viabilizando deslocamento frontal e reverso. | Must Have | Estruturas |  |
-| **RF17** | Completar giro | Wheelbase (distância entre os eixos traseiro e dianteiro) e dimensões externas do chassi devem permitir rotação de 180° dentro do espaço livre da célula (18 cm, descontando as paredes). | Must have | Estruturas |  |
-| **RF18** | Suportar módulo de sensoriamento | Pontos de fixação para sensores de parede, posicionados sem obstruir o campo de detecção e sem folga/vibração que degrade a leitura. | Must have | Estruturas |  |
-| **RF19** | Permitir modificações no compartimento de bateria | Bateria acessível e substituível entre tentativas, sem desmontagem completa do robô. | Must Have | Estruturas |  |
-| **RF20** | Acessar conector de recarga | Abertura/porta que permita recarga sem desmontar o robô. | Must Have | Estruturas |  |
-| **RF21** | Alojar interface de controle | O chassi deve prover um encaixe acessível para a fixação do botão de start e do LED de status. | Should Have | Estruturas |  |
-| **RF22** | Suportar compartimento anti-inversão de polaridade | Encaixe mecânico que só permite montar a bateria em uma polaridade. | Could Have | Estruturas |  |
-| **RF23** | Amortecer impactos | Bordas/para-choque com amortecimento nas zonas de maior risco de colisão com paredes. | Could Have | Estruturas |  |
+| **RF02** | Monitorar Localização | Acompanhar e atualizar a posição exata do robô dentro da grade do labirinto. | Must Have | Software | [#22](https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui/issues/22) |
+| **RF03** | Navegar labirinto | Executar algoritmos de busca e tomada de decisão, e movimentação do robo para percorrer autonomamente o labirinto. | Must Have | Software/Eletrônica | [#27](https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui/issues/27) |
+| **RF04** | Realizar telemetria | Coletar e transmitir métricas de operação do sistema para acompanhamento contínuo. | Must Have | Eletrônica | [#28](https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui/issues/28) |
+| **RF05** | Gerenciar dados | Permitir a trasmissão, armazenamento e exibição dos dados/logs do MicroMouse e do Labirinto | Must Have | Software/Eletrônica |  |
+| **RF06** | Interromper motores | Cessar imediatamente a alimentação dos motores em caso de conclusão, parada ou falha. | Should Have | Energia | [#32](https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui/issues/32) |
+| **RF07** | Controlar rotinas | Permitir a inicialização/Desligamento da rotina de controle e calibração de sensores | Must Have | Eletrônica |  |
+
