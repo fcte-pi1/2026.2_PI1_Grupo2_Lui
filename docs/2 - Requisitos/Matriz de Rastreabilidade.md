@@ -12,11 +12,11 @@ Aqui está a coleção de fotos detalhadas da matriz de rastreabilidade que fize
 
 ### Requisitos Funcionais
 
-![Requisitos Funcionais](../figs/Requisitos/Requisitos%20Funcionais.png)
+![Requisitos Funcionais](../figs/Requisitos/RFs.png)
 
 ### Requisitos Não Funcionais
 
-![Requisitos Funcionais](../figs/Requisitos/Requisito%20Não%20Funcional.png)
+![Requisitos Funcionais](../figs/Requisitos/RNFs.png)
 
 ### MoSCoW
 
@@ -24,19 +24,19 @@ Aqui está a coleção de fotos detalhadas da matriz de rastreabilidade que fize
 
 ### Must Have
 
-![Requisitos Funcionais](../figs/Requisitos/Must%20have.png)
+![Requisitos Funcionais](../figs/Requisitos/Must.png)
 
 ### Should Have
 
-![Requisitos Funcionais](../figs/Requisitos/Should%20Have.png)
+![Requisitos Funcionais](../figs/Requisitos/Should.png)
 
 ### Could Have
 
-![Requisitos Funcionais](../figs/Requisitos/Could%20Have.png)
+![Requisitos Funcionais](../figs/Requisitos/Could.png)
 
 ### Won’t have
 
-![Requisitos Funcionais](../figs/Requisitos/Wont%20have.png)
+![Requisitos Funcionais](../figs/Requisitos/Wont.png)
 
 ### MVP
 
