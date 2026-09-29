@@ -1,3 +1,11 @@
+---
+name: "Nova User Story"
+about: "Criação modelo de um US"
+title: '[HU-XX] - Nome'
+labels: 'HU'
+assignees: ''
+---
+
 ### Informações da História de Usuários
 
 - **Nome da história:** NNNNNNNNNNNNN
