@@ -115,15 +115,9 @@ As estimativas apresentadas foram elaboradas com base no levantamento histórico
 
 ### Carga Horária Semanal
 * **Aulas / Estudos:** 4h/semana (2 aulas de 2h)
-* **Trabalho Extraclasse:** 2h/semana
-* **Total Semanal por Pessoa:** 6 horas/semana
+* **Trabalho Extraclasse:** 6h/semana
+* **Total Semanal por Pessoa:** 10 horas/semana
 
 ### Capacidade Total do Projeto
-* **Por Integrante:** 6h/semana x 14 semanas = 84 horas
-* **Total do Grupo:** 84h x 19 integrantes = 1.596 horas
-
-### Divisão de Horas por Atividade
-1. **Estudos e Aulas (40%):** 638,4 horas
-2. **Programação / Firmware (25%):** 399,0 horas
-3. **Hardware e Modelagem 3D (20%):** 319,2 horas
-4. **Testes e Documentação (15%):** 239,4 horas
+* **Por Integrante:** 10h/semana x 14 semanas = 140 horas
+* **Total do Grupo:** 140h x 19 integrantes = 2.660 horas
