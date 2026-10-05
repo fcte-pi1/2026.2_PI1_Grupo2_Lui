@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model SessaoNavegacao {
+  id_sessao            Int      @id @default(autoincrement())
+  data_inicio          DateTime @default(now())
+  status_conclusao     String
+  tempo_total_segundos Float
+
+  celulas     CelulaLabirinto[]
+  telemetrias RegistroTelemetria[]
+  logs        LogEvento[]
+
+  @@map("SESSAO_NAVEGACAO")
+}
+
+model CelulaLabirinto {
+  id_celula Int @id @default(autoincrement())
+  id_sessao Int
+
+  pos_x Int
+  pos_y Int
+
+  parede_norte Boolean
+  parede_sul   Boolean
+  parede_leste Boolean
+  parede_oeste Boolean
+
+  visitada Boolean
+
+  sessao SessaoNavegacao @relation(fields: [id_sessao], references: [id_sessao])
+
+  @@map("CELULA_LABIRINTO")
+}
+
+model RegistroTelemetria {
+  id_telemetria      BigInt @id @default(autoincrement())
+  id_sessao          Int
+  timestamp_ms       BigInt
+  tensao_bateria     Float
+  corrente_bateria   Float
+  velocidade_esq    Float
+  velocidade_dir    Float
+  angulo_orientacao Float
+
+  sessao SessaoNavegacao @relation(fields: [id_sessao], references: [id_sessao])
+
+  @@map("REGISTRO_TELEMETRIA")
+}
+
+model LogEvento {
+  id_log       Int    @id @default(autoincrement())
+  id_sessao    Int
+  timestamp_ms BigInt
+  tipo_evento  String
+  descricao    String
+
+  sessao SessaoNavegacao @relation(fields: [id_sessao], references: [id_sessao])
+
+  @@map("LOG_EVENTO")
+}
