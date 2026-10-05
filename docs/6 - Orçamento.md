@@ -9,12 +9,12 @@
 |-----------|-----------:|
 | Mão de obra (estudantes, valor de referência) | 104.192,20 |
 | Serviços | 50,90 |
-| Equipamentos e materiais | 860,81 |
-| **Custo total do projeto** | **105.103,91** |
-| Desembolso em dinheiro (serviços + materiais) | 911,71 |
-| Desembolso por integrante (19 integrantes) | 47,98 |
+| Equipamentos e materiais | 654,49 |
+| **Custo total do projeto** | **104.897,59** |
+| Desembolso em dinheiro (serviços + materiais) | 705,39 |
+| Desembolso por integrante (19 integrantes) | 37,13 |
 
-A mão de obra não é gasto em dinheiro: entra no orçamento como valor de referência do tempo dos estudantes. O que a equipe paga de fato é o desembolso de R$ 911,71.
+A mão de obra não é gasto em dinheiro: entra no orçamento como valor de referência do tempo dos estudantes. O que a equipe paga de fato é o desembolso de R$ 705,39.
 
 ## 2. Orçamento consolidado
 
@@ -26,7 +26,7 @@ A mão de obra não é gasto em dinheiro: entra no orçamento como valor de refe
 | Impressão 3D (Faculdade UnB Gama) | 1 | 0,00 | |
 | Marcenaria (corte de madeira, equipamentos próprios) | 1 | 0,00 | |
 | Frete das compras online | 1 | 50,90 | |
-| <span style="color: blue;">**Equipamentos e Materiais**</span> | | 860,81 | |
+| <span style="color: blue;">**Equipamentos e Materiais**</span> | | 654,49 | |
 | *Eletrônica* | | 302,80 | |
 | ESP32 DevKit 30 pinos | 2 | 79,98 | |
 | Ponte H DRV8833 | 1 | 16,00 | |
@@ -45,14 +45,11 @@ A mão de obra não é gasto em dinheiro: entra no orçamento como valor de refe
 | Chassi, plataforma, suportes e cubo eixo-rodas (ABS Premium) | 1 | 124,69 | |
 | Rodas motrizes (kit com 2) | 2 | 30,08 | |
 | Roda boba (ball caster) | 1 | 35,87 | |
-| *Estrutura: labirinto* | | 206,32 | |
-| MDF para o labirinto | 1 | 186,57 | |
-| Cola para madeira | 1 | 8,00 | |
-| Lixa para madeira | 1 | 11,75 | |
+| *Estrutura: labirinto* | | 0,00 | |
 | Suportes impressos (reaproveitamento do ABS) | 1 | 0,00 | |
 | *Estrutura: extras* | | 50,00 | |
 | Porcas, parafusos, arruelas e buchas | 1 lote | 50,00 | |
-| <span style="color: blue;">**TOTAL**</span> | | **105.103,91** | |
+| <span style="color: blue;">**TOTAL**</span> | | **104.897,59** | |
 
 ## 3. Mão de obra
 
@@ -99,11 +96,8 @@ Cada integrante dedica 10 h/semana (4 h de aula + 6 h extraclasse) durante 14 se
 | Carrinho | Chassi, plataforma, suportes e cubo eixo-rodas | Filamento ABS Premium MG-94, vermelho, 1,75 mm, 1 kg | 124,69 | [Loja National 3D](https://www.lojanational3d.com.br/filamentoabspremiummg-94vermelhoextintor175mm1kg/prod-7395641/) |
 | Carrinho | Rodas motrizes | Roda 34 mm para micro motor N20 (kit com 2) | 30,08 | [Mercado Livre](https://www.mercadolivre.com.br/2x-roda-34mm-para-micro-motor-dc-12v-n20-robo/up/MLBU664879255) |
 | Carrinho | Roda boba | Esfera transferidora de aço carbono (ball caster) | 35,87 | [Mercado Livre](https://www.mercadolivre.com.br/esfera-transferidora-aco-carbono-roda-boba-para-robotica/up/MLBU2884521198) |
-| Labirinto | MDF para o labirinto | MDF | 186,57 | |
-| Labirinto | Cola para madeira | Cola para madeira | 8,00 | |
-| Labirinto | Lixa para madeira | Lixa para madeira | 11,75 | |
 | Labirinto | Suportes impressos | Reaproveitamento do ABS | 0,00 | |
 | Serviços | Impressão 3D | Faculdade UnB Gama | 0,00 | |
 | Serviços | Corte de madeira | Equipamentos próprios | 0,00 | |
 | Extras | Porcas, parafusos, arruelas e buchas | A definir | 50,00 | |
-| **Subtotal** | | | **446,96** | |
+| **Subtotal** | | | **240,64** | |
