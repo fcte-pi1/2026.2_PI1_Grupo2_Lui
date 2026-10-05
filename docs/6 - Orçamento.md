@@ -9,12 +9,12 @@
 |-----------|-----------:|
 | Mão de obra (estudantes, valor de referência) | 104.192,20 |
 | Serviços | 50,90 |
-| Equipamentos e materiais | 654,49 |
-| **Custo total do projeto** | **104.897,59** |
-| Desembolso em dinheiro (serviços + materiais) | 705,39 |
-| Desembolso por integrante (19 integrantes) | 37,13 |
+| Equipamentos e materiais | 626,01 |
+| **Custo total do projeto** | **104.869,11** |
+| Desembolso em dinheiro (serviços + materiais) | 676,01 |
+| Desembolso por integrante (19 integrantes) | 35,63 |
 
-A mão de obra não é gasto em dinheiro: entra no orçamento como valor de referência do tempo dos estudantes. O que a equipe paga de fato é o desembolso de R$ 705,39.
+A mão de obra não é gasto em dinheiro: entra no orçamento como valor de referência do tempo dos estudantes. O que a equipe paga de fato é o desembolso de R$ 676,01.
 
 ## 2. Orçamento consolidado
 
@@ -27,11 +27,11 @@ A mão de obra não é gasto em dinheiro: entra no orçamento como valor de refe
 | Marcenaria (corte de madeira, equipamentos próprios) | 1 | 0,00 | |
 | Frete das compras online | 1 | 50,90 | |
 | <span style="color: blue;">**Equipamentos e Materiais**</span> | | 654,49 | |
-| *Eletrônica* | | 302,80 | |
+| *Eletrônica* | | 274,32 | |
 | ESP32 DevKit 30 pinos | 2 | 79,98 | |
-| Ponte H DRV8833 | 1 | 16,00 | |
+| Ponte H DRV8833 | 1 | 19,00 | |
 | Motor N20 6V com encoder | 2 | 57,78 | |
-| Sensor ultrassônico HC-SR04 | 4 | 75,00 | |
+| Sensor ultrassônico HC-SR04 | 4 | 43,52 | |
 | Giroscópio IMU MPU6500 | 1 | 24,90 | |
 | Tradutor de nível lógico | 1 | 12,20 | |
 | Protoboard 400 pontos | 1 | 12,80 | |
@@ -76,9 +76,9 @@ Cada integrante dedica 10 h/semana (4 h de aula + 6 h extraclasse) durante 14 se
 | Item | Modelo | Qtde. | Valor unit. (R$) | Previsto (R$) | Onde comprar |
 |:-----|:-------|------:|-----------------:|--------------:|:-------------|
 | ESP32 | DevKit 30 pinos | 2 | 39,99 | 79,98 | [Shopee](https://shopee.com.br/Placa-Esp32-Wifi-Bluetooth-30-38-Pinos-soldados-i.322895481.23893449076) |
-| Ponte H | DRV8833 | 1 | 16,00 | 16,00 | [Mercado Livre](https://www.mercadolivre.com.br/ponte-h-dupla-2-canais-drv8833-2a-placa-preta/p/MLB35859089) |
+| Ponte H | DRV8833 | 1 | 19,00 | 19,00 | [Mercado Livre](https://www.mercadolivre.com.br/ponte-h-dupla-2-canais-drv8833-2a-placa-preta/p/MLB35859089) |
 | Motor | N20 6V com encoder | 2 | 28,89 | 57,78 |  |
-| Sensor ultrassônico | HC-SR04 | 4 | 18,75 | 75,00 | [Mercado Livre](https://www.mercadolivre.com.br/kit-com-2-unidades-sensor-ultrassonico-hc-sr04-casa-da-robotica-5v-distancia-arduino/p/MLB33346342) |
+| Sensor ultrassônico | HC-SR04 | 4 | 10,88 | 43,52 | [Mercado Livre](https://www.mercadolivre.com.br/kit-com-2-unidades-sensor-ultrassonico-hc-sr04-casa-da-robotica-5v-distancia-arduino/p/MLB33346342) |
 | Giroscópio IMU | MPU6500 | 1 | 24,90 | 24,90 | [Mercado Livre](https://www.mercadolivre.com.br/p/MLB2039721958?matt_tool=38524122&pdp_filters=item_id:MLB2089418706&ua=rKNA4v-WR8G72XmYRZfn7KvSfJiC05_Z-2pbyX2bvI8hSVnI#origin=share&sid=share&wid=MLB2089418706&action=copy) |
 | Tradutor de nível lógico | Conversor bidirecional 5 V / 3,3 V | 1 | 12,20 | 12,20 | [Mercado Livre](https://www.mercadolivre.com.br/conversor-nivel-logico-bidirecional-i2c-5v-p-33v-arduino/p/MLB2043582171?pdp_filters=item_id%3AMLB920040195&from=gshop&matt_tool=56164162&matt_word=&matt_source=google&matt_campaign_id=22090193744&matt_ad_group_id=194474654154&matt_match_type=&matt_network=g&matt_device=c&matt_creative=792355615410&matt_keyword=&matt_ad_position=&matt_ad_type=pla&matt_merchant_id=735128188&matt_product_id=MLB2043582171-product&matt_product_partition_id=2495059736147&matt_target_id=aud-2681155424872:pla-2495059736147&cq_src=google_ads&cq_cmp=22090193744&cq_net=g&cq_plt=gp&cq_med=pla&gad_source=1&gad_campaignid=22090193744&gbraid=0AAAAAD93qcCt4zhtD4uBqIvJZA0_PPcIe&gclid=CjwKCAjwlY3WBhANEiwApsNrLYGNXtZGS10XxKEl-dKNZaxImQN4QyVdy_Ht5SXaZNWjJR6HH0oU6xoC7xsQAvD_BwE) |
 | Protoboard | 400 pontos | 1 | 12,80 | 12,80 | [Mercado Livre](https://www.mercadolivre.com.br/protoboard-breadboard-400-pontos-furos-para-pic-e-arduino/p/MLB27400174?pdp_filters=item_id%3AMLB7698702108&from=gshop&matt_tool=38545640&matt_word=&matt_source=google&matt_campaign_id=22090354508&matt_ad_group_id=194474657034&matt_match_type=&matt_network=g&matt_device=c&matt_creative=792396419935&matt_keyword=&matt_ad_position=&matt_ad_type=pla&matt_merchant_id=735128188&matt_product_id=MLB27400174-product&matt_product_partition_id=2499513569492&matt_target_id=aud-2681155424872:pla-2499513569492&cq_src=google_ads&cq_cmp=22090354508&cq_net=g&cq_plt=gp&cq_med=pla&gad_source=1&gad_campaignid=22090354508&gbraid=0AAAAAD93qcBLK7W4Aqf7XUKEQ3_WORNQx&gclid=CjwKCAjwlY3WBhANEiwApsNrLQ0PwNwIzs5CDr5Jc-oIKUlx6SVIAwUFUTNI7JA3_e-KPbxd6WiCVBoCRv0QAvD_BwE) |
@@ -87,7 +87,7 @@ Cada integrante dedica 10 h/semana (4 h de aula + 6 h extraclasse) durante 14 se
 | Cabo conector | JST XH 2,54 mm, 2 pinos, 20 cm | 1 | 20,80 | 20,80 | [Mercado Livre](https://www.mercadolivre.com.br/up/MLBU5165009963?pdp_filters=item_id:MLB7640118870) |
 | Regulador buck | MP1584 (kit com 2) | 1 | 23,00 | 23,00 | [Mercado Livre](https://www.mercadolivre.com.br/2x-regulador-de-tensao-mp1584-conversor-dc-dc-step-down/p/MLB2102845932?pdp_filters=item_id%3AMLB2168028681&from=gshop&matt_tool=19390443&matt_word=&matt_source=google&matt_campaign_id=22090354205&matt_ad_group_id=173090538676&matt_match_type=&matt_network=g&matt_device=c&matt_creative=727882727907&matt_keyword=&matt_ad_position=&matt_ad_type=pla&matt_merchant_id=735128761&matt_product_id=MLB2102845932-product&matt_product_partition_id=2499513569252&matt_target_id=pla-2499513569252&cq_src=google_ads&cq_cmp=22090354205&cq_net=g&cq_plt=gp&cq_med=pla&gad_source=1&gad_campaignid=22090354205&gbraid=0AAAAAD93qcDzi2SHTDYNWyPTt5ZCcYyaC&gclid=CjwKCAjwrP3VBhBbEiwAnaqpQzG9eWG4UAThCwU1GII5ZWEDlc80-e6nBwICxyGMtFhc2tbZAX8YoxoCDX4QAvD_BwE) |
 | Medidor de tensão/corrente | INA226 | 1 | 34,00 | 34,00 | [Mercado Livre](https://www.mercadolivre.com.br/ina226-modulo-sensor-de-corrente-dc-alta-precisao-i2c/p/MLB2046304522) |
-| **Subtotal** | | | | **413,85** | |
+| **Subtotal** | | | | **385,37** | |
 
 ### Estrutura
 
