@@ -4,7 +4,7 @@
 
 Aqui está o fluxo de trabalho que usamos, do início ao fim. Siga estes passos com atenção\!
 
-Para instruções detalhadas de configuração do ambiente de desenvolvimento, consulte o nosso [Guia de SETUP](./SETUP.md).
+Para instruções detalhadas de configuração do ambiente de desenvolvimento, consulte o nosso [Guia de SETUP](../.github/SETUP.md).
 
 ### Passo 1: Sincronize com a Branch `develop`
 
