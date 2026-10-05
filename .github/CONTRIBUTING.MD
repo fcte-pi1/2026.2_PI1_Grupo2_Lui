@@ -1,121 +1,261 @@
-# Guia de contribuição
+# Guia de Contribuição
 
-## Estrutura do repositório
+## 💻 Passo a Passo da Contribuição
 
-**OBS.:** Estrutura sujeita a mudanças
+Aqui está o fluxo de trabalho que usamos, do início ao fim. Siga estes passos com atenção\!
 
-```
+### Passo 1: Sincronize com a Branch `develop`
 
-Repo/
-├── docs/
-│   ├── Arquitetura.md
-│   └── figs/
-│       └── Projeto_conceitual/
-│           ├── VisaoDeProcessos.png
-│           └── VisaoDeImplantaçao.png
-└── src/
-    ├── backend/
-    │   ├── prisma/                  # Schema e migrações do banco relacional (SQLite / PostgreSQL)
-    │   │   └── schema.prisma
-    │   ├── src/
-    │   │   ├── controllers/         # Camada Controller (MVC): Handlers das rotas HTTP e WebSockets
-    │   │   │   ├── SessionController.ts
-    │   │   │   ├── TelemetryController.ts
-    │   │   │   └── LogController.ts
-    │   │   ├── models/              # Camada Model (MVC) / Entidades do Banco de Dados
-    │   │   │   ├── SessaoNavegacao.ts
-    │   │   │   ├── CelulaLabirinto.ts
-    │   │   │   ├── RegistroTelemetria.ts
-    │   │   │   └── LogEvento.ts
-    │   │   ├── services/            # Regras de negócio e processamento de telemetria
-    │   │   │   ├── TelemetryProcessor.ts
-    │   │   │   └── MazeService.ts
-    │   │   ├── websocket/           # Servidor WebSockets (ws) para recepção de dados em tempo real
-    │   │   │   └── wsServer.ts
-    │   │   ├── routes/              # Definidor de rotas Express.js
-    │   │   │   └── apiRoutes.ts
-    │   │   └── index.ts             # Entry point do servidor Node.js/Express
-    │   ├── package.json
-    │   └── tsconfig.json
-    ├── firmware/
-    │   ├── include/                 # Arquivos de cabeçalho (.h / .hpp) organizados por camadas
-    │   │   ├── drivers/             # Módulo 1: HAL / Drivers de Hardware (Baixo Nível)
-    │   │   │   ├── mpu6500.h        # Driver IMU
-    │   │   │   ├── us100.h          # Driver Ultrassônico
-    │   │   │   ├── drv8833.h        # Driver Ponte H
-    │   │   │   ├── encoder.h        # Driver de Odometria
-    │   │   │   └── ina226.h         # Driver de Potência
-    │   │   ├── control/             # Módulo 2: Controle e Navegação (Médio Nível)
-    │   │   │   ├── pid.h            # Malha de Controle PID
-    │   │   │   └── floodfill.h      # Algoritmo Mapeador e Buscador
-    │   │   ├── comm/                # Módulo 3: Comunicação e Armazenamento (Alto Nível)
-    │   │   │   ├── storage.h        # Gerenciador NVS / LittleFS
-    │   │   │   └── ws_client.h      # Cliente WebSockets / Wi-Fi
-    │   │   └── tasks/               # Tarefas FreeRTOS (Visão de Processos)
-    │   │       ├── task_sensors.h
-    │   │       ├── task_pid.h
-    │   │       ├── task_navigation.h
-    │   │       └── task_comm.h
-    │   ├── src/                     # Implementação (.cpp)
-    │   │   ├── drivers/
-    │   │   │   ├── mpu6500.cpp
-    │   │   │   ├── us100.cpp
-    │   │   │   ├── drv8833.cpp
-    │   │   │   ├── encoder.cpp
-    │   │   │   └── ina226.cpp
-    │   │   ├── control/
-    │   │   │   ├── pid.cpp
-    │   │   │   └── floodfill.cpp
-    │   │   ├── comm/
-    │   │   │   ├── storage.cpp
-    │   │   │   └── ws_client.cpp
-    │   │   ├── tasks/
-    │   │   │   ├── task_sensors.cpp     # Core 0: Amostragem IMU, US-100, INA226 (10ms)
-    │   │   │   ├── task_pid.cpp         # Core 1: Encoders e Controle PWM DRV8833 (5ms)
-    │   │   │   ├── task_navigation.cpp  # Core 1: Atualização da grade e decisão Floodfill
-    │   │   │   └── task_comm.cpp        # Core 0: Envio JSON via WebSockets e NVS
-    │   │   └── main.cpp                 # Inicialização do FreeRTOS e pinout ESP32 DevKit V1
-    │   ├── data/                    # Arquivos gravados na Flash interna via LittleFS
-    │   └── platformio.ini           # Configurações do firmware (Framework Arduino ESP32 / Libs)
-    └── frontend/
-        ├── public/
-        ├── src/
-        │   ├── components/          # Componentes visuais da interface (View)
-        │   │   ├── MazeCanvas.tsx   # Renderização do labirinto (HTML5 Canvas API)
-        │   │   ├── TelemetryChart.tsx # Gráficos de telemetria em tempo real (Chart.js)
-        │   │   ├── BatteryWidget.tsx # Leitura de tensão e corrente
-        │   │   └── EventLogs.tsx    # Painel de logs de execução
-        │   ├── services/            # Cliente de comunicação com backend
-        │   │   ├── wsService.ts     # Conexão WebSocket para telemetria
-        │   │   └── api.ts           # Chamadas HTTP/REST
-        │   ├── types/               # Tipagens TypeScript baseadas no MER do sistema
-        │   │   └── index.ts
-        │   ├── App.tsx              # Componente principal do Dashboard
-        │   └── index.tsx
-        ├── package.json
-        ├── tailwind.config.js       # Configuração de estilos com TailwindCSS
-        └── tsconfig.json
-
-```
-
-## Pré-requisitos
-
-| Ferramenta                   | Versão mínima | Para que serve                                                                                                   |
-| ---------------------------- | ------------- | ---------------------------------------------------------------------------------------------------------------- |
-| Node.js                      | A definir     | Executar o servidor Backend e ferramentas de build do Dashboard Frontend                                         |
-| npm                          | A definir     | Gerenciamento das bibliotecas e dependências TypeScript, React.js e Express.js                                   |
-| PlatformIO                  | A definir     | Ambiente de desenvolvimento para compilar e enviar o firmware escrito em C/C++                                   |
-| Framework Arduino ESP32 Core | A definir     | Fornecer as bibliotecas base para interagir com o hardware da placa ESP32 DevKit V1                              |
-| PostgreSQL                   | A definir     | Banco de dados relacional adotado para persistir sessões de navegação, telemetria e logs                         |
-| Docker + Compose             | A definir     | Criação de contêineres locais para facilitar a execução do PostgreSQL durante o desenvolvimento                  |
-| Prisma CLI                   | A definir     | Ferramenta de ORM (Object-Relational Mapping) para criar as tabelas e gerenciar as migrações do banco relacional |
-
-## Setup inicial
-
-### 1) Clonar e instalar dependências
+Antes de criar sua branch, garanta que você está com a versão mais atualizada da `develop`, que é a nossa branch principal de desenvolvimento.
 
 ```bash
-git clone <repo-url>
-cd <pasta-do-repositorio>
-npm install
+# 1. Vá para a branch develop
+git checkout Software/develop
+
+# 2. Puxe as últimas atualizações do repositório remoto
+git pull origin Software/develop
 ```
+
+### Passo 2: Crie sua Branch de Trabalho
+
+Nunca trabalhe diretamente na `develop`. Crie uma nova branch a partir dela, seguindo nosso padrão de nomenclatura.
+
+**Padrão de Nomenclatura:** `Software/tipo/numero-da-issue-descricao-curta`
+
+- **tipo:** O mesmo tipo do seu primeiro commit (`feat`, `fix`, `docs`, etc.).
+- **numero-da-issue:** O número da issue que você está resolvendo.
+- **descricao-curta:** Duas ou três palavras que resumem a issue.
+
+**Exemplos:**
+
+- `feat/42-tela-de-login`
+- `fix/55-bug-no-botao-sair`
+- `docs/12-atualizar-readme`
+
+**Comando para criar sua branch:**
+
+```bash
+# Troque o nome abaixo pelo da sua branch
+git checkout -b Software/feat/42-tela-de-login
+```
+
+## ✍️ Padrão de Commits
+
+Usamos um padrão para manter nosso histórico de commits limpo e legível. A estrutura é:
+
+```bash
+<tipo>(<escopo>): <assunto>
+
+
+issue associada: #<numero-da-issue>
+
+Co-authored-by: Nome do Primeiro Coautor <primeiro@exemplo.com>
+Co-authored-by: Nome do Segundo Coautor <segundo@exemplo.com>
+```
+
+> **Use sempre aos Co-authors**, eles ajudam a identificar quem fez o commit. Atente-se à nomenclatura: `Co-authored-by: Nome do Coautor <email@exemplo.com>` sem isso não funciona.
+
+- **Referência completa:** [Padrões de Commits do iuricode](https://github.com/iuricode/padroes-de-commits)
+
+- **Co-authors:** [Github docs](https://docs.github.com/pt/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/creating-a-commit-with-multiple-authors)
+
+#### **Tipos mais comuns:**
+
+- `feat`: Uma nova funcionalidade (feature).
+- `fix`: Uma correção de bug.
+- `docs`: Alterações na documentação.
+- `style`: Formatação, ponto e vírgula, etc. (sem alteração de lógica).
+- `refactor`: Refatoração de código que não corrige um bug nem adiciona uma feature.
+- `test`: Adição ou correção de testes.
+- `chore`: Atualização de tarefas de build, pacotes, etc.
+
+#### **Exemplos de bons commits:**
+
+```bash
+feat(auth): implementar fluxo de login com e-mail e senha
+
+fix(feed): corrigir crash ao carregar evento sem imagem
+
+docs(contributing): adicionar guia de contribuição
+
+refactor(user): mover lógica de validação para um serviço separado
+
+test(auth): adicionar testes unitários para o serviço de autenticação
+```
+
+---
+
+
+**OBS.:** ⚠️ Seção em construção ⚠️
+
+### Passo 3: Implemente, Teste e Commite
+
+Agora é a hora de codificar\! 👨‍💻
+
+- **Implemente a Funcionalidade:** Escreva o código necessário para resolver a issue.
+- **Crie Testes Unitários:** Toda nova funcionalidade ou correção **deve** ser acompanhada de testes unitários que validem seu comportamento.
+- **Teste Localmente:** Antes de commitar, rode a aplicação e os testes para garantir que tudo está funcionando como esperado e que você não quebrou nada.
+No nosso caso, usamos o framework [Jest](https://jestjs.io/pt-BR/docs/getting-started).
+os comandos para criar os testes unitários e rodar eles sao:
+
+```bash
+# 1. Crie um teste em __tests__/
+
+# 2. Rode os testes
+pnpm test:api 
+# ou 
+pnpm test:mobile
+# ou ambos
+pnpm test
+
+```
+Depois de testar pode utilizar a biblioteca de Lint [ESLint](https://eslint.org/) para validar o seu código.
+além da biblioteca de formatação [Prettier](https://prettier.io/).
+```bash
+# 1. Rode o Lint
+pnpm lint
+
+# 2. Rode o Format
+pnpm format
+
+```
+
+# SEMPRE RODE o install antes de enviar para o CI workflow
+```bash
+pnpm install
+```
+
+
+Quando estiver pronto para salvar seu progresso, use commits que sigam o nosso padrão.
+
+```bash
+# 1. Adicione os arquivos que você modificou
+git add .
+
+# 2. Crie o commit seguindo o padrão (veja a seção abaixo)
+git commit -m "feat(login): adicionar autenticação com e-mail e senha
+
+issue associada: #42
+
+Co-authored-by: Rodrigo <rodrigo@exemplo.com>
+Co-authored-by: Giovana <giovana@exemplo.com>
+"
+```
+
+### Passo 4: Abra um Pull Request (PR)
+
+Quando sua implementação estiver completa e testada, é hora de enviá-la para o repositório.
+
+```bash
+# 1. Envie sua branch para o repositório remoto
+# Troque "feat/42-tela-de-login" pelo nome da sua branch
+git push origin feat/42-tela-de-login
+```
+
+2.  Acesse o [nosso repositório no GitHub](https://github.com/FGA0138-MDS-Ajax/2025.2-Ra). Você verá um aviso amarelo com o nome da sua branch e um botão **"Compare & pull request"**. Clique nele.
+3.  **Preencha o PR:**
+    - O título do PR já virá com o seu último commit, o que é ótimo\!
+    - Na descrição, **link a issue que você está resolvendo**. Escreva `Closes #42` (troque `42` pelo número da sua issue). Isso fará com que o GitHub feche a issue automaticamente quando o PR for mergeado.
+4.  Clique em **"Create pull request"**.
+
+### Passo 5: Aguarde a Revisão (Code Review)
+
+- **CI/CD em Ação:** Assim que você abrir o PR, nosso sistema de Integração Contínua (CI) irá rodar os testes automaticamente. Seu PR **precisa passar em todas as verificações** (ficar com o "check" verde ✅).
+- **Revisão:** Um ou mais membros da equipe irão revisar seu código. Eles podem solicitar alterações. Fique atento aos comentários e faça os ajustes necessários.
+- **Merge:** Após a aprovação e com todos os checks passando, sua branch será **mergeada na `develop`** por um dos mantenedores do projeto.
+
+Parabéns, sua contribuição foi concluída\! 🎉
+
+---
+
+## 🔀 Resolvendo Conflitos em Branches
+
+Durante o desenvolvimento, é comum que ocorram **divergências entre o branch local e o remoto**.  
+Para manter a consistência do histórico e evitar problemas, siga as recomendações abaixo.
+
+### 1. Antes de fazer `git pull`
+
+Sempre confira o histórico para entender a divergência:
+
+```bash
+git fetch origin
+git log --oneline --graph --decorate --all
+```
+
+### 2. Estratégias permitidas no projeto
+
+- **Rebase (`git pull --rebase`)**
+
+  - Usar em _branches de feature_.
+  - Mantém o histórico **linear** e facilita a leitura.
+  - Exemplo:
+
+    ```bash
+    git pull --rebase origin <nome-do-branch>
+    ```
+
+- **Merge (`git merge --no-rebase`)**
+
+  - Usar em _branches principais_ (`main` ou `dev`).
+  - Preserva o histórico completo sem reescrever commits já compartilhados.
+  - Exemplo:
+
+    ```bash
+    git fetch origin # Pega as últimas mudanças
+    git merge origin <nome-do-branch>
+    ```
+
+    > **Nota:** Sempre antes de fazer merge, certifique-se de estar na branch correta. 
+    > Para atualizar sua branch de feature com as últimas mudanças da `develop`, faça:
+
+    ```bash
+    git fetch origin
+    git checkout <sua-branch-de-feature>
+    git merge origin/develop
+    ```
+    Resolva os conflitos, se houver, e depois continue com seus commits normalmente.
+
+- **Fast-forward only (`git pull --ff-only`)**
+
+  - Usar como medida de segurança em branches protegidos.
+  - Não cria merge commits automáticos.
+  - Exemplo:
+
+    ```bash
+    git pull --ff-only origin <nome-do-branch>
+    ```
+
+### 3. Resolvendo conflitos
+
+Se durante o `pull` houver conflito:
+
+1. O Git marcará os arquivos em conflito com `<<<<<<<`, `=======`, `>>>>>>>`.
+2. Edite manualmente os arquivos para escolher a versão correta.
+3. Após resolver, marque o conflito como resolvido:
+
+   ```bash
+   git add <arquivo-resolvido>
+   ```
+
+4. Continue o processo:
+
+   - Se estiver em rebase:
+
+     ```bash
+     git rebase --continue
+     ```
+
+   - Se estiver em merge:
+
+   ```bash
+    git commit
+   ```
+
+### 4. Boas práticas
+
+- **Nunca faça `rebase` em commits já publicados** em `main` ou `dev`.
+- **Sempre comunique ao time** se precisar resolver conflitos grandes.
+- **Evite commits grandes e misturados** — quanto menores, mais fáceis de resolver.
+- **Documente o que foi resolvido no commit** para facilitar auditoria no futuro.
+
+---
