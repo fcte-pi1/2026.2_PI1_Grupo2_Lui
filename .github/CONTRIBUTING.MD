@@ -4,6 +4,8 @@
 
 Aqui está o fluxo de trabalho que usamos, do início ao fim. Siga estes passos com atenção\!
 
+Para instruções detalhadas de configuração do ambiente de desenvolvimento, consulte o nosso [Guia de SETUP](./SETUP.md).
+
 ### Passo 1: Sincronize com a Branch `develop`
 
 Antes de criar sua branch, garanta que você está com a versão mais atualizada da `develop`, que é a nossa branch principal de desenvolvimento.
