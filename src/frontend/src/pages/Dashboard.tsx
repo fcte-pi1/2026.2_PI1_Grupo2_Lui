@@ -52,7 +52,7 @@ export function Dashboard() {
           <select
             value={fonte}
             onChange={(e) => setFonte(e.target.value as Fonte)}
-            className="rounded-md border border-slate-300 bg-transparent px-2 py-1 dark:border-slate-700"
+            className="rounded-md border border-slate-300 bg-white px-2 py-1 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           >
             <option value="ws">Robô (WebSocket)</option>
             <option value="simulador">Simulação</option>
@@ -60,7 +60,7 @@ export function Dashboard() {
           <select
             value={tamanho}
             onChange={(e) => setTamanho(Number(e.target.value))}
-            className="rounded-md border border-slate-300 bg-transparent px-2 py-1 dark:border-slate-700"
+            className="rounded-md border border-slate-300 bg-white px-2 py-1 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           >
             {TAMANHOS.map((t, i) => (
               <option key={t.rotulo} value={i}>
