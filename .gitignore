@@ -169,7 +169,6 @@ acs-*.bib
 
 # knitr
 *-concordance.tex
-# TODO Uncomment the next line if you use knitr and want to ignore its generated tikz files
 # *.tikz
 *-tikzDictionary
 
@@ -260,15 +259,12 @@ pythontex-files-*/
 # titletoc
 *.ptc
 
-# todonotes
-*.tdo
+
 
 # vhistory
 *.hst
 *.ver
 
-# easy-todo
-*.lod
 
 # xcolor
 *.xcp
