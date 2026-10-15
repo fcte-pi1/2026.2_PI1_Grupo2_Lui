@@ -39,4 +39,19 @@ Todas em JSON, com o campo `type`. Coordenadas: `(0,0)` é a largada, no canto i
 `heading`: `N`, `S`, `L` ou `O`. `robot_state`: `MAPPING`, `NAVIGATING`, `RETURNING`, `STOPPED`, `ERROR` ou `FINISHED`
 (`error_reason` só aparece com `ERROR`). `timestamp` em milissegundos.
 
+### Pacote do firmware (HU-00)
+
+O backend também pode repassar, sem converter, o pacote que o firmware já gera em `MazeMap::cellPacketJson`:
+
+```json
+{ "robot": { "x": 3, "y": 1, "heading": "NORTH" },
+  "cell":  { "x": 3, "y": 1, "visited": true,
+             "walls": { "north": true, "south": false, "east": true, "west": false } } }
+```
+
+No firmware a origem `(0,0)` é a célula de largada e `y` cresce para o Sul. O adaptador
+`src/services/adaptadorFirmware.ts` transforma esse pacote nas mensagens `cell` e `position`
+acima, só invertendo o eixo `y` (`y_painel = altura - 1 - y`). Ele precisa da altura do
+labirinto, por isso a mensagem `maze` deve ser enviada antes de cada corrida.
+
 Hoje o backend (`telemetry.gateway.ts`) só recebe e loga; repassar essas mensagens ao dashboard faz parte da HU-10.
