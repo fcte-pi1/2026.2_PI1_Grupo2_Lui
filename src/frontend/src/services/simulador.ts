@@ -124,7 +124,7 @@ export function iniciarSimulador(
   const paredes = gerarLabirinto(largura, altura);
   const passos = planejarCorrida(paredes, largura, altura);
   const inicio = Date.now();
-  let bateria = 12.4;
+  let bateria = 8.3;
   let estado: EstadoRobo = "MAPPING";
   let indice = 0;
 
@@ -147,7 +147,7 @@ export function iniciarSimulador(
   const timerTelemetria = setInterval(() => {
     const t = (Date.now() - inicio) / 1000;
     // descarga acelerada para dar para ver o alerta de bateria na simulação
-    bateria = Math.max(9.8, bateria - 0.012);
+    bateria = Math.max(6.2, bateria - 0.012);
     const parado = estado === "FINISHED";
     const base = parado ? 0 : 0.45;
     const erro = parado ? 0 : 0.08 * Math.sin(t * 3) + (Math.random() - 0.5) * 0.03;
