@@ -3,10 +3,12 @@
 /**
  * HU-00 - Construção contínua do mapa interno do labirinto.
  *
- * Convenção de coordenadas (alinhar com HU-02 e HU-08):
+ * Convenção de coordenadas (IGUAL à do tracking::PositionTracker, HU-02):
+ *   - x = coluna (tracking: col), y = linha (tracking: row).
+ *   - Norte diminui y, Sul aumenta y, Leste aumenta x, Oeste diminui x.
  *   - Origem (0,0) = célula de partida.
- *   - Norte = y + 1, Leste = x + 1.
- *   - Dir: North=0, East=1, South=2, West=3 (o valor é o bit na máscara).
+ *   - Dir: North=0, East=1, South=2, West=3 - mesma ordem de
+ *     tracking::Orientation; o valor também é o bit na máscara de paredes.
  *
  * Duas máscaras por célula:
  *   walls -> bit = 1: há parede nesse lado

@@ -74,11 +74,21 @@ void test_update_cell_marca_visitada_e_paredes(void)
 
 void test_parede_espelho_na_vizinha(void)
 {
-    map.updateCell(0, 0, Dir::North, true, false, false);
-    const Cell *up = map.get(0, 1);
+    // Norte DIMINUI y (convenção do PositionTracker): vizinha ao norte de (0,1) é (0,0)
+    map.updateCell(0, 1, Dir::North, true, false, false);
+    const Cell *up = map.get(0, 0);
     TEST_ASSERT_TRUE(up->hasWall(Dir::South));
     TEST_ASSERT_TRUE(up->isKnown(Dir::South));
     TEST_ASSERT_EQUAL_UINT8(0, up->visited);
+}
+
+void test_norte_diminui_y_e_leste_aumenta_x(void)
+{
+    map.setWall(2, 2, Dir::North, true);
+    TEST_ASSERT_TRUE(map.get(2, 1)->hasWall(Dir::South));   // y-1
+    TEST_ASSERT_FALSE(map.get(2, 3)->isKnown(Dir::North));  // y+1 intacta
+    map.setWall(2, 2, Dir::East, true);
+    TEST_ASSERT_TRUE(map.get(3, 2)->hasWall(Dir::West));    // x+1
 }
 
 void test_mesma_parede_com_headings_diferentes(void)
@@ -95,7 +105,7 @@ void test_remedicao_corrige_parede(void)
     TEST_ASSERT_TRUE(map.get(1, 1)->hasWall(Dir::North));
     map.updateCell(1, 1, Dir::North, false, false, false); // leitura nova: sem parede
     TEST_ASSERT_FALSE(map.get(1, 1)->hasWall(Dir::North));
-    TEST_ASSERT_FALSE(map.get(1, 2)->hasWall(Dir::South)); // espelho também
+    TEST_ASSERT_FALSE(map.get(1, 0)->hasWall(Dir::South)); // espelho (y-1) também
 }
 
 void test_fora_dos_limites(void)
@@ -177,6 +187,7 @@ int main(int, char **)
     RUN_TEST(test_relativo_para_absoluto);
     RUN_TEST(test_update_cell_marca_visitada_e_paredes);
     RUN_TEST(test_parede_espelho_na_vizinha);
+    RUN_TEST(test_norte_diminui_y_e_leste_aumenta_x);
     RUN_TEST(test_mesma_parede_com_headings_diferentes);
     RUN_TEST(test_remedicao_corrige_parede);
     RUN_TEST(test_fora_dos_limites);

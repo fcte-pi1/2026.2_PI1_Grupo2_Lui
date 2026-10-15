@@ -1,6 +1,5 @@
-#include "navigation\MazeMap.h"
+#include "navigation/MazeMap.h"
 
-#include <cstdint>
 #include <cstdio>
 #include <cstring>
 
@@ -8,8 +7,9 @@ namespace mm {
 
 namespace {
 
-constexpr int8_t kDx[4] = { 0, 1, 0, -1 };   /* N, E, S, W */
-constexpr int8_t kDy[4] = { 1, 0, -1, 0 };
+/* N, E, S, W - mesma convenção do PositionTracker: Norte diminui a linha (y). */
+constexpr int8_t kDx[4] = { 0, 1, 0, -1 };
+constexpr int8_t kDy[4] = { -1, 0, 1, 0 };
 
 constexpr uint8_t kMagic0  = 'M';
 constexpr uint8_t kMagic1  = 'Z';
