@@ -9,7 +9,7 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "test": "jest"
+    "test": "tsx --test src/services/__tests__/*.test.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",
@@ -21,14 +21,10 @@
     "ws": "^8.22.0"
   },
   "devDependencies": {
-    "@swc/core": "^1.16.18",
-    "@swc/jest": "^0.2.39",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
-    "@types/jest": "^30.0.0",
     "@types/node": "^26.6.4",
     "@types/ws": "^8.18.2",
-    "jest": "^30.5.2",
     "prisma": "^7.10.0",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2"

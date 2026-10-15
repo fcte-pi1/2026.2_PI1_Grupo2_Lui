@@ -1,3 +1,5 @@
+import { describe, it } from "node:test";
+import assert from "node:assert/strict";
 import {
   createLogEventoService,
   LogInvalidoError,
@@ -6,66 +8,110 @@ import {
 } from "../logEvento.service";
 
 function criarDbFake(linhas: LogEventoRow[] = []) {
-  const create = jest.fn(async ({ data }) => ({ id_log: 1, ...data }) as LogEventoRow);
-  const findMany = jest.fn(async () => linhas);
+  const chamadasCreate: Array<{
+    id_sessao: number;
+    timestamp_ms: bigint;
+    tipo_evento: string;
+    descricao: string;
+  }> = [];
+
+  const chamadasFindMany: Array<{
+    where: { id_sessao: number; tipo_evento?: string };
+    orderBy: { timestamp_ms: "asc" };
+  }> = [];
+
+  const create = async ({
+    data
+  }: {
+    data: {
+      id_sessao: number;
+      timestamp_ms: bigint;
+      tipo_evento: string;
+      descricao: string;
+    };
+  }) => {
+    chamadasCreate.push(data);
+    return { id_log: 1, ...data } as LogEventoRow;
+  };
+
+  const findMany = async (args: {
+    where: { id_sessao: number; tipo_evento?: string };
+    orderBy: { timestamp_ms: "asc" };
+  }) => {
+    chamadasFindMany.push(args);
+    return linhas;
+  };
+
   const db = { logEvento: { create, findMany } } as unknown as LogEventoDb;
-  return { db, create, findMany };
+  return { db, chamadasCreate, chamadasFindMany };
 }
 
 const base = { idSessao: 1, nivel: "INFO", descricao: "Início", timestampMs: 1200 };
 
 describe("registrarLog", () => {
   it("grava o log e converte timestamp BigInt para number", async () => {
-    const { db, create } = criarDbFake();
+    const { db, chamadasCreate } = criarDbFake();
     const service = createLogEventoService(db);
 
     const resultado = await service.registrarLog(base);
 
-    expect(create).toHaveBeenCalledWith({
-      data: { id_sessao: 1, timestamp_ms: 1200n, tipo_evento: "INFO", descricao: "Início" }
+    assert.equal(chamadasCreate.length, 1);
+    assert.deepEqual(chamadasCreate[0], {
+      id_sessao: 1,
+      timestamp_ms: 1200n,
+      tipo_evento: "INFO",
+      descricao: "Início"
     });
-    expect(resultado).toEqual({
+    assert.deepEqual(resultado, {
       id_log: 1,
       timestamp_ms: 1200,
       tipo_evento: "INFO",
       descricao: "Início"
     });
-    expect(() => JSON.stringify(resultado)).not.toThrow();
+    assert.doesNotThrow(() => JSON.stringify(resultado));
   });
 
-  it.each(["INFO", "WARN", "ERROR", "SUCCESS"])("aceita o nível %s", async (nivel) => {
-    const { db } = criarDbFake();
-    await expect(
-      createLogEventoService(db).registrarLog({ ...base, nivel })
-    ).resolves.toBeDefined();
-  });
+  const niveisValidos = ["INFO", "WARN", "ERROR", "SUCCESS"];
+  for (const nivel of niveisValidos) {
+    it(`aceita o nível ${nivel}`, async () => {
+      const { db } = criarDbFake();
+      const res = await createLogEventoService(db).registrarLog({ ...base, nivel });
+      assert.ok(res);
+    });
+  }
 
   it("rejeita WARNING (o padrão do projeto é WARN)", async () => {
-    const { db, create } = criarDbFake();
-    await expect(
-      createLogEventoService(db).registrarLog({ ...base, nivel: "WARNING" })
-    ).rejects.toBeInstanceOf(LogInvalidoError);
-    expect(create).not.toHaveBeenCalled();
+    const { db, chamadasCreate } = criarDbFake();
+    await assert.rejects(
+      async () => createLogEventoService(db).registrarLog({ ...base, nivel: "WARNING" }),
+      LogInvalidoError
+    );
+    assert.equal(chamadasCreate.length, 0);
   });
 
-  it.each([
+  const casosRejeicao: Array<[string, Partial<typeof base>]> = [
     ["session_id zero", { idSessao: 0 }],
     ["session_id NaN", { idSessao: NaN }],
     ["mensagem vazia", { descricao: "   " }],
     ["t_ms negativo", { timestampMs: -1 }],
     ["t_ms NaN", { timestampMs: NaN }]
-  ])("rejeita %s", async (_nome, alteracao) => {
-    const { db, create } = criarDbFake();
-    await expect(
-      createLogEventoService(db).registrarLog({ ...base, ...alteracao })
-    ).rejects.toBeInstanceOf(LogInvalidoError);
-    expect(create).not.toHaveBeenCalled();
-  });
+  ];
+
+  for (const [nome, alteracao] of casosRejeicao) {
+    it(`rejeita ${nome}`, async () => {
+      const { db, chamadasCreate } = criarDbFake();
+      await assert.rejects(
+        async () => createLogEventoService(db).registrarLog({ ...base, ...alteracao }),
+        LogInvalidoError
+      );
+      assert.equal(chamadasCreate.length, 0);
+    });
+  }
 
   it("descarta casas decimais de t_ms", async () => {
-    const { db, create } = criarDbFake();
+    const { db, chamadasCreate } = criarDbFake();
     await createLogEventoService(db).registrarLog({ ...base, timestampMs: 1200.9 });
-    expect(create.mock.calls[0][0].data.timestamp_ms).toBe(1200n);
+    assert.equal(chamadasCreate[0].timestamp_ms, 1200n);
   });
 });
 
@@ -76,33 +122,39 @@ describe("listarLogs", () => {
   ];
 
   it("lista em ordem cronológica convertendo BigInt", async () => {
-    const { db, findMany } = criarDbFake(linhas);
+    const { db, chamadasFindMany } = criarDbFake(linhas);
 
     const resultado = await createLogEventoService(db).listarLogs(5);
 
-    expect(findMany).toHaveBeenCalledWith({
+    assert.equal(chamadasFindMany.length, 1);
+    assert.deepEqual(chamadasFindMany[0], {
       where: { id_sessao: 5 },
       orderBy: { timestamp_ms: "asc" }
     });
-    expect(resultado.map((l) => l.timestamp_ms)).toEqual([100, 250]);
+    assert.deepEqual(
+      resultado.map((l) => l.timestamp_ms),
+      [100, 250]
+    );
   });
 
   it("filtra por nível", async () => {
-    const { db, findMany } = criarDbFake([linhas[1]]);
+    const { db, chamadasFindMany } = criarDbFake([linhas[1]]);
 
     await createLogEventoService(db).listarLogs(5, { nivel: "ERROR" });
 
-    expect(findMany).toHaveBeenCalledWith({
+    assert.equal(chamadasFindMany.length, 1);
+    assert.deepEqual(chamadasFindMany[0], {
       where: { id_sessao: 5, tipo_evento: "ERROR" },
       orderBy: { timestamp_ms: "asc" }
     });
   });
 
   it("rejeita nível inválido no filtro", async () => {
-    const { db, findMany } = criarDbFake();
-    await expect(
-      createLogEventoService(db).listarLogs(5, { nivel: "DEBUG" })
-    ).rejects.toBeInstanceOf(LogInvalidoError);
-    expect(findMany).not.toHaveBeenCalled();
+    const { db, chamadasFindMany } = criarDbFake();
+    await assert.rejects(
+      async () => createLogEventoService(db).listarLogs(5, { nivel: "DEBUG" }),
+      LogInvalidoError
+    );
+    assert.equal(chamadasFindMany.length, 0);
   });
 });
