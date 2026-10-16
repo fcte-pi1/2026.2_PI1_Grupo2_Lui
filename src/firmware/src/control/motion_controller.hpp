@@ -33,7 +33,8 @@ enum class MotionFailureReason : uint8_t {
     MotionTimeout,
     LeftWheelStalled,
     RightWheelStalled,
-    Cancelled
+    Cancelled,
+    InvalidDistance
 };
 
 struct MotionControllerConfig {
@@ -59,6 +60,8 @@ struct MotionControllerConfig {
     // Corrige a diferença entre distâncias das rodas durante avanço.
     // Unidade aproximada: (mm/s de correção) / mm de diferença.
     float straightCorrectionKp;
+    // Correção diferencial a partir da diferença de distância dos sensores laterais.
+    float wallAlignmentKp;
 
     // Feed-forward aproximado do motor: PWM por mm/s + compensação de atrito
     // estático. Calibrar para cada roda.
@@ -95,6 +98,15 @@ public:
 
     // Cada start... inicia uma operação e retorna sem bloquear.
     bool startMoveForwardOneCell();
+    bool startMoveBackwardOneCell();
+    // Distância assinada em milímetros: positiva avança, negativa dá ré.
+    bool startMoveLinear(float signedDistanceMm);
+
+    // Feedback atualizado pelo subsistema de sensores, em milímetros.
+    // Leituras inválidas/desatualizadas devem ser enviadas com valid=false.
+    void setWallAlignmentFeedback(float leftDistanceMm,
+                                  float rightDistanceMm,
+                                  bool valid);
     bool startTurnLeft90();
     bool startTurnRight90();
     bool startTurnAround180(); // por convenção, gira para a esquerda (+180 graus)
@@ -159,6 +171,9 @@ private:
     uint8_t settledSamples_ = 0;
 
     float targetDistanceMm_ = 0.0f;
+    float leftWallDistanceMm_ = 0.0f;
+    float rightWallDistanceMm_ = 0.0f;
+    bool wallAlignmentValid_ = false;
     float distanceTravelledMm_ = 0.0f;
     float targetAngleDeg_ = 0.0f;
     float turnAngleDeg_ = 0.0f;

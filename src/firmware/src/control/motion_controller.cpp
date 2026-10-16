@@ -38,7 +38,7 @@ MotionControllerConfig::MotionControllerConfig()
     : leftCountsPerMm(6.74f),
       rightCountsPerMm(6.74f),
       wheelTrackMm(90.0f),
-      cellSizeMm(180.0f),
+      cellSizeMm(0.0f),
       maxLinearSpeedMmS(100.0f),
       minLinearSpeedMmS(20.0f),
       linearAccelerationMmS2(250.0f),
@@ -51,6 +51,7 @@ MotionControllerConfig::MotionControllerConfig()
       settledSpeedMmS(8.0f),
       settledGyroDegS(5.0f),
       straightCorrectionKp(1.0f),
+      wallAlignmentKp(1.0f),
       leftFeedForwardPwmPerMmS(0.8f),
       rightFeedForwardPwmPerMmS(0.8f),
       leftStaticFrictionPwm(20.0f),
@@ -89,6 +90,8 @@ bool MotionController::begin(const MotionControllerConfig& config,
         config.minAngularSpeedDegS > config.maxAngularSpeedDegS ||
         config.angularAccelerationDegS2 <= 0.0f ||
         config.turnKpDegPerSecPerDeg <= 0.0f ||
+        config.straightCorrectionKp < 0.0f ||
+        config.wallAlignmentKp < 0.0f ||
         config.positionToleranceMm <= 0.0f ||
         config.angleToleranceDeg <= 0.0f ||
         config.imuYawSign == 0.0f ||
@@ -166,6 +169,7 @@ bool MotionController::prepareMotion(MotionType type, uint32_t timeoutMs) {
 
     profiledLinearSpeedMmS_ = 0.0f;
     profiledAngularSpeedDegS_ = 0.0f;
+    wallAlignmentValid_ = false;
     lastLeftTargetMmS_ = 0.0f;
     lastRightTargetMmS_ = 0.0f;
     distanceTravelledMm_ = 0.0f;
@@ -181,11 +185,39 @@ bool MotionController::prepareMotion(MotionType type, uint32_t timeoutMs) {
 }
 
 bool MotionController::startMoveForwardOneCell() {
+    return startMoveLinear(config_.cellSizeMm);
+}
+
+bool MotionController::startMoveBackwardOneCell() {
+    return startMoveLinear(-config_.cellSizeMm);
+}
+
+bool MotionController::startMoveLinear(float signedDistanceMm) {
+    // Como as demais ações, não substitui uma operação que ainda está rodando.
+    if (status_ == MotionStatus::Running) return false;
+    if (!isfinite(signedDistanceMm) || absValue(signedDistanceMm) < 0.5f) {
+        failureReason_ = MotionFailureReason::InvalidDistance;
+        if (status_ != MotionStatus::Running) status_ = MotionStatus::Failed;
+        motors_.stop();
+        return false;
+    }
     if (!prepareMotion(MotionType::ForwardCell, config_.forwardTimeoutMs)) {
         return false;
     }
-    targetDistanceMm_ = config_.cellSizeMm;
+    targetDistanceMm_ = signedDistanceMm;
     return true;
+}
+
+void MotionController::setWallAlignmentFeedback(float leftDistanceMm,
+                                                float rightDistanceMm,
+                                                bool valid) {
+    wallAlignmentValid_ = valid && isfinite(leftDistanceMm) &&
+        isfinite(rightDistanceMm) && leftDistanceMm > 0.0f &&
+        rightDistanceMm > 0.0f;
+    if (wallAlignmentValid_) {
+        leftWallDistanceMm_ = leftDistanceMm;
+        rightWallDistanceMm_ = rightDistanceMm;
+    }
 }
 
 bool MotionController::startTurn(float targetAngleDeg, MotionType type) {
@@ -314,6 +346,14 @@ void MotionController::updateForward(float dtSeconds,
     // esquerda e aumenta a da direita. A correção some quando a velocidade zera.
     float correction = config_.straightCorrectionKp *
                        (leftTravelMm - rightTravelMm);
+    if (wallAlignmentValid_) {
+        // Diferença positiva significa que há mais espaço à esquerda; para
+        // alinhar, a correção muda de sinal quando o robô está em marcha à ré.
+        float wallCorrection = config_.wallAlignmentKp *
+            (leftWallDistanceMm_ - rightWallDistanceMm_);
+        if (profiledLinearSpeedMmS_ < 0.0f) wallCorrection = -wallCorrection;
+        correction += wallCorrection;
+    }
     const float correctionLimit = config_.maxLinearSpeedMmS * 0.35f;
     correction = clampValue(correction, -correctionLimit, correctionLimit);
     if (absValue(profiledLinearSpeedMmS_) < config_.settledSpeedMmS) {

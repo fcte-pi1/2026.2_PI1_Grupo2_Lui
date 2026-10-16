@@ -1,18 +1,4 @@
 #pragma once
-
-/**
- * Integração HU-00 (mapa interno) + HU-03 (decisão Flood Fill).
- *
- * O controlador deve ser chamado quando o robô estiver parado no centro de
- * uma célula, com a posição/orientação atualizadas pelo subsistema de
- * localização e com as leituras binárias da HU-01 disponíveis.
- *
- * O controlador atualiza o mapa, persiste a versão mais recente e só então
- * pede ao solver a próxima direção absoluta. O código de movimento (HU-04 /
- * HU-05) executa essa direção e chama observeCell novamente ao chegar à
- * próxima célula. Isso mantém os drivers de hardware fora da lógica pura.
- */
-
 #include <cstdint>
 
 #include "hal/IMapStorage.h"
@@ -31,25 +17,27 @@ enum class NavigationStatus : uint8_t {
 };
 
 struct WallReadings {
-    bool front;  // true se existe parede à frente
-    bool left;   // true se existe parede à esquerda
-    bool right;  // true se existe parede à direita
+    bool front;  
+    bool left;   
+    bool right;  
 };
 
 struct NavigationResult {
     NavigationStatus status;
     mm::Dir nextDirection;  // direção absoluta; válida somente para Move
-    uint16_t distance;      // passos estimados; kUnreachable se não houver rota
+    uint16_t distance;      // passos estimados; Unreachable se não houver rota
 };
 
 class AutonomousNavigator {
 public:
     AutonomousNavigator(mm::MazeMap &map, mm::IMapStorage &storage)
         : map_(map), solver_(map), storage_(storage), initialized_(false),
-          hasLastPosition_(false), lastX_(0), lastY_(0) {}
+          hasLastPosition_(false), lastX_(0), lastY_(0), startX_(0), startY_(0),
+          goalX_(0), goalY_(0) {}
 
-    /** Configura como objetivo o canto oposto: (width-1, height-1). */
     bool begin();
+
+    bool begin(uint8_t startX, uint8_t startY, uint8_t goalX, uint8_t goalY);
 
     /**
      * Registra as paredes da célula atual, persiste o mapa e calcula a próxima
@@ -59,8 +47,10 @@ public:
                                  const WallReadings &walls);
 
     bool initialized() const { return initialized_; }
-    uint8_t goalX() const { return map_.width() ? map_.width() - 1 : 0; }
-    uint8_t goalY() const { return map_.height() ? map_.height() - 1 : 0; }
+    uint8_t startX() const { return startX_; }
+    uint8_t startY() const { return startY_; }
+    uint8_t goalX() const { return goalX_; }
+    uint8_t goalY() const { return goalY_; }
     const mm::MazeMap &map() const { return map_; }
 
 private:
@@ -77,6 +67,10 @@ private:
     bool hasLastPosition_;
     uint8_t lastX_;
     uint8_t lastY_;
+    uint8_t startX_;
+    uint8_t startY_;
+    uint8_t goalX_;
+    uint8_t goalY_;
 };
 
 }  // namespace nav

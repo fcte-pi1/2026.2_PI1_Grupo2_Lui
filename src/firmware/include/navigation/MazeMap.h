@@ -6,7 +6,7 @@
  * Convenção de coordenadas (IGUAL à do tracking::PositionTracker, HU-02):
  *   - x = coluna (tracking: col), y = linha (tracking: row).
  *   - Norte diminui y, Sul aumenta y, Leste aumenta x, Oeste diminui x.
- *   - Origem (0,0) = célula de partida.
+ *   - x/y são coordenadas da grade; a partida pode estar em qualquer canto configurado.
  *   - Dir: North=0, East=1, South=2, West=3 - mesma ordem de
  *     tracking::Orientation; o valor também é o bit na máscara de paredes.
  *
@@ -22,11 +22,12 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "common/robot_types.hpp"
 #include "hal/IMapStorage.h"
 
 namespace mm {
 
-enum class Dir : uint8_t { North = 0, East = 1, South = 2, West = 3 };
+using Dir = ::Direction;  // tipo único compartilhado com MazeConfig/RobotPose; ordem N, E, S, W.
 
 /** Direção relativa ao robô (somada ao heading vira direção absoluta). */
 enum class Rel : uint8_t { Front = 0, Right = 1, Back = 2, Left = 3 };

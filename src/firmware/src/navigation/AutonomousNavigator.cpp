@@ -4,15 +4,31 @@ namespace nav {
 
 bool AutonomousNavigator::begin()
 {
+    if (map_.width() == 0 || map_.height() == 0) {
+        initialized_ = false;
+        return false;
+    }
+    return begin(0, 0,
+                 static_cast<uint8_t>(map_.width() - 1),
+                 static_cast<uint8_t>(map_.height() - 1));
+}
+
+bool AutonomousNavigator::begin(uint8_t startX, uint8_t startY,
+                                uint8_t goalX, uint8_t goalY)
+{
     initialized_ = false;
     hasLastPosition_ = false;
-    if (map_.width() == 0 || map_.height() == 0) {
+    if (map_.get(startX, startY) == nullptr ||
+        map_.get(goalX, goalY) == nullptr) {
         return false;
     }
-    if (!solver_.setGoal(static_cast<uint8_t>(map_.width() - 1),
-                         static_cast<uint8_t>(map_.height() - 1))) {
+    if (!solver_.setGoal(goalX, goalY)) {
         return false;
     }
+    startX_ = startX;
+    startY_ = startY;
+    goalX_ = goalX;
+    goalY_ = goalY;
     initialized_ = true;
     return true;
 }

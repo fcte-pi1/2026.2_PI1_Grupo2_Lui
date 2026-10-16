@@ -37,6 +37,10 @@ namespace MazeSettings {
 
     constexpr uint8_t MAX_ATTEMPTS = 3;
 
+    // Limite inicial para a classificação de paredes a partir dos US-100.
+    // TODO: Calibrar conforme a posição física dos sensores no chassi.
+    constexpr float WALL_THRESHOLD_CELL_RATIO = 0.55f;
+
 }
 
 inline CellPosition getCornerPosition(
@@ -169,19 +173,18 @@ inline bool isValidMazeConfig(const MazeConfig& config) {
         return false;
     }
 
-    if (config.rows != 4 &&
-        config.rows != 8 &&
-        config.rows != 12) {
+    const bool formatMatches =
+        (config.format == MazeFormat::Maze4x4 && config.rows == 4) ||
+        (config.format == MazeFormat::Maze8x4 && config.rows == 8) ||
+        (config.format == MazeFormat::Maze12x4 && config.rows == 12);
+    if (!formatMatches) {
         return false;
     }
 
     if (config.start.row >= config.rows ||
-        config.start.col >= config.cols) {
-        return false;
-    }
-
-    if (config.goal.row != config.rows - 1 ||
-        config.goal.col != config.cols - 1) {
+        config.start.col >= config.cols ||
+        config.goal.row >= config.rows ||
+        config.goal.col >= config.cols) {
         return false;
     }
 
@@ -191,16 +194,20 @@ inline bool isValidMazeConfig(const MazeConfig& config) {
         return false;
     }
 
-    CellPosition expectedGoal = getCornerPosition(
-        getOppositeCorner(config.startCorner),
-        config.rows,
-        config.cols
-    );
-
-    if (config.goal.row != expectedGoal.row ||
-        config.goal.col != expectedGoal.col) {
+    if (static_cast<uint8_t>(config.startCorner) >
+        static_cast<uint8_t>(MazeCorner::BottomRight) ||
+        static_cast<uint8_t>(config.initialHeading) >
+        static_cast<uint8_t>(Direction::West)) {
         return false;
     }
-    
-    return true;
+
+    const CellPosition expectedStart = getCornerPosition(
+        config.startCorner, config.rows, config.cols);
+    const CellPosition expectedGoal = getCornerPosition(
+        getOppositeCorner(config.startCorner), config.rows, config.cols);
+
+    return config.start.row == expectedStart.row &&
+           config.start.col == expectedStart.col &&
+           config.goal.row == expectedGoal.row &&
+           config.goal.col == expectedGoal.col;
 }
