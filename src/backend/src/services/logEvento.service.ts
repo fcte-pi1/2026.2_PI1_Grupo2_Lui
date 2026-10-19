@@ -46,7 +46,7 @@ export interface LogEventoDb {
     }): Promise<LogEventoRow>;
     findMany(args: {
       where: { id_sessao: number; tipo_evento?: string };
-      orderBy: { timestamp_ms: "asc" };
+      orderBy: { timestamp_ms: "asc" | "desc" };
       take?: number;
     }): Promise<LogEventoRow[]>;
   };
@@ -110,10 +110,14 @@ export function createLogEventoService(db: LogEventoDb) {
 
     async listarLogs(
       idSessao: number,
-      filtros: { nivel?: string; limite?: number } = {}
+      filtros: { nivel?: string; limite?: number; recentes?: boolean } = {}
     ): Promise<LogEventoDTO[]> {
       if (filtros.nivel !== undefined && !isNivelLog(filtros.nivel)) {
         throw new LogInvalidoError(`nível inválido (use ${NIVEIS_LOG.join(", ")})`);
+      }
+      if (filtros.limite !== undefined &&
+          (!Number.isInteger(filtros.limite) || filtros.limite < 1 || filtros.limite > 1000)) {
+        throw new LogInvalidoError("limite deve ser um inteiro entre 1 e 1000");
       }
 
       const linhas = await db.logEvento.findMany({
@@ -121,10 +125,11 @@ export function createLogEventoService(db: LogEventoDb) {
           id_sessao: idSessao,
           ...(filtros.nivel ? { tipo_evento: filtros.nivel } : {})
         },
-        orderBy: { timestamp_ms: "asc" },
-        ...(filtros.limite ? { take: filtros.limite } : {})
+        orderBy: { timestamp_ms: filtros.recentes ? "desc" : "asc" },
+        ...(filtros.limite !== undefined ? { take: filtros.limite } : {})
       });
-      return linhas.map(toDTO);
+      // A API mantém a apresentação cronológica até mesmo quando consulta os mais recentes.
+      return (filtros.recentes ? [...linhas].reverse() : linhas).map(toDTO);
     }
   };
 }

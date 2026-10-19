@@ -84,7 +84,9 @@ export function createLogsController(
 
       try {
         const nivel = typeof req.query.nivel === "string" ? req.query.nivel : undefined;
-        res.json(await logs.listarLogs(idSessao, { nivel }));
+        const limite = typeof req.query.limite === "string" ? Number(req.query.limite) : undefined;
+        const recentes = req.query.recentes === "true";
+        res.json(await logs.listarLogs(idSessao, { nivel, limite, recentes }));
       } catch (erro) {
         if (erro instanceof LogInvalidoError) {
           res.status(400).json({ erro: erro.message });

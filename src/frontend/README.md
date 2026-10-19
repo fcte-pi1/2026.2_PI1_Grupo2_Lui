@@ -1,4 +1,4 @@
-# Frontend: painel da corrida (HU-08 e HU-09)
+# Frontend: painel da corrida e histórico (HU-08, HU-09, HU-11 e HU-12)
 
 ```bash
 npm install
@@ -13,8 +13,13 @@ npm run dev
 
 | Arquivo | O que faz |
 |---|---|
+| `src/App.tsx` | Alterna entre painel ao vivo e histórico, compartilhando a lista de sessões entre as telas |
 | `src/pages/Dashboard.tsx` | Tela principal, escolhe a fonte (robô ou simulação) e o tamanho do labirinto |
-| `src/components/MazeMap.tsx` | HU-08: mapa em SVG (grade, paredes, células visitadas, robô com seta de orientação) |
+| `src/components/SessionOverview.tsx` | HU-11/HU-12: resumo de execuções registradas e últimos eventos dentro do painel ao vivo |
+| `src/pages/Historico.tsx` | HU-11/HU-12: consulta sessões, trajetos e eventos com filtro por severidade |
+| `src/services/api.ts` | Cliente HTTP único para sessões, trajetos e logs, com tipos alinhados às respostas do backend |
+| `src/utils/formatters.ts` | Formatadores compartilhados de data, tempo, duração e estado de conclusão |
+| `src/components/MazeMap.tsx` | HU-08: mapa em SVG (grade, paredes, células visitadas, trilha percorrida e robô com orientação) |
 | `src/components/StatusPanel.tsx` | HU-09: bateria com alerta, velocidade das rodas, estado do robô |
 | `src/components/PidChart.tsx` | HU-09: gráfico contínuo do erro PID (Chart.js) |
 | `src/services/dashboardStore.ts` | Estado global; `aplicarMensagem` aplica cada mensagem recebida |
@@ -55,3 +60,10 @@ acima, só invertendo o eixo `y` (`y_painel = altura - 1 - y`). Ele precisa da a
 labirinto, por isso a mensagem `maze` deve ser enviada antes de cada corrida.
 
 Hoje o backend (`telemetry.gateway.ts`) só recebe e loga; repassar essas mensagens ao dashboard faz parte da HU-10.
+
+
+## Integração do histórico e diagnósticos (HU-11/HU-12)
+
+O cabeçalho do painel possui a ação **Histórico e diagnósticos**, que abre a consulta das sessões persistidas, pontos do trajeto e eventos filtráveis por severidade. O mapa ao vivo destaca a trilha derivada das mensagens de posição, sem duplicar a persistência do firmware. O painel ao vivo também mostra as quatro sessões mais recentes e solicita ao backend apenas os cinco eventos finais da sessão mais recente, sem carregar todo o log para produzir o resumo. O resumo pode ser atualizado manualmente e é solicitado novamente quando a telemetria muda o estado do robô para `FINISHED`, `STOPPED` ou `ERROR`.
+
+As telas compartilham a mesma lista de sessões carregada por `App.tsx`; a navegação apenas oculta a tela inativa, mantendo a conexão WebSocket e o estado do mapa/telemetria ativos. Se o backend estiver indisponível, o painel de corrida continua utilizável e exibe um erro localizado no resumo do histórico.

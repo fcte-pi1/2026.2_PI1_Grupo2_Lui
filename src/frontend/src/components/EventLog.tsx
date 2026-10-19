@@ -1,19 +1,11 @@
 import type { LogEvento } from '../services/api'
+import { formatarTempo } from '../utils/formatters'
 
 const ESTILO_NIVEL: Record<string, string> = {
   INFO: 'bg-sky-500/15 text-sky-300 ring-sky-500/30',
   WARN: 'bg-amber-500/15 text-amber-300 ring-amber-500/30',
   ERROR: 'bg-red-500/15 text-red-300 ring-red-500/30',
   SUCCESS: 'bg-emerald-500/15 text-emerald-300 ring-emerald-500/30',
-}
-
-/** 83500 -> "01:23.500" (tempo desde o início da sessão) */
-function formatarTempo(ms: number): string {
-  const minutos = Math.floor(ms / 60000)
-  const segundos = Math.floor((ms % 60000) / 1000)
-  const resto = Math.floor(ms % 1000)
-  const dois = (n: number) => String(n).padStart(2, '0')
-  return `${dois(minutos)}:${dois(segundos)}.${String(resto).padStart(3, '0')}`
 }
 
 interface EventLogProps {

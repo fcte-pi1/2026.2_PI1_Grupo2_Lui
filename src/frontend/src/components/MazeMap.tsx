@@ -151,6 +151,21 @@ export function MazeMap({ estado }: Props) {
           />
         ))}
 
+        {/* Trilha ao vivo derivada das mensagens de posição (HU-08); paredes ficam sobre a trilha. */}
+        {estado.trajeto.length > 1 && (
+          <polyline
+            points={estado.trajeto
+              .map((ponto) => `${esq(ponto.x) + TAM / 2},${topo(ponto.y) + TAM / 2}`)
+              .join(" ")}
+            fill="none"
+            className="stroke-violet-600 dark:stroke-violet-400"
+            strokeWidth={7}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            opacity={0.78}
+          />
+        )}
+
         {/* paredes descobertas (CA-02) */}
         {celulas.flat().map((c) => {
           if (!c.walls) return null;
@@ -204,6 +219,7 @@ export function MazeLegend() {
   const itens = [
     { cor: "bg-slate-200 opacity-60 dark:bg-slate-800", rotulo: "Inexplorada" },
     { cor: "bg-sky-200 dark:bg-sky-900", rotulo: "Visitada" },
+    { cor: "bg-violet-600 dark:bg-violet-400 h-1.5!", rotulo: "Trajeto" },
     { cor: "bg-slate-900 dark:bg-slate-100 h-1.5!", rotulo: "Parede" },
     { cor: "bg-amber-300 border-2 border-amber-500", rotulo: "Robô" },
   ];

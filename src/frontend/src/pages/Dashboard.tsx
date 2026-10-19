@@ -5,6 +5,8 @@ import { connectTelemetry } from "../services/websocket";
 import { iniciarSimulador } from "../services/simulador";
 import { MazeLegend, MazeMap } from "../components/MazeMap";
 import { BatteryAlert, RobotStateBadge, StatusPanel } from "../components/StatusPanel";
+import { SessionOverview } from "../components/SessionOverview";
+import type { Sessao } from "../services/api";
 import type { MensagemDashboard } from "../types/telemetry";
 
 type Fonte = "ws" | "simulador";
@@ -21,7 +23,23 @@ function ehMensagemDashboard(data: unknown): data is MensagemDashboard {
   return typeof data === "object" && data !== null && TIPOS.includes((data as { type?: string }).type ?? "");
 }
 
-export function Dashboard() {
+interface DashboardProps {
+  onAbrirHistorico: () => void;
+  sessoes: Sessao[] | null;
+  erroSessoes: string | null;
+  carregandoSessoes: boolean;
+  versaoSessoes: number;
+  onAtualizarSessoes: () => void;
+}
+
+export function Dashboard({
+  onAbrirHistorico,
+  sessoes,
+  erroSessoes,
+  carregandoSessoes,
+  versaoSessoes,
+  onAtualizarSessoes,
+}: DashboardProps) {
   const estado = useDashboard();
   // ?fonte=simulador na URL já abre em modo simulação
   const [fonte, setFonte] = useState<Fonte>(() =>
@@ -43,12 +61,26 @@ export function Dashboard() {
     return () => socket.close();
   }, [fonte, tamanho, rodada]);
 
+  // Ao encerrar/parar uma corrida, atualiza o resumo persistido da HU-11/HU-12.
+  useEffect(() => {
+    if (["FINISHED", "STOPPED", "ERROR"].includes(estado.estadoRobo ?? "")) {
+      void onAtualizarSessoes();
+    }
+  }, [estado.estadoRobo, onAtualizarSessoes]);
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-200">
       <header className="sticky top-0 z-10 flex flex-wrap items-center gap-4 border-b border-slate-200 bg-white/90 px-6 py-3 backdrop-blur dark:border-slate-800 dark:bg-slate-900/90">
         <h1 className="text-xl font-bold text-slate-900 dark:text-white">MicroMouse · Painel da corrida</h1>
         <RobotStateBadge estado={estado.estadoRobo} motivo={estado.motivoErro} />
         <div className="ml-auto flex flex-wrap items-center gap-2 text-sm">
+          <button
+            type="button"
+            onClick={onAbrirHistorico}
+            className="rounded-md border border-slate-300 px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-800"
+          >
+            Histórico e diagnósticos
+          </button>
           <select
             value={fonte}
             onChange={(e) => setFonte(e.target.value as Fonte)}
@@ -97,6 +129,14 @@ export function Dashboard() {
             <StatusPanel estado={estado} />
           </section>
         </div>
+
+        <SessionOverview
+          sessoes={sessoes}
+          erroSessoes={erroSessoes}
+          carregandoSessoes={carregandoSessoes}
+          versaoSessoes={versaoSessoes}
+          onAtualizarSessoes={onAtualizarSessoes}
+        />
       </main>
     </div>
   );

@@ -17,7 +17,8 @@ function criarDbFake(linhas: LogEventoRow[] = []) {
 
   const chamadasFindMany: Array<{
     where: { id_sessao: number; tipo_evento?: string };
-    orderBy: { timestamp_ms: "asc" };
+    orderBy: { timestamp_ms: "asc" | "desc" };
+    take?: number;
   }> = [];
 
   const create = async ({
@@ -36,7 +37,8 @@ function criarDbFake(linhas: LogEventoRow[] = []) {
 
   const findMany = async (args: {
     where: { id_sessao: number; tipo_evento?: string };
-    orderBy: { timestamp_ms: "asc" };
+    orderBy: { timestamp_ms: "asc" | "desc" };
+    take?: number;
   }) => {
     chamadasFindMany.push(args);
     return linhas;
@@ -149,6 +151,31 @@ describe("listarLogs", () => {
       resultado.map((l) => l.timestamp_ms),
       [100, 250]
     );
+  });
+
+  it("consulta os eventos recentes sem alterar a ordem cronológica da resposta", async () => {
+    const recentesPrimeiro: LogEventoRow[] = [
+      { id_log: 3, id_sessao: 5, timestamp_ms: 500n, tipo_evento: "ERROR", descricao: "c" },
+      { id_log: 2, id_sessao: 5, timestamp_ms: 250n, tipo_evento: "WARN", descricao: "b" }
+    ];
+    const { db, chamadasFindMany } = criarDbFake(recentesPrimeiro);
+    const resultado = await createLogEventoService(db).listarLogs(5, { limite: 2, recentes: true });
+
+    assert.deepEqual(chamadasFindMany[0], {
+      where: { id_sessao: 5 },
+      orderBy: { timestamp_ms: "desc" },
+      take: 2
+    });
+    assert.deepEqual(resultado.map((l) => l.timestamp_ms), [250, 500]);
+  });
+
+  it("rejeita limite inválido", async () => {
+    const { db, chamadasFindMany } = criarDbFake();
+    await assert.rejects(
+      async () => createLogEventoService(db).listarLogs(5, { limite: 0 }),
+      LogInvalidoError
+    );
+    assert.equal(chamadasFindMany.length, 0);
   });
 
   it("filtra por nível", async () => {

@@ -18,6 +18,8 @@ export interface EstadoDashboard {
   altura: number;
   celulas: Celula[][]; // celulas[y][x]
   robo: { x: number; y: number; heading: Direcao } | null;
+  // Trilha derivada das mensagens position; não substitui o trajeto persistido da HU-11.
+  trajeto: Array<{ x: number; y: number }>;
 
   tensaoBateria: number | null;
   velocidadeEsq: number | null;
@@ -48,6 +50,7 @@ export function estadoInicial(largura = 4, altura = 4): EstadoDashboard {
     altura,
     celulas: criarGrade(largura, altura),
     robo: null,
+    trajeto: [],
     tensaoBateria: null,
     velocidadeEsq: null,
     velocidadeDir: null,
@@ -88,9 +91,15 @@ export function aplicarMensagem(
       // a célula em que o robô está passa a contar como visitada
       const celulas = e.celulas.map((linha) => linha.slice());
       celulas[msg.y][msg.x] = { ...celulas[msg.y][msg.x], visited: true };
+      const ultimo = e.trajeto[e.trajeto.length - 1];
+      const mudouDeCelula = !ultimo || ultimo.x !== msg.x || ultimo.y !== msg.y;
+      const trajeto = mudouDeCelula
+        ? [...e.trajeto, { x: msg.x, y: msg.y }].slice(-5000)
+        : e.trajeto;
       return {
         ...e,
         celulas,
+        trajeto,
         robo: { x: msg.x, y: msg.y, heading: msg.heading },
       };
     }
