@@ -109,6 +109,25 @@ static void test_try_confirm_rotation_below_threshold_does_not_confirm(void) {
     TEST_ASSERT_FALSE(confirmed);
 }
 
+// O yaw do sensor é circular: cruzar 0° não pode perder a mudança de orientação.
+static void test_position_tracker_handles_yaw_wraparound(void) {
+    MockOdometryReader odometry;
+    MockOrientationSensor orientationSensor;
+    const tracking::TrackingState initialState{GridPosition{2, 2}, Orientation::North, 0};
+    PositionTracker tracker(odometry, orientationSensor, initialState, 350);
+
+    orientationSensor.setYawDegrees(350, 10);
+    odometry.setAccumulatedDistanceMm(0, 10);
+    tracker.update();
+    TEST_ASSERT_EQUAL(Orientation::North, tracker.currentState().orientation);
+
+    // 350° -> 80° é uma rotação horária de +90°, não -270°.
+    orientationSensor.setYawDegrees(80, 20);
+    odometry.setAccumulatedDistanceMm(0, 20);
+    tracker.update();
+    TEST_ASSERT_EQUAL(Orientation::East, tracker.currentState().orientation);
+}
+
 // User Story 1 — avanço de célula completo muda a posição corretamente,
 // na orientação inicial padrão (Norte).
 static void test_position_tracker_confirms_advance_and_updates_position(void) {
@@ -326,6 +345,7 @@ int main(int argc, char** argv) {
     RUN_TEST(test_try_confirm_rotation_90_degrees_within_tolerance);
     RUN_TEST(test_try_confirm_rotation_180_degrees_within_tolerance);
     RUN_TEST(test_try_confirm_rotation_below_threshold_does_not_confirm);
+    RUN_TEST(test_position_tracker_handles_yaw_wraparound);
     RUN_TEST(test_position_tracker_confirms_advance_and_updates_position);
     RUN_TEST(test_position_tracker_below_threshold_does_not_change_position);
     RUN_TEST(test_position_tracker_deduplicates_rapid_advance_confirmations);

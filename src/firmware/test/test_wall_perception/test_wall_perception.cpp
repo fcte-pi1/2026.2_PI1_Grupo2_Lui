@@ -174,9 +174,34 @@ static void test_current_state_has_no_missing_fields_after_update(void) {
 
     const WallCellState& state = perception.currentState();
     TEST_ASSERT_EQUAL_UINT32(123, state.timestampMs);
+    TEST_ASSERT_TRUE(state.frontValid);
+    TEST_ASSERT_TRUE(state.leftValid);
+    TEST_ASSERT_TRUE(state.rightValid);
     TEST_ASSERT_EQUAL_UINT16(50, state.distFrontMm);
     TEST_ASSERT_EQUAL_UINT16(60, state.distLeftMm);
     TEST_ASSERT_EQUAL_UINT16(70, state.distRightMm);
+}
+
+// Uma amostra fisicamente inválida permanece desconhecida para os módulos
+// consumidores; não deve ser interpretada como parede nem como corredor livre.
+static void test_invalid_current_reading_is_marked_unknown(void) {
+    MockWallSensor sensor;
+    WallPerception perception(sensor);
+
+    sensor.enqueue(Direction::Front, RawEcho{0, true, 77});  // inválida: abaixo do alcance mínimo
+    sensor.enqueue(Direction::Left, RawEcho{100, true, 77});
+    sensor.enqueue(Direction::Right, RawEcho{0, false, 77}); // sem eco = caminho livre
+    perception.update();
+
+    const WallCellState& state = perception.currentState();
+    TEST_ASSERT_FALSE(state.frontValid);
+    TEST_ASSERT_FALSE(state.wallFront);
+    TEST_ASSERT_EQUAL_UINT16(0, state.distFrontMm);
+
+    TEST_ASSERT_TRUE(state.leftValid);
+    TEST_ASSERT_FALSE(state.wallLeft);
+    TEST_ASSERT_TRUE(state.rightValid);
+    TEST_ASSERT_FALSE(state.wallRight);
 }
 
 // T023 — microbenchmark do custo de computação de update() (FR-008/SC-002).
@@ -218,6 +243,7 @@ int main(int argc, char** argv) {
     RUN_TEST(test_lateral_distance_reflects_filtered_value_not_raw_spike);
     RUN_TEST(test_lateral_distance_updates_every_cycle);
     RUN_TEST(test_current_state_has_no_missing_fields_after_update);
+    RUN_TEST(test_invalid_current_reading_is_marked_unknown);
     RUN_TEST(test_update_computation_latency_budget);
 
     return UNITY_END();

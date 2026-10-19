@@ -83,13 +83,20 @@ void WallPerception::update() {
     const SensorReading& left = readings_[indexOf(Direction::Left)];
     const SensorReading& right = readings_[indexOf(Direction::Right)];
 
-    state_.wallFront = front.filteredDistanceMm <= thresholdMm_;
-    state_.wallLeft = left.filteredDistanceMm <= thresholdMm_;
-    state_.wallRight = right.filteredDistanceMm <= thresholdMm_;
+    state_.frontValid = front.valid;
+    state_.leftValid = left.valid;
+    state_.rightValid = right.valid;
 
-    state_.distFrontMm = front.filteredDistanceMm;
-    state_.distLeftMm = left.filteredDistanceMm;
-    state_.distRightMm = right.filteredDistanceMm;
+    // Uma amostra inválida não pode virar uma parede por causa de um valor
+    // inicial zero, nem virar um caminho livre por causa de um valor antigo.
+    // A validade explícita preserva a distinção entre Open e Unknown.
+    state_.wallFront = front.valid && front.filteredDistanceMm <= thresholdMm_;
+    state_.wallLeft = left.valid && left.filteredDistanceMm <= thresholdMm_;
+    state_.wallRight = right.valid && right.filteredDistanceMm <= thresholdMm_;
+
+    state_.distFrontMm = front.valid ? front.filteredDistanceMm : 0;
+    state_.distLeftMm = left.valid ? left.filteredDistanceMm : 0;
+    state_.distRightMm = right.valid ? right.filteredDistanceMm : 0;
 
     state_.timestampMs = front.timestampMs;
 }

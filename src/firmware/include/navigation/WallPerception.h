@@ -83,9 +83,19 @@ void updateFaultState(SensorFaultState& fault, bool readingValid);
 // completo). As direções são relativas ao robô, NÃO ao labirinto; a
 // tradução para N/S/E/W não é responsabilidade deste módulo (FR-006).
 struct WallCellState {
+    // Presença de parede derivada da leitura válida mais recente. Quando a
+    // leitura é inválida, a flag fica false e o consumidor deve consultar
+    // o campo *Valid* para distinguir "sem parede" de "desconhecido".
     bool wallFront = false;
     bool wallLeft = false;
     bool wallRight = false;
+
+    bool frontValid = false;
+    bool leftValid = false;
+    bool rightValid = false;
+
+    // Distâncias suavizadas em mm. São zero quando a amostra atual é inválida,
+    // evitando que consumidores usem inadvertidamente uma distância obsoleta.
     uint16_t distFrontMm = 0;
     uint16_t distLeftMm = 0;
     uint16_t distRightMm = 0;

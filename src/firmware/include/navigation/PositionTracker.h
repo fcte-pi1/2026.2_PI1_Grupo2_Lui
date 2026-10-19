@@ -75,7 +75,16 @@ inline constexpr uint32_t kMinCellAdvanceIntervalMs = 200;
 // consumidores (mapeamento, navegação, telemetria).
 class PositionTracker {
 public:
+    // Inicialização padrão para compatibilidade: origem (0,0), orientação Norte.
     explicit PositionTracker(IOdometryReader& odometry, IOrientationSensor& orientationSensor);
+
+    // Permite iniciar em qualquer canto/orientação do labirinto. O yaw informado
+    // é a referência inicial do sensor IMU, não uma direção cardinal.
+    // Útil quando a configuração da missão define uma origem diferente de (0,0).
+    PositionTracker(IOdometryReader& odometry,
+                    IOrientationSensor& orientationSensor,
+                    const TrackingState& initialState,
+                    int16_t initialYawReferenceDegrees = 0);
 
     // Lê odometria e orientação, confirma avanços/rotações e recalcula o
     // estado. Chamar a cada ciclo de controle relevante.
