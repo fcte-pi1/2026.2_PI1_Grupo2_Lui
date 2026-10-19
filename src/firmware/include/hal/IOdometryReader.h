@@ -4,10 +4,10 @@
 
 namespace tracking {
 
-// Leitura bruta de deslocamento linear acumulado desde o último reset do
-// acumulador, já convertida para milímetros pela implementação concreta.
+// Deslocamento linear assinado acumulado desde o último reset do
+// acumulador, em milímetros (positivo para frente, negativo para ré).
 struct OdometryReading {
-    uint16_t accumulatedDistanceMm;
+    int16_t accumulatedDistanceMm;
     uint32_t timestampMs;
 };
 

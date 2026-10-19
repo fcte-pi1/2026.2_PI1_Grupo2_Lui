@@ -34,25 +34,26 @@ static void test_fault_state_set_after_five_consecutive_invalid_readings(void) {
     MockWallSensor sensor;
     WallPerception perception(sensor);
 
-    sensor.enqueue(Direction::Front, RawEcho{100, true, 0});
-    sensor.enqueue(Direction::Left, RawEcho{100, true, 0});
-    sensor.enqueue(Direction::Right, RawEcho{100, true, 0});
+    sensor.enqueue(Direction::Front, RawEcho{100, true, 1});
+    sensor.enqueue(Direction::Left, RawEcho{100, true, 1});
+    sensor.enqueue(Direction::Right, RawEcho{100, true, 1});
     perception.update();
     TEST_ASSERT_FALSE(perception.hasFault(Direction::Front));
 
     // 4 leituras inválidas (fisicamente impossíveis, 0mm) seguidas: ainda sem falha.
     for (int i = 0; i < 4; ++i) {
-        sensor.enqueue(Direction::Front, RawEcho{0, true, 0});
-        sensor.enqueue(Direction::Left, RawEcho{100, true, 0});
-        sensor.enqueue(Direction::Right, RawEcho{100, true, 0});
+        const uint32_t timestamp = static_cast<uint32_t>(i + 2);
+        sensor.enqueue(Direction::Front, RawEcho{0, true, timestamp});
+        sensor.enqueue(Direction::Left, RawEcho{100, true, timestamp});
+        sensor.enqueue(Direction::Right, RawEcho{100, true, timestamp});
         perception.update();
     }
     TEST_ASSERT_FALSE(perception.hasFault(Direction::Front));
 
     // 5ª leitura inválida consecutiva: falha deve ser sinalizada.
-    sensor.enqueue(Direction::Front, RawEcho{0, true, 0});
-    sensor.enqueue(Direction::Left, RawEcho{100, true, 0});
-    sensor.enqueue(Direction::Right, RawEcho{100, true, 0});
+    sensor.enqueue(Direction::Front, RawEcho{0, true, 6});
+    sensor.enqueue(Direction::Left, RawEcho{100, true, 6});
+    sensor.enqueue(Direction::Right, RawEcho{100, true, 6});
     perception.update();
     TEST_ASSERT_TRUE(perception.hasFault(Direction::Front));
 
@@ -61,9 +62,9 @@ static void test_fault_state_set_after_five_consecutive_invalid_readings(void) {
     TEST_ASSERT_FALSE(perception.hasFault(Direction::Right));
 
     // 1 leitura válida: falha removida automaticamente.
-    sensor.enqueue(Direction::Front, RawEcho{100, true, 0});
-    sensor.enqueue(Direction::Left, RawEcho{100, true, 0});
-    sensor.enqueue(Direction::Right, RawEcho{100, true, 0});
+    sensor.enqueue(Direction::Front, RawEcho{100, true, 7});
+    sensor.enqueue(Direction::Left, RawEcho{100, true, 7});
+    sensor.enqueue(Direction::Right, RawEcho{100, true, 7});
     perception.update();
     TEST_ASSERT_FALSE(perception.hasFault(Direction::Front));
 }
@@ -89,9 +90,10 @@ static void test_wall_detection_boundary_is_deterministic(void) {
     WallPerception perception(sensor);
 
     for (int i = 0; i < 5; ++i) {
-        sensor.enqueue(Direction::Front, RawEcho{kCorridorWallThresholdMm, true, 0});
-        sensor.enqueue(Direction::Left, RawEcho{kCorridorWallThresholdMm, true, 0});
-        sensor.enqueue(Direction::Right, RawEcho{kCorridorWallThresholdMm, true, 0});
+        const uint32_t timestamp = static_cast<uint32_t>(i + 1);
+        sensor.enqueue(Direction::Front, RawEcho{kCorridorWallThresholdMm, true, timestamp});
+        sensor.enqueue(Direction::Left, RawEcho{kCorridorWallThresholdMm, true, timestamp});
+        sensor.enqueue(Direction::Right, RawEcho{kCorridorWallThresholdMm, true, timestamp});
         perception.update();
         TEST_ASSERT_TRUE(perception.currentState().wallFront);
     }
@@ -141,6 +143,24 @@ static void test_lateral_distance_reflects_filtered_value_not_raw_spike(void) {
 
     const uint16_t afterSpike = perception.lateralDistanceMm(Direction::Left);
     TEST_ASSERT_LESS_THAN_UINT16(spike, afterSpike);  // suavizado, não reflete o pico bruto
+}
+
+static void test_same_snapshot_is_not_filtered_twice(void) {
+    MockWallSensor sensor;
+    WallPerception perception(sensor);
+
+    sensor.enqueue(Direction::Front, RawEcho{300, true, 42});
+    sensor.enqueue(Direction::Left, RawEcho{120, true, 42});
+    sensor.enqueue(Direction::Right, RawEcho{300, true, 42});
+    perception.update();
+    TEST_ASSERT_EQUAL_UINT16(120, perception.lateralDistanceMm(Direction::Left));
+
+    // Uma leitura reprocessada sem novo timestamp deve ser ignorada.
+    sensor.enqueue(Direction::Front, RawEcho{300, true, 42});
+    sensor.enqueue(Direction::Left, RawEcho{400, true, 42});
+    sensor.enqueue(Direction::Right, RawEcho{300, true, 42});
+    perception.update();
+    TEST_ASSERT_EQUAL_UINT16(120, perception.lateralDistanceMm(Direction::Left));
 }
 
 static void test_lateral_distance_updates_every_cycle(void) {
@@ -212,11 +232,14 @@ static void test_update_computation_latency_budget(void) {
     MockWallSensor sensor;
     WallPerception perception(sensor);
 
-    sensor.enqueue(Direction::Front, RawEcho{100, true, 0});
-    sensor.enqueue(Direction::Left, RawEcho{100, true, 0});
-    sensor.enqueue(Direction::Right, RawEcho{100, true, 0});
-
     constexpr int kIterations = 1000;
+    for (int i = 0; i < kIterations; ++i) {
+        const uint32_t timestamp = static_cast<uint32_t>(i + 1);
+        sensor.enqueue(Direction::Front, RawEcho{100, true, timestamp});
+        sensor.enqueue(Direction::Left, RawEcho{100, true, timestamp});
+        sensor.enqueue(Direction::Right, RawEcho{100, true, timestamp});
+    }
+
     const auto start = std::chrono::steady_clock::now();
     for (int i = 0; i < kIterations; ++i) {
         perception.update();
@@ -241,6 +264,7 @@ int main(int argc, char** argv) {
     RUN_TEST(test_wall_detection_boundary_is_deterministic);
     RUN_TEST(test_wall_detection_independent_of_maze_size);
     RUN_TEST(test_lateral_distance_reflects_filtered_value_not_raw_spike);
+    RUN_TEST(test_same_snapshot_is_not_filtered_twice);
     RUN_TEST(test_lateral_distance_updates_every_cycle);
     RUN_TEST(test_current_state_has_no_missing_fields_after_update);
     RUN_TEST(test_invalid_current_reading_is_marked_unknown);

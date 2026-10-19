@@ -82,7 +82,9 @@ public:
      * heading (HU-02) e atualiza a célula.
      */
     bool updateCell(int x, int y, Dir heading,
-                    bool wall_front, bool wall_left, bool wall_right);
+                    bool wall_front, bool wall_left, bool wall_right,
+                    bool front_valid = true, bool left_valid = true,
+                    bool right_valid = true);
 
     uint16_t visitedCount() const;
 

@@ -21,7 +21,6 @@ bool UltrasonicUS100::begin(uint8_t triggerPin,
     pinMode(_triggerPin, OUTPUT);
     pinMode(_echoPin, INPUT);
     digitalWrite(_triggerPin, LOW);
-    clearFilter();
     _initialized = true;
     return true;
 }
@@ -50,48 +49,5 @@ UltrasonicReading UltrasonicUS100::measure() {
         return {false, NAN, pulseUs};
     }
 
-    pushSample(centimeters);
-    return {true, medianOfSamples(), pulseUs};
-}
-
-void UltrasonicUS100::clearFilter() {
-    _sampleCount = 0;
-    _nextSample = 0;
-    for (uint8_t i = 0; i < FILTER_WINDOW; ++i) {
-        _samples[i] = 0.0f;
-    }
-}
-
-void UltrasonicUS100::pushSample(float centimeters) {
-    _samples[_nextSample] = centimeters;
-    _nextSample = static_cast<uint8_t>((_nextSample + 1) % FILTER_WINDOW);
-    if (_sampleCount < FILTER_WINDOW) {
-        ++_sampleCount;
-    }
-}
-
-float UltrasonicUS100::medianOfSamples() const {
-    float sorted[FILTER_WINDOW] = {};
-    for (uint8_t i = 0; i < _sampleCount; ++i) {
-        sorted[i] = _samples[i];
-    }
-
-    for (uint8_t i = 1; i < _sampleCount; ++i) {
-        const float value = sorted[i];
-        int j = static_cast<int>(i) - 1;
-        while (j >= 0 && sorted[j] > value) {
-            sorted[j + 1] = sorted[j];
-            --j;
-        }
-        sorted[j + 1] = value;
-    }
-
-    if (_sampleCount == 0) {
-        return NAN;
-    }
-    if ((_sampleCount % 2U) == 1U) {
-        return sorted[_sampleCount / 2U];
-    }
-    const uint8_t upper = _sampleCount / 2U;
-    return (sorted[upper - 1U] + sorted[upper]) / 2.0f;
+    return {true, centimeters, pulseUs};
 }

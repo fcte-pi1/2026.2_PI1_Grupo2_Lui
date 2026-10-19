@@ -74,6 +74,15 @@ bool tryConfirmRotation(int16_t yawDeltaDegrees, uint8_t& outSteps, bool& outClo
 PositionTracker::PositionTracker(IOdometryReader& odometry, IOrientationSensor& orientationSensor)
     : PositionTracker(odometry, orientationSensor, TrackingState{}, 0) {}
 
+void PositionTracker::reset(const TrackingState& initialState,
+                            int16_t initialYawReferenceDegrees) {
+    state_ = initialState;
+    hasAcceptedAdvance_ = false;
+    lastAdvanceAcceptedMs_ = 0;
+    movementYawReferenceDegrees_ = initialYawReferenceDegrees;
+    odometry_.resetAccumulator();
+}
+
 PositionTracker::PositionTracker(IOdometryReader& odometry,
                                  IOrientationSensor& orientationSensor,
                                  const TrackingState& initialState,
@@ -96,13 +105,19 @@ void PositionTracker::update() {
 
     const OdometryReading odoReading = odometry_.read();
 
-    if (odoReading.accumulatedDistanceMm >= kCellDistanceThresholdMm) {
+    const int32_t absoluteDistanceMm = odoReading.accumulatedDistanceMm < 0
+        ? -static_cast<int32_t>(odoReading.accumulatedDistanceMm)
+        : static_cast<int32_t>(odoReading.accumulatedDistanceMm);
+    if (absoluteDistanceMm >= kCellDistanceThresholdMm) {
         const uint32_t elapsedSinceLastAdvance = odoReading.timestampMs - lastAdvanceAcceptedMs_;
         const bool withinDedupWindow =
             hasAcceptedAdvance_ && elapsedSinceLastAdvance < kMinCellAdvanceIntervalMs;
 
         if (!withinDedupWindow) {
-            state_.position = applyCellAdvance(state_.position, state_.orientation);
+            const Orientation travelDirection = odoReading.accumulatedDistanceMm >= 0
+                ? state_.orientation
+                : rotateOrientation(state_.orientation, 2, true);
+            state_.position = applyCellAdvance(state_.position, travelDirection);
             lastAdvanceAcceptedMs_ = odoReading.timestampMs;
             hasAcceptedAdvance_ = true;
         }

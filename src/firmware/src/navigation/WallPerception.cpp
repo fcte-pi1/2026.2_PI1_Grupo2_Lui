@@ -67,14 +67,22 @@ WallPerception::WallPerception(IWallSensor& sensor, uint16_t thresholdMm)
 void WallPerception::update() {
     static constexpr std::array<Direction, kDirectionCount> kDirections{
         Direction::Front, Direction::Left, Direction::Right};
+    std::array<RawEcho, kDirectionCount> echoes{};
+    for (Direction direction : kDirections) {
+        echoes[indexOf(direction)] = sensor_.read(direction);
+    }
+
+    // HardwareWallSensor pode expor um snapshot em cache. Processar o mesmo
+    // timestamp mais de uma vez inflaria artificialmente a média móvel.
+    const uint32_t sampleTimestamp = echoes[indexOf(Direction::Front)].timestampMs;
+    if (hasProcessedSample_ && sampleTimestamp == lastProcessedTimestampMs_) return;
+    hasProcessedSample_ = true;
+    lastProcessedTimestampMs_ = sampleTimestamp;
 
     for (Direction direction : kDirections) {
         const std::size_t idx = indexOf(direction);
-
         readings_[idx].direction = direction;
-        const RawEcho echo = sensor_.read(direction);
-        applyReading(readings_[idx], echo, filters_[idx]);
-
+        applyReading(readings_[idx], echoes[idx], filters_[idx]);
         faults_[idx].direction = direction;
         updateFaultState(faults_[idx], readings_[idx].valid);
     }

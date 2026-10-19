@@ -17,6 +17,12 @@
 #include "control/pid_controller.hpp"
 #include "navigation/MazeMap.h"
 #include "navigation/MazeMissionController.h"
+#include "navigation/PositionTracker.h"
+#include "navigation/RobotStateEstimator.h"
+#include "navigation/WallPerception.h"
+#include "hal/IWallSensor.h"
+#include "hal/IOdometryReader.h"
+#include "hal/IOrientationSensor.h"
 
 namespace {
 
@@ -43,66 +49,18 @@ PIDController rightPid(0.8f, 0.10f, 0.0f, -120.0f, 120.0f);
 MotionController motion(motors, encoderLeft, encoderRight, imu, odometry,
                         leftPid, rightPid);
 
-MazeConfig mazeConfig{};
-mm::MazeMap mazeMap;
-mm::NvsMapStorage mapStorage;
-nav::MazeMissionController mission(mazeMap, mapStorage);
-
-bool ready = false;
-bool motionResultPending = false;
-uint32_t attemptStartedMs = 0;
-uint32_t lastControlUpdateUs = 0;
-
+// O sampler de hardware é a única camada que dispara os ultrassons. O estimador
+// e o alinhamento PID consomem o mesmo snapshot, sem leituras duplicadas.
 struct LateralSnapshot {
-    float leftMm = 0.0f;
-    float rightMm = 0.0f;
+    UltrasonicReading front{false, NAN, 0};
+    UltrasonicReading left{false, NAN, 0};
+    UltrasonicReading right{false, NAN, 0};
     uint32_t sampledAtMs = 0;
-    bool valid = false;
+    bool ready = false;
 };
 
 portMUX_TYPE lateralMux = portMUX_INITIALIZER_UNLOCKED;
-bool lateralTaskEnabled = false;
-bool lateralTaskBusy = false;
 LateralSnapshot lateralSnapshot;
-
-bool lateralShouldStartRead() {
-    bool start = false;
-    portENTER_CRITICAL(&lateralMux);
-    if (lateralTaskEnabled && !lateralTaskBusy) {
-        lateralTaskBusy = true;
-        start = true;
-    }
-    portEXIT_CRITICAL(&lateralMux);
-    return start;
-}
-
-void setLateralTaskEnabled(bool enabled) {
-    portENTER_CRITICAL(&lateralMux);
-    lateralTaskEnabled = enabled;
-    if (!enabled) lateralSnapshot.valid = false;
-    portEXIT_CRITICAL(&lateralMux);
-}
-
-bool isLateralTaskBusy() {
-    bool busy;
-    portENTER_CRITICAL(&lateralMux);
-    busy = lateralTaskBusy;
-    portEXIT_CRITICAL(&lateralMux);
-    return busy;
-}
-
-void publishLateralSnapshot(const UltrasonicReading &left,
-                            const UltrasonicReading &right) {
-    portENTER_CRITICAL(&lateralMux);
-    lateralSnapshot.valid = left.valid && right.valid;
-    if (lateralSnapshot.valid) {
-        lateralSnapshot.leftMm = left.distanceCm * 10.0f;
-        lateralSnapshot.rightMm = right.distanceCm * 10.0f;
-    }
-    lateralSnapshot.sampledAtMs = millis();
-    lateralTaskBusy = false;
-    portEXIT_CRITICAL(&lateralMux);
-}
 
 LateralSnapshot getLateralSnapshot() {
     LateralSnapshot copy;
@@ -112,17 +70,132 @@ LateralSnapshot getLateralSnapshot() {
     return copy;
 }
 
-// Leituras laterais ocorrem numa task separada para não bloquear o ciclo PID
-// de 5 ms durante pulseIn() do US-100. A leitura frontal é feita em cada centro.
-void lateralSensorTask(void *) {
-    for (;;) {
-        if (!lateralShouldStartRead()) {
-            vTaskDelay(pdMS_TO_TICKS(5));
-            continue;
+class HardwareWallSensor final : public perception::IWallSensor {
+public:
+    perception::RawEcho read(perception::Direction direction) override {
+        // WallPerception solicita sempre Frente, Esquerda e Direita nessa ordem.
+        // Reutilizar um único snapshot evita combinar sensores de dois ciclos se
+        // a task de aquisição publicar uma amostra durante esta leitura.
+        if (direction == perception::Direction::Front || !hasCachedSnapshot_) {
+            cachedSnapshot_ = getLateralSnapshot();
+            hasCachedSnapshot_ = true;
         }
+        const LateralSnapshot& snapshot = cachedSnapshot_;
+        const UltrasonicReading* reading = &snapshot.front;
+        if (direction == perception::Direction::Left) reading = &snapshot.left;
+        else if (direction == perception::Direction::Right) reading = &snapshot.right;
+
+        // O pulso zero é ausência de eco (via livre) segundo o contrato HU-01.
+        // A validação física e a suavização ficam centralizadas em WallPerception.
+        perception::RawEcho echo{};
+        echo.timestampMs = snapshot.sampledAtMs;
+        if (reading->pulseUs == 0) {
+            echo.hasEcho = false;
+            echo.rawDistanceMm = 0;
+        } else {
+            const uint32_t distanceMm =
+                (static_cast<uint32_t>(reading->pulseUs) * 10U + 29U) / 58U;
+            echo.rawDistanceMm = static_cast<uint16_t>(
+                distanceMm > 65535U ? 65535U : distanceMm);
+            echo.hasEcho = true;
+        }
+        if (direction == perception::Direction::Right) hasCachedSnapshot_ = false;
+        return echo;
+    }
+
+private:
+    LateralSnapshot cachedSnapshot_{};
+    bool hasCachedSnapshot_ = false;
+};
+
+class MotionDistanceReader final : public tracking::IOdometryReader {
+public:
+    explicit MotionDistanceReader(MotionController& motion) : motion_(motion) {}
+
+    tracking::OdometryReading read() override {
+        const float delta = currentMoveDistance() - accumulatorBaselineMm_;
+        float bounded = delta;
+        if (bounded > 32767.0f) bounded = 32767.0f;
+        if (bounded < -32768.0f) bounded = -32768.0f;
+        return {static_cast<int16_t>(lroundf(bounded)), millis()};
+    }
+
+    void resetAccumulator() override { accumulatorBaselineMm_ = currentMoveDistance(); }
+    void beginMotionSegment() { accumulatorBaselineMm_ = currentMoveDistance(); }
+
+private:
+    float currentMoveDistance() const {
+        return motion_.getMotionType() == MotionType::ForwardCell
+            ? motion_.getDistanceTravelledMm() : 0.0f;
+    }
+
+    MotionController& motion_;
+    float accumulatorBaselineMm_ = 0.0f;
+};
+
+class ClockwiseYawSensor final : public tracking::IOrientationSensor {
+public:
+    explicit ClockwiseYawSensor(IMUMPU6500& imu) : imu_(imu) {}
+
+    tracking::OrientationReading read() override {
+        // IMU: yaw positivo anti-horário. Grade: N->E->S->W horário.
+        float yaw = -imu_.getYawDegrees();
+        while (yaw > 180.0f) yaw -= 360.0f;
+        while (yaw < -180.0f) yaw += 360.0f;
+        return {static_cast<int16_t>(lroundf(yaw)), millis()};
+    }
+
+private:
+    IMUMPU6500& imu_;
+};
+
+HardwareWallSensor hardwareWallSensor;
+MotionDistanceReader gridOdometry(motion);
+ClockwiseYawSensor gridOrientation(imu);
+tracking::PositionTracker positionTracker(gridOdometry, gridOrientation);
+perception::WallPerception wallPerception(hardwareWallSensor);
+state_estimation::RobotStateEstimator robotStateEstimator(positionTracker, wallPerception);
+
+MazeConfig mazeConfig{};
+mm::MazeMap mazeMap;
+mm::NvsMapStorage mapStorage;
+nav::MazeMissionController mission(mazeMap, mapStorage, robotStateEstimator);
+
+bool ready = false;
+bool motionResultPending = false;
+uint32_t attemptStartedMs = 0;
+uint32_t lastControlUpdateUs = 0;
+uint32_t observationStartedAtMs = 0;
+uint32_t lastProcessedSensorTimestampMs = 0;
+uint8_t freshObservationSamples = 0;
+
+bool isSensorSnapshotReady() {
+    return getLateralSnapshot().ready;
+}
+
+void publishSensorSnapshot(const UltrasonicReading& front,
+                           const UltrasonicReading& left,
+                           const UltrasonicReading& right,
+                           uint32_t sampleStartedAtMs) {
+    portENTER_CRITICAL(&lateralMux);
+    lateralSnapshot.front = front;
+    lateralSnapshot.left = left;
+    lateralSnapshot.right = right;
+    lateralSnapshot.sampledAtMs = sampleStartedAtMs;
+    lateralSnapshot.ready = true;
+    portEXIT_CRITICAL(&lateralMux);
+}
+
+// Executa no núcleo de sensores; pulseIn() nunca bloqueia o ciclo PID principal.
+void lateralSensorTask(void*) {
+    for (;;) {
+        const uint32_t sampleStartedAtMs = millis();
+        const UltrasonicReading front = sensorFront.measure();
+        vTaskDelay(pdMS_TO_TICKS(1)); // separação para reduzir diafonia acústica
         const UltrasonicReading left = sensorLeft.measure();
+        vTaskDelay(pdMS_TO_TICKS(1));
         const UltrasonicReading right = sensorRight.measure();
-        publishLateralSnapshot(left, right);
+        publishSensorSnapshot(front, left, right, sampleStartedAtMs);
         vTaskDelay(pdMS_TO_TICKS(LATERAL_SENSOR_PERIOD_MS));
     }
 }
@@ -139,28 +212,7 @@ float initialHeadingRadians(Direction heading) {
     return 0.0f;
 }
 
-bool classifyWall(const UltrasonicReading &reading, bool &hasWall) {
-    if (!reading.valid) return false;
-    const float thresholdMm = mazeConfig.cellSizeMm *
-        MazeSettings::WALL_THRESHOLD_CELL_RATIO;
-    hasWall = reading.distanceCm * 10.0f <= thresholdMm;
-    return true;
-}
-
-bool readWallsAtCell(nav::WallReadings &walls) {
-    // A task de sensores laterais precisa terminar antes que a mesma HAL seja
-    // usada pela rotina de observação do centro da célula.
-    if (isLateralTaskBusy()) return false;
-    const UltrasonicReading front = sensorFront.measure();
-    const UltrasonicReading left = sensorLeft.measure();
-    const UltrasonicReading right = sensorRight.measure();
-    return classifyWall(front, walls.front) &&
-           classifyWall(left, walls.left) &&
-           classifyWall(right, walls.right);
-}
-
 void safeStop(const char *reason) {
-    setLateralTaskEnabled(false);
     ready = false;
     motion.stop();
     motors.brake();
@@ -170,13 +222,14 @@ void safeStop(const char *reason) {
 
 void handleMissionUpdate(const nav::MissionUpdate &update) {
     bool started = false;
-    bool needsLateralFeedback = false;
     switch (update.action) {
         case nav::MissionAction::None:
             return;
         case nav::MissionAction::MoveForwardOneCell:
             started = motion.startMoveForwardOneCell();
-            needsLateralFeedback = true;
+            break;
+        case nav::MissionAction::MoveBackwardOneCell:
+            started = motion.startMoveBackwardOneCell();
             break;
         case nav::MissionAction::TurnLeft90:
             started = motion.startTurnLeft90();
@@ -188,7 +241,6 @@ void handleMissionUpdate(const nav::MissionUpdate &update) {
             started = motion.startTurnAround180();
             break;
         case nav::MissionAction::Brake:
-            setLateralTaskEnabled(false);
             ready = false;
             motors.brake();
             motors.setEnabled(false);
@@ -203,22 +255,25 @@ void handleMissionUpdate(const nav::MissionUpdate &update) {
     }
 
     if (!started) {
-        setLateralTaskEnabled(false);
         const nav::MissionUpdate failed = mission.onMotionFinished(false);
         (void)failed;
         safeStop("não foi possível iniciar a ação de movimento");
         return;
     }
+    gridOdometry.beginMotionSegment();
     motionResultPending = true;
     lastControlUpdateUs = micros();
-    setLateralTaskEnabled(needsLateralFeedback);
+    // O sampler lê os três sensores continuamente; o PID e a HU-01 consomem o mesmo snapshot.
 }
 
 void updateWallAlignmentFeedback() {
     const LateralSnapshot snapshot = getLateralSnapshot();
     const uint32_t age = static_cast<uint32_t>(millis() - snapshot.sampledAtMs);
-    if (snapshot.valid && age <= MAX_LATERAL_SAMPLE_AGE_MS) {
-        motion.setWallAlignmentFeedback(snapshot.leftMm, snapshot.rightMm, true);
+    const bool valid = snapshot.ready && snapshot.left.valid && snapshot.right.valid &&
+                       age <= MAX_LATERAL_SAMPLE_AGE_MS;
+    if (valid) {
+        motion.setWallAlignmentFeedback(snapshot.left.distanceCm * 10.0f,
+                                        snapshot.right.distanceCm * 10.0f, true);
     } else {
         motion.setWallAlignmentFeedback(0.0f, 0.0f, false);
     }
@@ -306,7 +361,7 @@ void setup() {
         return;
     }
 
-    if (!mission.begin(mazeConfig)) {
+    if (!mission.begin(mazeConfig, gridOrientation.read().yawDegrees)) {
         Serial.println("Falha ao inicializar o mapa/navegação da missão.");
         motors.setEnabled(false);
         return;
@@ -314,12 +369,13 @@ void setup() {
 
     if (xTaskCreatePinnedToCore(lateralSensorTask, "lateral-sensors", 4096,
                                 nullptr, 1, nullptr, 0) != pdPASS) {
-        Serial.println("Falha ao iniciar a task dos sensores laterais.");
+        Serial.println("Falha ao iniciar a task dos sensores.");
         motors.setEnabled(false);
         return;
     }
 
-    attemptStartedMs = millis();
+    observationStartedAtMs = millis();
+    attemptStartedMs = observationStartedAtMs;
     motors.setEnabled(true);
     ready = true;
     Serial.printf("Labirinto %ux%u; início=(%u,%u); objetivo=(%u,%u).\n",
@@ -342,6 +398,19 @@ void loop() {
         return;
     }
 
+    if (isSensorSnapshotReady()) {
+        const LateralSnapshot sensorSnapshot = getLateralSnapshot();
+        if (sensorSnapshot.sampledAtMs != lastProcessedSensorTimestampMs) {
+            lastProcessedSensorTimestampMs = sensorSnapshot.sampledAtMs;
+            robotStateEstimator.updateWalls();
+            if (mission.state() == nav::MissionState::AwaitingObservation &&
+                static_cast<int32_t>(sensorSnapshot.sampledAtMs - observationStartedAtMs) >= 0 &&
+                freshObservationSamples < 3) {
+                ++freshObservationSamples;
+            }
+        }
+    }
+
     if (motionResultPending) {
         MotionStatus status = motion.getStatus();
         if (status == MotionStatus::Running) {
@@ -349,6 +418,7 @@ void loop() {
             const uint32_t elapsedUs = static_cast<uint32_t>(nowUs - lastControlUpdateUs);
             if (elapsedUs >= CONTROL_PERIOD_US) {
                 motion.update(static_cast<float>(elapsedUs) / 1000000.0f);
+                robotStateEstimator.updatePose();
                 lastControlUpdateUs = nowUs;
             }
             if (motion.getStatus() == MotionStatus::Running) {
@@ -359,28 +429,25 @@ void loop() {
             status = motion.getStatus();
         }
 
-        // Pausa a task de ultrassom antes de executar a próxima leitura de célula.
-        setLateralTaskEnabled(false);
-        if (isLateralTaskBusy()) {
-            delayMicroseconds(500);
-            return;
-        }
         motionResultPending = false;
-        handleMissionUpdate(mission.onMotionFinished(status == MotionStatus::Succeeded));
+        const nav::MissionUpdate missionUpdate =
+            mission.onMotionFinished(status == MotionStatus::Succeeded);
+        handleMissionUpdate(missionUpdate);
+        if (missionUpdate.state == nav::MissionState::AwaitingObservation) {
+            observationStartedAtMs = millis();
+            freshObservationSamples = 0;
+        }
         return;
     }
 
     if (mission.state() == nav::MissionState::AwaitingObservation) {
-        setLateralTaskEnabled(false);
-        if (isLateralTaskBusy()) {
+        const auto& state = robotStateEstimator.currentState();
+        const uint32_t sampleAge = static_cast<uint32_t>(millis() - state.sensorTimestampMs);
+        if (!state.initialized || freshObservationSamples < 3 ||
+            sampleAge > MAX_LATERAL_SAMPLE_AGE_MS) {
             delayMicroseconds(500);
             return;
         }
-        nav::WallReadings walls{};
-        if (!readWallsAtCell(walls)) {
-            handleMissionUpdate(mission.fail());
-            return;
-        }
-        handleMissionUpdate(mission.observeCell(walls));
+        handleMissionUpdate(mission.observeCurrentCell());
     }
 }

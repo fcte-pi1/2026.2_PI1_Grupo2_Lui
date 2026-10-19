@@ -72,6 +72,20 @@ void test_update_cell_marca_visitada_e_paredes(void)
     TEST_ASSERT_FALSE(c->isKnown(Dir::South));
 }
 
+void test_leitura_invalida_permanece_desconhecida(void)
+{
+    // Frente válida indica parede; laterais inválidas não podem virar caminho livre.
+    TEST_ASSERT_TRUE(map.updateCell(2, 2, Dir::North,
+                                    true, false, false,
+                                    true, false, false));
+    const Cell *cell = map.get(2, 2);
+    TEST_ASSERT_TRUE(cell->isKnown(Dir::North));
+    TEST_ASSERT_TRUE(cell->hasWall(Dir::North));
+    TEST_ASSERT_FALSE(cell->isKnown(Dir::West));
+    TEST_ASSERT_FALSE(cell->isKnown(Dir::East));
+    TEST_ASSERT_TRUE(cell->visited);
+}
+
 void test_parede_espelho_na_vizinha(void)
 {
     // Norte DIMINUI y (convenção do PositionTracker): vizinha ao norte de (0,1) é (0,0)
@@ -186,6 +200,7 @@ int main(int, char **)
     RUN_TEST(test_init_valida_dimensoes);
     RUN_TEST(test_relativo_para_absoluto);
     RUN_TEST(test_update_cell_marca_visitada_e_paredes);
+    RUN_TEST(test_leitura_invalida_permanece_desconhecida);
     RUN_TEST(test_parede_espelho_na_vizinha);
     RUN_TEST(test_norte_diminui_y_e_leste_aumenta_x);
     RUN_TEST(test_mesma_parede_com_headings_diferentes);

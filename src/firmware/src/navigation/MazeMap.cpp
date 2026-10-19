@@ -95,15 +95,16 @@ void MazeMap::setWall(int x, int y, Dir d, bool has_wall)
 }
 
 bool MazeMap::updateCell(int x, int y, Dir heading,
-                         bool wall_front, bool wall_left, bool wall_right)
+                         bool wall_front, bool wall_left, bool wall_right,
+                         bool front_valid, bool left_valid, bool right_valid)
 {
     if (!inBounds(x, y)) {
         return false;
     }
     cells_[y][x].visited = 1;
-    setWall(x, y, relToAbs(heading, Rel::Front), wall_front);
-    setWall(x, y, relToAbs(heading, Rel::Left),  wall_left);
-    setWall(x, y, relToAbs(heading, Rel::Right), wall_right);
+    if (front_valid) setWall(x, y, relToAbs(heading, Rel::Front), wall_front);
+    if (left_valid)  setWall(x, y, relToAbs(heading, Rel::Left), wall_left);
+    if (right_valid) setWall(x, y, relToAbs(heading, Rel::Right), wall_right);
     return true;
 }
 

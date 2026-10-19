@@ -142,6 +142,21 @@ static void test_position_tracker_confirms_advance_and_updates_position(void) {
     TEST_ASSERT_EQUAL_INT16(0, tracker.currentState().position.col);
 }
 
+// Movimento linear negativo (HU-05) desloca uma célula para trás sem alterar a orientação.
+static void test_position_tracker_handles_reverse_cell_advance(void) {
+    MockOdometryReader odometry;
+    MockOrientationSensor orientationSensor;
+    const tracking::TrackingState initial{GridPosition{2, 2}, Orientation::East, 0};
+    PositionTracker tracker(odometry, orientationSensor, initial, 0);
+
+    odometry.setAccumulatedDistanceMm(static_cast<int16_t>(-kCellDistanceThresholdMm), 500);
+    tracker.update();
+
+    TEST_ASSERT_EQUAL_INT16(2, tracker.currentState().position.row);
+    TEST_ASSERT_EQUAL_INT16(1, tracker.currentState().position.col);
+    TEST_ASSERT_EQUAL(Orientation::East, tracker.currentState().orientation);
+}
+
 // Deslocamento abaixo do limiar não muda a posição.
 static void test_position_tracker_below_threshold_does_not_change_position(void) {
     MockOdometryReader odometry;
@@ -347,6 +362,7 @@ int main(int argc, char** argv) {
     RUN_TEST(test_try_confirm_rotation_below_threshold_does_not_confirm);
     RUN_TEST(test_position_tracker_handles_yaw_wraparound);
     RUN_TEST(test_position_tracker_confirms_advance_and_updates_position);
+    RUN_TEST(test_position_tracker_handles_reverse_cell_advance);
     RUN_TEST(test_position_tracker_below_threshold_does_not_change_position);
     RUN_TEST(test_position_tracker_deduplicates_rapid_advance_confirmations);
     RUN_TEST(test_position_tracker_advance_behavior_independent_of_maze_size);

@@ -35,12 +35,20 @@ RobotStateEstimator::RobotStateEstimator(tracking::PositionTracker& positionTrac
                                          perception::WallPerception& wallPerception)
     : positionTracker_(positionTracker), wallPerception_(wallPerception) {}
 
-void RobotStateEstimator::update() {
-    // O rastreador é atualizado primeiro para que as leituras relativas de
-    // frente/esquerda/direita sejam projetadas na orientação mais recente.
-    positionTracker_.update();
-    wallPerception_.update();
+void RobotStateEstimator::initialize(const tracking::TrackingState& initialPose,
+                                     int16_t initialYawReferenceDegrees) {
+    positionTracker_.reset(initialPose, initialYawReferenceDegrees);
+    state_ = RobotStateSnapshot{};
+    state_.pose = initialPose;
+}
 
+void RobotStateEstimator::updatePose() {
+    positionTracker_.update();
+    state_.pose = positionTracker_.currentState();
+}
+
+void RobotStateEstimator::updateWalls() {
+    wallPerception_.update();
     state_.pose = positionTracker_.currentState();
     const perception::WallCellState& walls = wallPerception_.currentState();
 
@@ -58,6 +66,11 @@ void RobotStateEstimator::update() {
 
     state_.sensorTimestampMs = walls.timestampMs;
     state_.initialized = true;
+}
+
+void RobotStateEstimator::update() {
+    updatePose();
+    updateWalls();
 }
 
 }  // namespace state_estimation

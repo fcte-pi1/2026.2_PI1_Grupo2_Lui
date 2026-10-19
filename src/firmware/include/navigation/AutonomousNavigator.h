@@ -17,9 +17,13 @@ enum class NavigationStatus : uint8_t {
 };
 
 struct WallReadings {
-    bool front;  
-    bool left;   
-    bool right;  
+    bool front = false;
+    bool left = false;
+    bool right = false;
+    // A valid false value means a measured open passage; invalid means unknown.
+    bool frontValid = true;
+    bool leftValid = true;
+    bool rightValid = true;
 };
 
 struct NavigationResult {

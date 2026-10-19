@@ -26,6 +26,7 @@ public:
 
     bool read(MPU6500Reading& reading);
     void resetYaw(float yawDegrees = 0.0f);
+    float getYawDegrees() const;
     bool isInitialized() const;
     uint8_t deviceId() const;
 

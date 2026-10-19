@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "config/maze_geometry.hpp"
 #include "hal/IWallSensor.h"
 
 // NOTA: fica em include/navigation/ (Constitution/SETUP.md — camada de
@@ -19,7 +20,8 @@ namespace perception {
 // robô. Não depende do tamanho do labirinto (FR-011): o mesmo valor vale
 // para os labirintos 4x4, 8x4 e 12x4, já que todos compartilham a mesma
 // largura de corredor.
-inline constexpr uint16_t kCorridorWallThresholdMm = 90;
+inline constexpr uint16_t kCorridorWallThresholdMm =
+    static_cast<uint16_t>(MazeSettings::CELL_SIZE_MM * MazeSettings::WALL_THRESHOLD_CELL_RATIO);
 
 // Uma amostra de uma direção em um instante.
 struct SensorReading {
@@ -144,6 +146,8 @@ private:
     std::array<SensorReading, kDirectionCount> readings_{};
     std::array<SensorFaultState, kDirectionCount> faults_{};
     WallCellState state_{};
+    uint32_t lastProcessedTimestampMs_ = 0;
+    bool hasProcessedSample_ = false;
 };
 
 }  // namespace perception

@@ -3,6 +3,7 @@
 #include <cstdint>
 
 #include "common/robot_types.hpp"
+#include "config/maze_geometry.hpp"
 
 enum class MazeFormat : uint8_t {
     Maze4x4,
@@ -30,16 +31,10 @@ struct MazeConfig {
 
 namespace MazeSettings {
 
-    constexpr uint16_t CELL_SIZE_MM = 180;
-
     constexpr uint32_t ATTEMPT_TIMEOUT_MS =
         10UL * 60UL * 1000UL;
 
     constexpr uint8_t MAX_ATTEMPTS = 3;
-
-    // Limite inicial para a classificação de paredes a partir dos US-100.
-    // TODO: Calibrar conforme a posição física dos sensores no chassi.
-    constexpr float WALL_THRESHOLD_CELL_RATIO = 0.55f;
 
 }
 

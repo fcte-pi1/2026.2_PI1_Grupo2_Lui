@@ -184,3 +184,7 @@ bool IMUMPU6500::readRawGyroZ(int16_t& gyroZ) {
     gyroZ = static_cast<int16_t>((static_cast<uint16_t>(high) << 8) | low);
     return true;
 }
+
+float IMUMPU6500::getYawDegrees() const {
+    return _yawDegrees;
+}

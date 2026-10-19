@@ -39,6 +39,14 @@ public:
     RobotStateEstimator(tracking::PositionTracker& positionTracker,
                         perception::WallPerception& wallPerception);
 
+    // Configura a referência única de pose para o canto/orientação da missão.
+    void initialize(const tracking::TrackingState& initialPose,
+                    int16_t initialYawReferenceDegrees);
+
+    // Pose é atualizada no ciclo de controle; paredes são lidas nos centros
+    // das células, evitando disputar o mesmo hardware ultrassônico com a task de alinhamento.
+    void updatePose();
+    void updateWalls();
     void update();
     const RobotStateSnapshot& currentState() const { return state_; }
 

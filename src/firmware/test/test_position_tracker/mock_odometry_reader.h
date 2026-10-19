@@ -9,7 +9,7 @@ namespace tracking::test {
 // imitando o comportamento esperado de um driver real.
 class MockOdometryReader : public IOdometryReader {
 public:
-    void setAccumulatedDistanceMm(uint16_t value, uint32_t timestampMs) {
+    void setAccumulatedDistanceMm(int16_t value, uint32_t timestampMs) {
         distanceMm_ = value;
         timestampMs_ = timestampMs;
     }
@@ -23,7 +23,7 @@ public:
     }
 
 private:
-    uint16_t distanceMm_ = 0;
+    int16_t distanceMm_ = 0;
     uint32_t timestampMs_ = 0;
 };
 

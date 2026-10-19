@@ -2,6 +2,7 @@
 
 #include <cstdint>
 
+#include "config/maze_geometry.hpp"
 #include "hal/IOdometryReader.h"
 #include "hal/IOrientationSensor.h"
 
@@ -61,7 +62,10 @@ bool tryConfirmRotation(int16_t yawDeltaDegrees, uint8_t& outSteps, bool& outClo
 // Não depende do tamanho do labirinto: o mesmo valor vale para os
 // labirintos 4x4, 8x4 e 12x4, já que todos compartilham a mesma largura de
 // corredor.
-inline constexpr uint16_t kCellDistanceThresholdMm = 180;
+// 75% da célula: permite confirmar o deslocamento mesmo quando o controlador
+// desacelera e conclui dentro da tolerância posicional definida na HU-05.
+inline constexpr int16_t kCellDistanceThresholdMm =
+    static_cast<int16_t>(MazeSettings::CELL_SIZE_MM * 0.75f);
 
 // Intervalo mínimo entre dois avanços de célula aceitos consecutivamente.
 // Um novo avanço que chegue antes desse intervalo desde o último aceito é
@@ -89,6 +93,10 @@ public:
     // Lê odometria e orientação, confirma avanços/rotações e recalcula o
     // estado. Chamar a cada ciclo de controle relevante.
     void update();
+
+    // Reinicializa a referência de grade no início de cada missão, sem criar
+    // uma segunda estimativa de pose no controlador de navegação.
+    void reset(const TrackingState& initialState, int16_t initialYawReferenceDegrees);
 
     // Snapshot mais recente — significativo desde a inicialização, mesmo
     // antes da primeira chamada a update(). Somente leitura: não modifica

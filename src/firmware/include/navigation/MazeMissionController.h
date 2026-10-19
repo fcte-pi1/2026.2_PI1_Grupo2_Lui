@@ -4,6 +4,7 @@
 
 #include "config/maze_config.hpp"
 #include "navigation/AutonomousNavigator.h"
+#include "navigation/RobotStateEstimator.h"
 
 namespace nav {
 
@@ -22,6 +23,7 @@ enum class MissionAction : uint8_t {
     TurnRight90,
     TurnAround180,
     MoveForwardOneCell,
+    MoveBackwardOneCell,
     Brake
 };
 
@@ -31,28 +33,27 @@ struct MissionUpdate {
     NavigationStatus navigationStatus;
 };
 
+// Orquestra HU-00/03/05/06 usando o snapshot HU-01/02 como fonte única de
+// pose e observações. O controlador não mantém uma segunda cópia de x/y/heading.
 class MazeMissionController {
 public:
-    MazeMissionController(mm::MazeMap &map, mm::IMapStorage &storage)
-        : map_(map), navigator_(map, storage), state_(MissionState::NotStarted),
-          x_(0), y_(0), heading_(mm::Dir::North), pendingDirection_(mm::Dir::North) {}
+    MazeMissionController(mm::MazeMap& map, mm::IMapStorage& storage,
+                          state_estimation::RobotStateEstimator& stateEstimator)
+        : map_(map), navigator_(map, storage), stateEstimator_(stateEstimator),
+          state_(MissionState::NotStarted), pendingDirection_(mm::Dir::North),
+          expectedX_(0), expectedY_(0) {}
 
-    /** Valida a configuração, inicializa o mapa e registra a origem e o objetivo. */
-    bool begin(const MazeConfig &config);
+    bool begin(const MazeConfig& config, int16_t initialYawReferenceDegrees = 0);
 
-    /** Fornece as três leituras da célula atual; só válido em AwaitingObservation. */
-    MissionUpdate observeCell(const WallReadings &walls);
-
-    /** Notifica conclusão/falha da ação de movimento atualmente solicitada. */
+    // Usa pose e paredes absolutas mais recentes produzidas por RobotStateEstimator.
+    MissionUpdate observeCurrentCell();
     MissionUpdate onMotionFinished(bool succeeded);
-
-    /** Falha explícita da camada de hardware/sensores. */
     MissionUpdate fail();
 
     MissionState state() const { return state_; }
-    uint8_t x() const { return x_; }
-    uint8_t y() const { return y_; }
-    mm::Dir heading() const { return heading_; }
+    uint8_t x() const;
+    uint8_t y() const;
+    mm::Dir heading() const;
     uint8_t goalX() const { return navigator_.goalX(); }
     uint8_t goalY() const { return navigator_.goalY(); }
 
@@ -60,15 +61,16 @@ private:
     MissionUpdate update(MissionAction action,
                          NavigationStatus status = NavigationStatus::NotInitialized) const;
     MissionUpdate failWith(NavigationStatus status);
+    bool currentPoseInBounds() const;
 
-    mm::MazeMap &map_;
+    mm::MazeMap& map_;
     AutonomousNavigator navigator_;
+    state_estimation::RobotStateEstimator& stateEstimator_;
     MazeConfig config_{};
     MissionState state_;
-    uint8_t x_;
-    uint8_t y_;
-    mm::Dir heading_;
     mm::Dir pendingDirection_;
+    uint8_t expectedX_;
+    uint8_t expectedY_;
 };
 
 }  // namespace nav

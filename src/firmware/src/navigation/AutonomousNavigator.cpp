@@ -66,7 +66,9 @@ NavigationResult AutonomousNavigator::observeCell(
         map_.setWall(lastX_, lastY_, traversed, false);
     }
 
-    if (!map_.updateCell(x, y, heading, walls.front, walls.left, walls.right)) {
+    if (!map_.updateCell(x, y, heading,
+                         walls.front, walls.left, walls.right,
+                         walls.frontValid, walls.leftValid, walls.rightValid)) {
         return result(NavigationStatus::InvalidObservation, heading,
                       MazeSolver::kUnreachable);
     }
