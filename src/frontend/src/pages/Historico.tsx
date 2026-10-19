@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react'
 import { EventLog } from '../components/EventLog'
 import {
   getSessionLogs,
+  getSessionNavigation,
   getSessions,
   NIVEIS,
   type LogEvento,
   type Nivel,
+  type PontoPercurso,
   type Sessao,
 } from '../services/api'
 
@@ -29,6 +31,14 @@ function formatarData(iso: string): string {
   })
 }
 
+function formatarTempo(ms: number): string {
+  const minutos = Math.floor(ms / 60000)
+  const segundos = Math.floor((ms % 60000) / 1000)
+  const resto = Math.floor(ms % 1000)
+  const dois = (n: number) => String(n).padStart(2, '0')
+  return `${dois(minutos)}:${dois(segundos)}.${String(resto).padStart(3, '0')}`
+}
+
 function formatarDuracao(segundos: number): string {
   const min = Math.floor(segundos / 60)
   const seg = Math.round(segundos % 60)
@@ -44,6 +54,7 @@ export default function Historico() {
   const [idSelecionada, setIdSelecionada] = useState<number | null>(null)
   const [filtro, setFiltro] = useState<Filtro>('TODOS')
   const [logs, setLogs] = useState<Resultado<LogEvento[]> | null>(null)
+  const [pontos, setPontos] = useState<Resultado<PontoPercurso[]> | null>(null)
 
   useEffect(() => {
     getSessions()
@@ -52,6 +63,7 @@ export default function Historico() {
   }, [])
 
   const chaveLogs = `${idSelecionada}:${filtro}`
+  const chavePontos = idSelecionada === null ? '' : String(idSelecionada)
 
   useEffect(() => {
     if (idSelecionada === null) return
@@ -64,6 +76,15 @@ export default function Historico() {
       cancelado = true
     }
   }, [idSelecionada, filtro, chaveLogs])
+
+  useEffect(() => {
+    if (idSelecionada === null) return
+    let cancelado = false
+    getSessionNavigation(idSelecionada)
+      .then((dados) => !cancelado && setPontos({ chave: chavePontos, dados, erro: null }))
+      .catch((e) => !cancelado && setPontos({ chave: chavePontos, dados: [], erro: mensagemErro(e) }))
+    return () => { cancelado = true }
+  }, [idSelecionada, chavePontos])
 
   const lista = sessoes?.dados ?? []
   const selecionada = lista.find((s) => s.id_sessao === idSelecionada)
@@ -105,6 +126,11 @@ export default function Historico() {
               >
                 {s.status_conclusao} · {formatarDuracao(s.tempo_total_segundos)}
               </div>
+              <div className="mt-1 text-xs text-gray-500">
+                {s.tipo_labirinto ?? 'Labirinto não informado'}
+                {s.numero_tentativa !== null ? ` · tentativa ${s.numero_tentativa}` : ''}
+                {s.consumo_bateria_mah !== null ? ` · ${s.consumo_bateria_mah.toFixed(1)} mAh` : ''}
+              </div>
             </button>
           )
         })}
@@ -120,6 +146,42 @@ export default function Historico() {
           </p>
         ) : (
           <>
+            <section aria-label="Trajeto da sessão" className="border-b border-white/10 p-4">
+              <header className="mb-3 flex items-center justify-between gap-3">
+                <h2 className="font-semibold text-gray-100">Trajeto · {pontos?.chave === chavePontos ? pontos.dados.length : '…'} pontos</h2>
+                <span className="text-xs text-gray-500">coordenadas (x, y) e tempo relativo</span>
+              </header>
+              {pontos?.chave !== chavePontos ? (
+                <p className="text-sm text-gray-400">Carregando trajeto...</p>
+              ) : pontos.erro ? (
+                <p className="text-sm text-red-300">{pontos.erro}</p>
+              ) : pontos.dados.length === 0 ? (
+                <p className="text-sm text-gray-400">Esta sessão não contém pontos de percurso.</p>
+              ) : (
+                <div className="max-h-56 overflow-auto rounded-lg border border-white/5">
+                  <table className="w-full text-left text-sm">
+                    <thead className="sticky top-0 bg-[#151821] text-xs uppercase tracking-wider text-gray-500">
+                      <tr>
+                        <th className="px-3 py-2 font-medium">#</th>
+                        <th className="px-3 py-2 font-medium">Tempo</th>
+                        <th className="px-3 py-2 font-medium">Célula (x, y)</th>
+                        <th className="px-3 py-2 font-medium">Orientação</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pontos.dados.map((ponto) => (
+                        <tr key={`${ponto.ordem}-${ponto.timestamp_ms}`} className="border-t border-white/5">
+                          <td className="px-3 py-2 text-gray-500">{ponto.ordem + 1}</td>
+                          <td className="px-3 py-2 font-mono text-gray-400">{formatarTempo(ponto.timestamp_ms)}</td>
+                          <td className="px-3 py-2 text-gray-200">({ponto.pos_x}, {ponto.pos_y})</td>
+                          <td className="px-3 py-2 text-gray-300">{ponto.orientacao}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
             <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 p-4">
               <h2 className="font-semibold text-gray-100">
                 Eventos · sessão #{selecionada.id_sessao}

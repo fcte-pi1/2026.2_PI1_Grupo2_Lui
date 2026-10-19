@@ -46,7 +46,7 @@ function criarDbFake(linhas: LogEventoRow[] = []) {
   return { db, chamadasCreate, chamadasFindMany };
 }
 
-const base = { idSessao: 1, nivel: "INFO", descricao: "Início", timestampMs: 1200 };
+const base = { idSessaoDispositivo: 1, nivel: "INFO", descricao: "Início", timestampMs: 1200 };
 
 describe("registrarLog", () => {
   it("grava o log e converte timestamp BigInt para number", async () => {
@@ -90,8 +90,8 @@ describe("registrarLog", () => {
   });
 
   const casosRejeicao: Array<[string, Partial<typeof base>]> = [
-    ["session_id zero", { idSessao: 0 }],
-    ["session_id NaN", { idSessao: NaN }],
+    ["session_id zero", { idSessaoDispositivo: 0 }],
+    ["session_id NaN", { idSessaoDispositivo: NaN }],
     ["mensagem vazia", { descricao: "   " }],
     ["t_ms negativo", { timestampMs: -1 }],
     ["t_ms NaN", { timestampMs: NaN }]
@@ -112,6 +112,20 @@ describe("registrarLog", () => {
     const { db, chamadasCreate } = criarDbFake();
     await createLogEventoService(db).registrarLog({ ...base, timestampMs: 1200.9 });
     assert.equal(chamadasCreate[0].timestamp_ms, 1200n);
+  });
+});
+
+describe("associação de logs à sessão do dispositivo", () => {
+  it("resolve session_id do firmware para a chave interna do banco", async () => {
+    const { db, chamadasCreate } = criarDbFake();
+    (db as unknown as { sessaoNavegacao: { findUnique: (args: { where: { id_dispositivo: bigint } }) => Promise<{ id_sessao: number } | null> } }).sessaoNavegacao = {
+      async findUnique({ where }) {
+        if (where.id_dispositivo === 77n) return { id_sessao: 5 };
+        return null;
+      },
+    };
+    await createLogEventoService(db).registrarLog({ ...base, idSessaoDispositivo: 77 });
+    assert.equal(chamadasCreate[0].id_sessao, 5);
   });
 });
 

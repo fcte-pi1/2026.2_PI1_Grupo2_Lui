@@ -1,7 +1,9 @@
 #include "navigation/SessionBuffer.h"
 
 #include <cinttypes>
+#include <cmath>
 #include <cstdio>
+#include <cstring>
 
 namespace mm {
 
@@ -16,18 +18,38 @@ void SessionBuffer::reset()
     stride_        = 1;
     seen_          = 0;
     count_         = 0;
+    std::strncpy(tipo_labirinto_, "desconhecido", sizeof(tipo_labirinto_) - 1);
+    tipo_labirinto_[sizeof(tipo_labirinto_) - 1] = '\0';
+    tentativa_ = 1;
+    consumo_bateria_mah_ = -1.0f;
 }
 
-bool SessionBuffer::start(uint32_t session_id, uint32_t now_ms)
+bool SessionBuffer::start(uint32_t session_id, uint32_t now_ms,
+                          const char *tipo_labirinto, uint16_t tentativa)
 {
-    if (state_ == SessionState::Running) {
+    if (state_ == SessionState::Running || session_id == 0 || tentativa == 0) {
         return false;
     }
     reset();
     session_id_ = session_id;
     start_ms_   = now_ms;
+    if (tipo_labirinto &&
+        (std::strcmp(tipo_labirinto, "4x4") == 0 ||
+         std::strcmp(tipo_labirinto, "8x4") == 0 ||
+         std::strcmp(tipo_labirinto, "12x4") == 0)) {
+        std::strncpy(tipo_labirinto_, tipo_labirinto, sizeof(tipo_labirinto_) - 1);
+        tipo_labirinto_[sizeof(tipo_labirinto_) - 1] = '\0';
+    }
+    tentativa_ = tentativa;
     state_      = SessionState::Running;
     return true;
+}
+
+void SessionBuffer::setBatteryConsumedMah(float consumo_mAh)
+{
+    if (state_ == SessionState::Running && std::isfinite(consumo_mAh) && consumo_mAh >= 0.0f) {
+        consumo_bateria_mah_ = consumo_mAh;
+    }
 }
 
 /* Mantém os pontos de índice par e dobra o stride. */
@@ -102,11 +124,23 @@ bool SessionBuffer::writeJson(WriteFn write, void *ctx) const
         return false;
     }
 
-    char line[160];
+    char line[256];
     int n = std::snprintf(line, sizeof(line),
         "{\"session_id\":%" PRIu32 ",\"tempo_total_ms\":%" PRIu32
-        ",\"motivo\":\"%s\",\"stride\":%" PRIu32 ",\"pontos\":[",
-        session_id_, total_time_ms_, reasonStr(reason_), stride_);
+        ",\"motivo\":\"%s\",\"tipo_labirinto\":\"%s\",\"tentativa\":%u"
+        ",\"desafio_cumprido\":%s,\"consumo_bateria_mah\":",
+        session_id_, total_time_ms_, reasonStr(reason_), tipo_labirinto_,
+        static_cast<unsigned>(tentativa_), reason_ == EndReason::FinishLine ? "true" : "false");
+    if (n < 0 || static_cast<size_t>(n) >= sizeof(line) ||
+        write(line, static_cast<size_t>(n), ctx) != 0) {
+        return false;
+    }
+
+    if (consumo_bateria_mah_ >= 0.0f && std::isfinite(consumo_bateria_mah_)) {
+        n = std::snprintf(line, sizeof(line), "%.3f,\"stride\":%" PRIu32 ",\"pontos\":[", consumo_bateria_mah_, stride_);
+    } else {
+        n = std::snprintf(line, sizeof(line), "null,\"stride\":%" PRIu32 ",\"pontos\":[", stride_);
+    }
     if (n < 0 || static_cast<size_t>(n) >= sizeof(line) ||
         write(line, static_cast<size_t>(n), ctx) != 0) {
         return false;

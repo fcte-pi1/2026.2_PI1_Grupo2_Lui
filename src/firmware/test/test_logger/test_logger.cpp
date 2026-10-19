@@ -83,6 +83,17 @@ static void test_reject_empty_or_null_message(void) {
     TEST_ASSERT_EQUAL_UINT32(0, mock.sentMessages.size());
 }
 
+// Mensagens com aspas e quebras de linha continuam sendo JSON válido.
+static void test_escapa_mensagem_json(void) {
+    char buf[128];
+    size_t len = Logger::formatJson(buf, sizeof(buf), 7, LogLevel::Error,
+                                    "Falha: \"sensor\"\nreiniciado", 55);
+    TEST_ASSERT_GREATER_THAN(0, len);
+    TEST_ASSERT_EQUAL_STRING(
+        "{\"type\":\"log\",\"session_id\":7,\"nivel\":\"ERROR\",\"mensagem\":\"Falha: \\\"sensor\\\"\\nreiniciado\",\"t_ms\":55}",
+        buf);
+}
+
 // Propagação de falha do transporte
 static void test_transport_failure_propagates(void) {
     MockLogTransport mock;
@@ -102,6 +113,7 @@ int main(void) {
     RUN_TEST(test_format_json_structure);
     RUN_TEST(test_logger_helper_methods);
     RUN_TEST(test_reject_empty_or_null_message);
+    RUN_TEST(test_escapa_mensagem_json);
     RUN_TEST(test_transport_failure_propagates);
     return UNITY_END();
 }

@@ -51,8 +51,16 @@ public:
 
     SessionBuffer() { reset(); }
 
-    /** Abre a sessão. false se já houver uma em andamento. */
-    bool start(uint32_t session_id, uint32_t now_ms);
+    /**
+     * Abre a sessão. false se já houver uma em andamento.
+     * tipo_labirinto deve ser 4x4, 8x4 ou 12x4; valores desconhecidos são
+     * normalizados para "desconhecido" em vez de gerar metadados inválidos.
+     */
+    bool start(uint32_t session_id, uint32_t now_ms,
+               const char *tipo_labirinto = "desconhecido", uint16_t tentativa = 1);
+
+    /** Define o consumo medido de bateria em mAh. Valor negativo = indisponível. */
+    void setBatteryConsumedMah(float consumo_mAh);
 
     /**
      * Registra uma célula da rota. Não bloqueia, não aloca, não faz I/O.
@@ -77,8 +85,9 @@ public:
 
     /**
      * Formato do POST /api/sessions/navigation:
-     * {"session_id":..,"tempo_total_ms":..,"motivo":"CHEGADA","stride":..,
-     *  "pontos":[{"t":..,"x":..,"y":..,"heading":"NORTH"}]}
+     * {"session_id":..,"tempo_total_ms":..,"motivo":"CHEGADA",
+     *  "tipo_labirinto":"8x4","tentativa":1,"desafio_cumprido":true,
+     *  "consumo_bateria_mah":null,"stride":..,"pontos":[...]}
      * Só funciona com a sessão fechada.
      */
     bool writeJson(WriteFn write, void *ctx) const;
@@ -99,6 +108,9 @@ private:
     uint32_t stride_;
     uint32_t seen_;        /* células recebidas antes da decimação */
     size_t   count_;
+    char     tipo_labirinto_[16];
+    uint16_t tentativa_;
+    float    consumo_bateria_mah_;
     RoutePoint points_[kCapacity];
 };
 

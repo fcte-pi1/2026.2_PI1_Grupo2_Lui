@@ -31,6 +31,10 @@ export interface LogEventoDTO {
 
 /** Parte mínima do Prisma que o serviço usa. */
 export interface LogEventoDb {
+  // session_id do firmware é um identificador do dispositivo, não a PK do banco.
+  sessaoNavegacao?: {
+    findUnique(args: { where: { id_dispositivo: bigint } }): Promise<{ id_sessao: number } | null>;
+  };
   logEvento: {
     create(args: {
       data: {
@@ -49,7 +53,7 @@ export interface LogEventoDb {
 }
 
 export interface NovoLog {
-  idSessao: number;
+  idSessaoDispositivo: number;
   nivel: string;
   descricao: string;
   timestampMs: number;
@@ -69,7 +73,7 @@ function toDTO(row: LogEventoRow): LogEventoDTO {
 export function createLogEventoService(db: LogEventoDb) {
   return {
     async registrarLog(novo: NovoLog): Promise<LogEventoDTO> {
-      if (!Number.isInteger(novo.idSessao) || novo.idSessao <= 0) {
+      if (!Number.isInteger(novo.idSessaoDispositivo) || novo.idSessaoDispositivo <= 0) {
         throw new LogInvalidoError("session_id inválido");
       }
       if (!isNivelLog(novo.nivel)) {
@@ -82,9 +86,20 @@ export function createLogEventoService(db: LogEventoDb) {
         throw new LogInvalidoError("t_ms inválido");
       }
 
+      let idSessaoBanco = novo.idSessaoDispositivo;
+      if (db.sessaoNavegacao) {
+        const sessaoDispositivo = await db.sessaoNavegacao.findUnique({
+          where: { id_dispositivo: BigInt(novo.idSessaoDispositivo) }
+        });
+        if (!sessaoDispositivo) {
+          throw new LogInvalidoError("sessão do dispositivo inexistente; registre a sessão antes de enviar logs");
+        }
+        idSessaoBanco = sessaoDispositivo.id_sessao;
+      }
+
       const criado = await db.logEvento.create({
         data: {
-          id_sessao: novo.idSessao,
+          id_sessao: idSessaoBanco,
           timestamp_ms: BigInt(Math.trunc(novo.timestampMs)),
           tipo_evento: novo.nivel,
           descricao: novo.descricao.trim()

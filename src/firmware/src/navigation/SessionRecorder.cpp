@@ -2,34 +2,34 @@
 
 namespace mm {
 
-bool SessionRecorder::begin(uint32_t session_id, const tracking::TrackingState &initial,
-                            uint32_t now_ms)
+bool SessionRecorder::begin(uint32_t session_id, const SessionPose &initial,
+                            uint32_t now_ms, const char *tipo_labirinto, uint16_t tentativa)
 {
-    if (!buffer_.start(session_id, now_ms)) {
+    if (!buffer_.start(session_id, now_ms, tipo_labirinto, tentativa)) {
         return false;
     }
-    last_ = initial.position;
-    return buffer_.record(now_ms, initial.position.col, initial.position.row,
-                          static_cast<uint8_t>(initial.orientation));
+    last_row_ = initial.row;
+    last_col_ = initial.col;
+    return buffer_.record(now_ms, initial.col, initial.row, initial.heading);
 }
 
-bool SessionRecorder::onTracking(const tracking::TrackingState &state)
+bool SessionRecorder::onTracking(const SessionPose &state)
 {
     if (!running()) {
         return false;
     }
-    if (state.position.row == last_.row && state.position.col == last_.col) {
-        return false;                          /* mesma célula: nada a gravar */
+    if (state.row == last_row_ && state.col == last_col_) {
+        return false; // rotação na mesma célula não cria ponto redundante
     }
-    last_ = state.position;
+    last_row_ = state.row;
+    last_col_ = state.col;
 
-    /* Timestamp atrasado em relação ao início não pode gerar t negativo. */
+    // Timestamp anterior ao início é fixado em t=0; a subtração respeita wrap de millis().
     uint32_t ts = state.timestampMs;
     if (static_cast<int32_t>(ts - buffer_.startMs()) < 0) {
         ts = buffer_.startMs();
     }
-    return buffer_.record(ts, state.position.col, state.position.row,
-                          static_cast<uint8_t>(state.orientation));
+    return buffer_.record(ts, state.col, state.row, state.heading);
 }
 
 bool SessionRecorder::end(uint32_t now_ms, EndReason reason)

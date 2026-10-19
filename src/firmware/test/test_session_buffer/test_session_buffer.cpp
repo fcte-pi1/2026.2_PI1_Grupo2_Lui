@@ -114,7 +114,7 @@ void test_json_do_pacote(void)
     sb.stop(5100, EndReason::FinishLine);
     TEST_ASSERT_TRUE(sb.writeJson(collect, &out));
     TEST_ASSERT_EQUAL_STRING(
-        "{\"session_id\":42,\"tempo_total_ms\":5000,\"motivo\":\"CHEGADA\",\"stride\":1,\"pontos\":["
+        "{\"session_id\":42,\"tempo_total_ms\":5000,\"motivo\":\"CHEGADA\",\"tipo_labirinto\":\"desconhecido\",\"tentativa\":1,\"desafio_cumprido\":true,\"consumo_bateria_mah\":null,\"stride\":1,\"pontos\":["
         "{\"t\":0,\"x\":0,\"y\":0,\"heading\":\"EAST\"},"
         "{\"t\":500,\"x\":1,\"y\":0,\"heading\":\"EAST\"},"
         "{\"t\":1000,\"x\":1,\"y\":1,\"heading\":\"SOUTH\"}]}",

@@ -39,3 +39,15 @@ export function getSessionLogs(idSessao: number, nivel?: Nivel): Promise<LogEven
   const query = nivel ? `?nivel=${nivel}` : ''
   return get<LogEvento[]>(`/api/sessions/${idSessao}/logs${query}`)
 }
+
+export interface PontoPercurso {
+  ordem: number
+  timestamp_ms: number
+  pos_x: number
+  pos_y: number
+  orientacao: string
+}
+
+export function getSessionNavigation(idSessao: number): Promise<PontoPercurso[]> {
+  return get<PontoPercurso[]>(`/api/sessions/${idSessao}/navigation`)
+}
