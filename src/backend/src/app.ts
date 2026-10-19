@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import logsRouter from "./routes/logs.routes";
 
 const app = express();
 
@@ -12,5 +13,7 @@ app.get("/health", (_req, res) => {
     service: "micromouse-backend"
   });
 });
+
+app.use("/api/sessions", logsRouter);
 
 export default app;

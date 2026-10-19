@@ -9,13 +9,19 @@ datasource db {
 
 model SessaoNavegacao {
   id_sessao            Int      @id @default(autoincrement())
+  id_dispositivo       BigInt?  @unique
   data_inicio          DateTime @default(now())
   status_conclusao     String
-  tempo_total_segundos Float
+  tempo_total_segundos Float    @default(0)
+  tipo_labirinto       String?
+  numero_tentativa     Int?
+  desafio_cumprido     Boolean  @default(false)
+  consumo_bateria_mah  Float?
 
   celulas     CelulaLabirinto[]
   telemetrias RegistroTelemetria[]
   logs        LogEvento[]
+  pontos      PontoPercurso[]
 
   @@map("SESSAO_NAVEGACAO")
 }
@@ -64,4 +70,20 @@ model LogEvento {
   sessao SessaoNavegacao @relation(fields: [id_sessao], references: [id_sessao])
 
   @@map("LOG_EVENTO")
+}
+
+model PontoPercurso {
+  id_ponto    BigInt @id @default(autoincrement())
+  id_sessao   Int
+  ordem       Int
+  timestamp_ms BigInt
+  pos_x       Int
+  pos_y       Int
+  orientacao  String
+
+  sessao SessaoNavegacao @relation(fields: [id_sessao], references: [id_sessao], onDelete: Cascade)
+
+  @@unique([id_sessao, ordem])
+  @@index([id_sessao, timestamp_ms])
+  @@map("PONTO_PERCURSO")
 }
