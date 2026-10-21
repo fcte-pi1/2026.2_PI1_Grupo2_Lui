@@ -6,3 +6,6 @@
 .vscode/launch.json
 .vscode/ipch
 compile_commands.json
+
+# Credenciais e calibração locais do firmware (não versionar)
+include/config/network_config.local.hpp

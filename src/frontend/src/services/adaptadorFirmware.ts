@@ -4,6 +4,7 @@ import type { Direcao, MensagemDashboard, Paredes } from "../types/telemetry";
 // mensagens do painel. O firmware manda, a cada célula:
 //   { "robot": { "x", "y", "heading": "NORTH" },
 //     "cell":  { "x", "y", "visited", "walls": { north, south, east, west } } }
+// A lateral pode ser booleano (medida) ou null (ainda desconhecida).
 // com a origem (0,0) na célula de largada e y crescendo para o Sul. O painel
 // desenha com y crescendo para o Norte, então só o eixo y é invertido
 // (y_painel = altura - 1 - y_firmware). Norte, Sul, Leste e Oeste continuam
@@ -23,10 +24,10 @@ function ehObjeto(v: unknown): v is Record<string, unknown> {
 function ehParedes(v: unknown): v is Paredes {
   return (
     ehObjeto(v) &&
-    typeof v.north === "boolean" &&
-    typeof v.south === "boolean" &&
-    typeof v.east === "boolean" &&
-    typeof v.west === "boolean"
+    (typeof v.north === "boolean" || v.north === null) &&
+    (typeof v.south === "boolean" || v.south === null) &&
+    (typeof v.east === "boolean" || v.east === null) &&
+    (typeof v.west === "boolean" || v.west === null)
   );
 }
 

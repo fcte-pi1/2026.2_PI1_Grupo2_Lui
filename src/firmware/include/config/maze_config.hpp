@@ -114,23 +114,22 @@ inline MazeConfig makeMazeConfig(
     MazeConfig config{};
 
     config.format = format;
-    config.cols = 4;
-
+    // Os nomes seguem largura x altura (colunas x linhas), como no dashboard.
+    // A origem/goal usam row em sentido norte-sul e col em sentido oeste-leste.
+    config.rows = 4;
     switch (format) {
         case MazeFormat::Maze4x4:
-            config.rows = 4;
+            config.cols = 4;
             break;
-
         case MazeFormat::Maze8x4:
-            config.rows = 8;
+            config.cols = 8;
             break;
-
         case MazeFormat::Maze12x4:
-            config.rows = 12;
+            config.cols = 12;
             break;
-
         default:
             config.rows = 0;
+            config.cols = 0;
             break;
     }
 
@@ -164,14 +163,10 @@ inline MazeConfig makeMazeConfig(
 }
 
 inline bool isValidMazeConfig(const MazeConfig& config) {
-    if (config.cols != 4) {
-        return false;
-    }
-
     const bool formatMatches =
-        (config.format == MazeFormat::Maze4x4 && config.rows == 4) ||
-        (config.format == MazeFormat::Maze8x4 && config.rows == 8) ||
-        (config.format == MazeFormat::Maze12x4 && config.rows == 12);
+        (config.format == MazeFormat::Maze4x4 && config.cols == 4 && config.rows == 4) ||
+        (config.format == MazeFormat::Maze8x4 && config.cols == 8 && config.rows == 4) ||
+        (config.format == MazeFormat::Maze12x4 && config.cols == 12 && config.rows == 4);
     if (!formatMatches) {
         return false;
     }

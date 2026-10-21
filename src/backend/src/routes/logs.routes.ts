@@ -10,11 +10,13 @@ import {
   type SessionNavigationDb
 } from "../services/sessionNavigation.service";
 import { createLogsController } from "../controllers/logs.controller";
+import { createTelemetryService, type TelemetryDb } from "../services/telemetry.service";
 
 // Instâncias compartilhadas: o gateway recebe o serviço no ponto de composição do servidor.
 export const logEventoService = createLogEventoService(prisma as unknown as LogEventoDb);
 const sessionListService = createSessionListService(prisma as unknown as SessionListDb);
-const sessionNavigationService = createSessionNavigationService(prisma as unknown as SessionNavigationDb);
+export const sessionNavigationService = createSessionNavigationService(prisma as unknown as SessionNavigationDb);
+export const telemetryPersistenceService = createTelemetryService(prisma as unknown as TelemetryDb);
 const controller = createLogsController(logEventoService, sessionListService, sessionNavigationService);
 
 /** HU-11: início/finalização e caminho; HU-12: consulta cronológica de eventos. */

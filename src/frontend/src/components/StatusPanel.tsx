@@ -5,7 +5,7 @@ import { TENSAO_CRITICA, TENSAO_MAXIMA, TENSAO_MINIMA, bateriaCritica } from "..
 
 // HU-09: indicadores de status e telemetria do robô
 
-export function BatteryWidget({ tensao }: { tensao: number | null }) {
+export function BatteryWidget({ tensao, corrente }: { tensao: number | null; corrente: number | null }) {
   const critica = bateriaCritica(tensao);
   const pct =
     tensao === null
@@ -28,6 +28,7 @@ export function BatteryWidget({ tensao }: { tensao: number | null }) {
         />
       </div>
       <p className="mt-1 text-xs">{tensao === null ? "sem leitura" : `${pct}% · limite seguro ${TENSAO_CRITICA} V`}</p>
+      <p className="mt-1 text-xs text-slate-500">Corrente: {corrente === null ? "--" : `${corrente.toFixed(3)} A`}</p>
     </div>
   );
 }
@@ -84,7 +85,17 @@ export function RobotStateBadge({ estado, motivo }: { estado: EstadoRobo | null;
 export function StatusPanel({ estado }: { estado: EstadoDashboard }) {
   return (
     <div className="flex flex-col gap-4">
-      <BatteryWidget tensao={estado.tensaoBateria} />
+      <BatteryWidget tensao={estado.tensaoBateria} corrente={estado.correnteBateriaA} />
+      {estado.leiturasSensorMm && (
+        <div className="grid grid-cols-3 gap-2 rounded-xl border border-slate-300 p-3 dark:border-slate-700">
+          {([["Frente", estado.leiturasSensorMm.frente], ["Esquerda", estado.leiturasSensorMm.esquerda], ["Direita", estado.leiturasSensorMm.direita]] as const).map(([rotulo, distancia]) => (
+            <div key={rotulo}>
+              <p className="text-xs text-slate-500">US-100 · {rotulo}</p>
+              <p className="text-sm font-semibold">{distancia === null ? "sem leitura" : `${distancia.toFixed(0)} mm`}</p>
+            </div>
+          ))}
+        </div>
+      )}
       <WheelSpeedCards esq={estado.velocidadeEsq} dir={estado.velocidadeDir} />
       <div className="rounded-xl border border-slate-300 dark:border-slate-700 p-4">
         <p className="text-sm mb-2">

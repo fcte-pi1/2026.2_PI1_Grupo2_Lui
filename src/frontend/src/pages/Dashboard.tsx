@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useDashboard } from "../hooks/useDashboard";
 import { dashboardStore } from "../services/dashboardStore";
 import { connectTelemetry } from "../services/websocket";
+import { adaptarPacoteFirmware } from "../services/adaptadorFirmware";
 import { iniciarSimulador } from "../services/simulador";
 import { MazeLegend, MazeMap } from "../components/MazeMap";
 import { BatteryAlert, RobotStateBadge, StatusPanel } from "../components/StatusPanel";
@@ -56,17 +57,26 @@ export function Dashboard({
       return iniciarSimulador({ largura, altura }, dashboardStore.dispatch);
     }
     const socket = connectTelemetry((data) => {
+      if (typeof data === "object" && data !== null && !Array.isArray(data)) {
+        const packet = data as Record<string, unknown>;
+        // Eventos persistidos atualizam o resumo e os últimos diagnósticos sem
+        // manter uma segunda cópia de sessão dentro do dashboardStore.
+        if (["event_recorded", "session_finished", "session_started"].includes(String(packet.type ?? ""))) {
+          onAtualizarSessoes();
+          return;
+        }
+        // MazeMap do firmware compartilha robot + cell em um único pacote.
+        const adaptadas = adaptarPacoteFirmware(data, dashboardStore.getState().altura);
+        if (adaptadas) {
+          adaptadas.forEach((mensagem) => dashboardStore.dispatch(mensagem));
+          return;
+        }
+      }
       if (ehMensagemDashboard(data)) dashboardStore.dispatch(data);
     });
     return () => socket.close();
-  }, [fonte, tamanho, rodada]);
+  }, [fonte, tamanho, rodada, onAtualizarSessoes]);
 
-  // Ao encerrar/parar uma corrida, atualiza o resumo persistido da HU-11/HU-12.
-  useEffect(() => {
-    if (["FINISHED", "STOPPED", "ERROR"].includes(estado.estadoRobo ?? "")) {
-      void onAtualizarSessoes();
-    }
-  }, [estado.estadoRobo, onAtualizarSessoes]);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-200">

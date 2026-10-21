@@ -123,6 +123,9 @@ public:
     Pose2D getPose() const;
     float getDistanceTravelledMm() const;
     float getTurnAngleDeg() const;
+    float getLeftSpeedMmS() const;
+    float getRightSpeedMmS() const;
+    float getPidErrorMmS() const;
 
 private:
     bool prepareMotion(MotionType type, uint32_t timeoutMs);
@@ -183,4 +186,6 @@ private:
     float profiledAngularSpeedDegS_ = 0.0f;
     float lastLeftTargetMmS_ = 0.0f;
     float lastRightTargetMmS_ = 0.0f;
+    float lastLeftMeasuredMmS_ = 0.0f;
+    float lastRightMeasuredMmS_ = 0.0f;
 };

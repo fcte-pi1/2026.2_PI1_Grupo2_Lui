@@ -201,13 +201,13 @@ void lateralSensorTask(void*) {
 }
 
 float initialHeadingRadians(Direction heading) {
-    constexpr float HALF_PI = 1.57079632679489661923f;
-    constexpr float PI = 3.14159265358979323846f;
+    constexpr float kHalfPiRadians = 1.57079632679489661923f;
+    constexpr float kPiRadians = 3.14159265358979323846f;
     switch (heading) {
         case Direction::East: return 0.0f;
-        case Direction::North: return HALF_PI;
-        case Direction::West: return PI;
-        case Direction::South: return -HALF_PI;
+        case Direction::North: return kHalfPiRadians;
+        case Direction::West: return kPiRadians;
+        case Direction::South: return -kHalfPiRadians;
     }
     return 0.0f;
 }
@@ -293,7 +293,19 @@ void setup() {
         return;
     }
 
-    Wire.begin(BoardPins::I2C_SDA, BoardPins::I2C_SCL);
+    const bool i2cReady = Wire.begin(
+        BoardPins::I2C_SDA,
+        BoardPins::I2C_SCL
+    );
+
+    if (!i2cReady) {
+        Serial.println(
+            "[ERRO] Falha ao inicializar o barramento I2C."
+        );
+
+        return;
+    }
+    
     Wire.setClock(BoardPins::I2C_CLOCK_HZ);
 
     const bool motorsOK = motors.begin(
@@ -305,7 +317,31 @@ void setup() {
         BoardPins::ENCODER_LEFT_A, BoardPins::ENCODER_LEFT_B);
     const bool rightEncoderOK = encoderRight.begin(
         BoardPins::ENCODER_RIGHT_A, BoardPins::ENCODER_RIGHT_B);
-    const bool imuOK = imu.begin(Wire, BoardPins::MPU6500_ADDRESS);
+    
+    // HU-02: verifica se a IMU responde antes de tentar ler seus registradores.
+    Wire.beginTransmission(BoardPins::MPU6500_ADDRESS);
+
+    const uint8_t imuProbeStatus = Wire.endTransmission(true);
+
+    bool imuOK = false;
+
+    if (imuProbeStatus == 0) {
+        Serial.println("[OK] MPU6500 respondeu no barramento I2C.");
+
+        imuOK = imu.begin(Wire, BoardPins::MPU6500_ADDRESS);
+
+        if (!imuOK) {
+            Serial.println(
+                "[ERRO] A MPU6500 respondeu, mas sua inicializacao falhou."
+            );
+        }
+    } else {
+        Serial.printf(
+            "[INFO] MPU6500 nao detectada em 0x%02X (status I2C=%u).\n",
+            BoardPins::MPU6500_ADDRESS,
+            static_cast<unsigned>(imuProbeStatus)
+        );
+    }
     const bool frontSensorOK = sensorFront.begin(
         BoardPins::ULTRASONIC_FRONT.trigger, BoardPins::ULTRASONIC_FRONT.echo);
     const bool leftSensorOK = sensorLeft.begin(

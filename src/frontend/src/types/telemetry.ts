@@ -4,10 +4,11 @@
 export type Direcao = "N" | "S" | "L" | "O";
 
 export interface Paredes {
-  north: boolean;
-  south: boolean;
-  east: boolean;
-  west: boolean;
+  // true = parede; false = passagem medida; null = ainda desconhecido.
+  north: boolean | null;
+  south: boolean | null;
+  east: boolean | null;
+  west: boolean | null;
 }
 
 export interface Celula {
@@ -53,7 +54,10 @@ export interface MensagemPosicao {
 // HU-09: indicadores de hardware e software
 export interface MensagemTelemetria {
   type: "telemetry";
-  battery_voltage: number;
+  battery_voltage: number | null;
+  battery_current_a?: number | null;
+  sensor_distances_mm?: { front: number | null; left: number | null; right: number | null };
+  heading_deg?: number;
   pid_error: number;
   wheels_speed: { left: number; right: number };
   robot_state: EstadoRobo;

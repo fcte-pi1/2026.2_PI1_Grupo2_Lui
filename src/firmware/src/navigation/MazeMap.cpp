@@ -125,14 +125,18 @@ int MazeMap::cellPacketJson(int x, int y, Dir heading, char *buf, size_t size) c
     if (c == nullptr) {
         return -1;
     }
+    auto sideJson = [c](Dir d) {
+        if (!c->isKnown(d)) return "null";
+        return c->hasWall(d) ? "true" : "false";
+    };
     auto b = [](bool v) { return v ? "true" : "false"; };
     const int n = std::snprintf(buf, size,
         "{\"robot\":{\"x\":%d,\"y\":%d,\"heading\":\"%s\"},"
         "\"cell\":{\"x\":%u,\"y\":%u,\"visited\":%s,"
         "\"walls\":{\"north\":%s,\"south\":%s,\"east\":%s,\"west\":%s}}}",
         x, y, dirStr(heading), c->x, c->y, b(c->visited != 0),
-        b(c->hasWall(Dir::North)), b(c->hasWall(Dir::South)),
-        b(c->hasWall(Dir::East)),  b(c->hasWall(Dir::West)));
+        sideJson(Dir::North), sideJson(Dir::South),
+        sideJson(Dir::East), sideJson(Dir::West));
     return (n < 0 || static_cast<size_t>(n) >= size) ? -1 : n;
 }
 

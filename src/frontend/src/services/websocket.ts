@@ -1,24 +1,17 @@
-export function connectTelemetry(
-  onMessage: (data: unknown) => void
-) {
-  const socket = new WebSocket("ws://localhost:3000/ws");
+/** Conexão dashboard -> gateway HU-10. URL substituível no .env via VITE_WS_URL. */
+const WS_URL = import.meta.env.VITE_WS_URL ?? "ws://localhost:3000/ws?role=dashboard";
 
-  socket.onopen = () => {
-    console.log("WebSocket conectado");
-  };
-
+export function connectTelemetry(onMessage: (data: unknown) => void) {
+  const socket = new WebSocket(WS_URL);
+  socket.onopen = () => console.log("WebSocket do dashboard conectado");
   socket.onmessage = (event) => {
     try {
-      const data = JSON.parse(event.data);
-      onMessage(data);
+      onMessage(JSON.parse(event.data) as unknown);
     } catch {
-      console.error("Mensagem inválida");
+      console.error("Mensagem WebSocket inválida; JSON descartado");
     }
   };
-
-  socket.onclose = () => {
-    console.log("WebSocket encerrado");
-  };
-
+  socket.onerror = () => console.error("Falha na conexão WebSocket do dashboard");
+  socket.onclose = () => console.log("WebSocket do dashboard encerrado");
   return socket;
 }

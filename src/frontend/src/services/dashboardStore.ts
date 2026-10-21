@@ -2,6 +2,7 @@ import type {
   Celula,
   Direcao,
   EstadoRobo,
+  Paredes,
   MensagemDashboard,
 } from "../types/telemetry";
 
@@ -22,6 +23,8 @@ export interface EstadoDashboard {
   trajeto: Array<{ x: number; y: number }>;
 
   tensaoBateria: number | null;
+  correnteBateriaA: number | null;
+  leiturasSensorMm: { frente: number | null; esquerda: number | null; direita: number | null } | null;
   velocidadeEsq: number | null;
   velocidadeDir: number | null;
   estadoRobo: EstadoRobo | null;
@@ -52,6 +55,8 @@ export function estadoInicial(largura = 4, altura = 4): EstadoDashboard {
     robo: null,
     trajeto: [],
     tensaoBateria: null,
+    correnteBateriaA: null,
+    leiturasSensorMm: null,
     velocidadeEsq: null,
     velocidadeDir: null,
     estadoRobo: null,
@@ -77,12 +82,36 @@ export function aplicarMensagem(
     case "cell": {
       if (!dentroDaGrade(e, msg.x, msg.y)) return e;
       const celulas = e.celulas.map((linha) => linha.slice());
+      const atual = celulas[msg.y][msg.x];
+      const anterior: Paredes = atual.walls ?? { north: null, south: null, east: null, west: null };
+      // null significa "não medido", não "caminho livre". Uma mensagem parcial
+      // não apaga conhecimento válido recebido em uma observação anterior.
+      const walls: Paredes = {
+        north: msg.walls.north ?? anterior.north,
+        south: msg.walls.south ?? anterior.south,
+        east: msg.walls.east ?? anterior.east,
+        west: msg.walls.west ?? anterior.west,
+      };
       celulas[msg.y][msg.x] = {
         x: msg.x,
         y: msg.y,
-        visited: msg.visited,
-        walls: msg.walls,
+        visited: msg.visited || atual.visited,
+        walls,
       };
+
+      // Uma parede/passagem é compartilhada por duas células. Espelha apenas
+      // lados medidos, mantendo desconhecidos intactos nas células vizinhas.
+      const espelhar = (lado: keyof Paredes, nx: number, ny: number, oposto: keyof Paredes) => {
+        const valor = walls[lado];
+        if (valor === null || !dentroDaGrade(e, nx, ny)) return;
+        const vizinha = celulas[ny][nx];
+        const paredesVizinhas: Paredes = vizinha.walls ?? { north: null, south: null, east: null, west: null };
+        celulas[ny][nx] = { ...vizinha, walls: { ...paredesVizinhas, [oposto]: valor } };
+      };
+      espelhar("north", msg.x, msg.y + 1, "south");
+      espelhar("south", msg.x, msg.y - 1, "north");
+      espelhar("east", msg.x + 1, msg.y, "west");
+      espelhar("west", msg.x - 1, msg.y, "east");
       return { ...e, celulas };
     }
 
@@ -112,6 +141,10 @@ export function aplicarMensagem(
       return {
         ...e,
         tensaoBateria: msg.battery_voltage,
+        correnteBateriaA: msg.battery_current_a ?? null,
+        leiturasSensorMm: msg.sensor_distances_mm
+          ? { frente: msg.sensor_distances_mm.front, esquerda: msg.sensor_distances_mm.left, direita: msg.sensor_distances_mm.right }
+          : e.leiturasSensorMm,
         velocidadeEsq: msg.wheels_speed.left,
         velocidadeDir: msg.wheels_speed.right,
         estadoRobo: msg.robot_state,

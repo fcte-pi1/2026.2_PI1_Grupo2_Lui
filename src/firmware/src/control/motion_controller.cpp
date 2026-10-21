@@ -4,7 +4,7 @@
 #include <math.h>
 
 namespace {
-constexpr float PI = 3.14159265358979323846f;
+constexpr float kPiRadians = 3.14159265358979323846f;
 
 float absValue(float value) { return value < 0.0f ? -value : value; }
 
@@ -435,7 +435,7 @@ void MotionController::updateTurn(float dtSeconds,
     // Convenção: omega positivo = giro anti-horário/esquerda.
     // dR - dL = omega * wheelTrack. Portanto a roda esquerda vai para trás
     // e a direita para frente durante um giro positivo no próprio eixo.
-    const float omegaRadS = profiledAngularSpeedDegS_ * PI / 180.0f;
+    const float omegaRadS = profiledAngularSpeedDegS_ * kPiRadians / 180.0f;
     const float leftTarget = -omegaRadS * config_.wheelTrackMm / 2.0f;
     const float rightTarget = omegaRadS * config_.wheelTrackMm / 2.0f;
 
@@ -451,7 +451,7 @@ void MotionController::updateTurn(float dtSeconds,
             // Corrige a orientação da odometria com o ângulo relativo medido
             // pela IMU durante este giro. x/y continuam baseados nos encoders.
             odometry_.setHeadingRad(
-                turnStartHeadingRad_ + turnAngleDeg_ * PI / 180.0f);
+                turnStartHeadingRad_ + turnAngleDeg_ * kPiRadians / 180.0f);
             succeed();
             return;
         }

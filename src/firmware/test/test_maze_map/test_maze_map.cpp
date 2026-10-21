@@ -150,6 +150,7 @@ void test_pacote_json(void)
     TEST_ASSERT_NOT_NULL(std::strstr(js, "\"north\":true"));
     TEST_ASSERT_NOT_NULL(std::strstr(js, "\"east\":true"));
     TEST_ASSERT_NOT_NULL(std::strstr(js, "\"west\":false"));
+    TEST_ASSERT_NOT_NULL(std::strstr(js, "\"south\":null"));
     TEST_ASSERT_EQUAL(-1, map.cellPacketJson(0, 0, Dir::North, js, 10));
     TEST_ASSERT_EQUAL(-1, map.cellPacketJson(9, 9, Dir::North, js, sizeof(js)));
 }

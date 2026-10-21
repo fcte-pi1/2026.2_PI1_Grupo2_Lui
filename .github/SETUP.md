@@ -224,7 +224,7 @@ apps/backend/.env
 Exemplo:
 
 ```env
-DATABASE_URL="postgresql://micromouse:<SENHA>@localhost:5432/micromouse?schema=public"
+DATABASE_URL="postgresql://micromouse:<SENHA>@localhost:5433/micromouse?schema=public"
 PORT=3000
 ```
 

@@ -49,8 +49,12 @@ model RegistroTelemetria {
   id_telemetria      BigInt @id @default(autoincrement())
   id_sessao          Int
   timestamp_ms       BigInt
-  tensao_bateria     Float
-  corrente_bateria   Float
+  tensao_bateria     Float?
+  corrente_bateria   Float?
+  distancia_frontal_mm Float?
+  distancia_esquerda_mm Float?
+  distancia_direita_mm Float?
+  erro_pid           Float    @default(0)
   velocidade_esq    Float
   velocidade_dir    Float
   angulo_orientacao Float

@@ -92,7 +92,8 @@ public:
      * Pacote para o WebSocket (formato de células da HU-08):
      * {"robot":{"x":..,"y":..,"heading":"NORTH"},
      *  "cell":{"x":..,"y":..,"visited":true,
-     *          "walls":{"north":true,"south":false,"east":true,"west":false}}}
+     *          "walls":{"north":true,"south":null,"east":true,"west":false}}}
+     * Lados ainda não medidos são serializados como null, não como passagem livre.
      * Retorna bytes escritos ou -1 se não coube / célula inválida.
      */
     int cellPacketJson(int x, int y, Dir heading, char *buf, size_t size) const;

@@ -193,8 +193,17 @@ void test_configura_origem_objetivo_nos_quatro_cantos(void) {
         MazeFormat::Maze4x4, MazeCorner::TopRight, Direction::West)));
     TEST_ASSERT_TRUE(isValidMazeConfig(makeMazeConfig(
         MazeFormat::Maze8x4, MazeCorner::BottomLeft, Direction::North)));
-    TEST_ASSERT_TRUE(isValidMazeConfig(makeMazeConfig(
-        MazeFormat::Maze12x4, MazeCorner::BottomRight, Direction::North)));
+    const MazeConfig maze12x4 = makeMazeConfig(
+        MazeFormat::Maze12x4, MazeCorner::BottomRight, Direction::North);
+    TEST_ASSERT_TRUE(isValidMazeConfig(maze12x4));
+    TEST_ASSERT_EQUAL_UINT8(12, maze12x4.cols);
+    TEST_ASSERT_EQUAL_UINT8(4, maze12x4.rows);
+    TEST_ASSERT_EQUAL_UINT8(11, maze12x4.start.col);
+    TEST_ASSERT_EQUAL_UINT8(3, maze12x4.start.row);
+    const MazeConfig maze8x4 = makeMazeConfig(
+        MazeFormat::Maze8x4, MazeCorner::TopLeft, Direction::East);
+    TEST_ASSERT_EQUAL_UINT8(8, maze8x4.cols);
+    TEST_ASSERT_EQUAL_UINT8(4, maze8x4.rows);
 }
 
 void test_rejeita_objetivo_nao_oposto_ao_inicio(void) {

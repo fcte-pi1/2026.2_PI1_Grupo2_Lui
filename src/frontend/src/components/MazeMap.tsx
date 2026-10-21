@@ -172,22 +172,27 @@ export function MazeMap({ estado }: Props) {
           const x0 = esq(c.x);
           const y0 = topo(c.y);
           const linhas: [number, number, number, number][] = [];
-          if (c.walls.north) linhas.push([x0, y0, x0 + TAM, y0]);
-          if (c.walls.south) linhas.push([x0, y0 + TAM, x0 + TAM, y0 + TAM]);
-          if (c.walls.west) linhas.push([x0, y0, x0, y0 + TAM]);
-          if (c.walls.east) linhas.push([x0 + TAM, y0, x0 + TAM, y0 + TAM]);
-          return linhas.map(([x1, y1, x2, y2], i) => (
-            <line
-              key={`p-${c.x}-${c.y}-${i}`}
-              x1={x1}
-              y1={y1}
-              x2={x2}
-              y2={y2}
-              className="stroke-slate-900 dark:stroke-slate-100"
-              strokeWidth={5}
-              strokeLinecap="round"
-            />
-          ));
+          const desconhecidas: [number, number, number, number][] = [];
+          if (c.walls.north === true) linhas.push([x0, y0, x0 + TAM, y0]);
+          else if (c.walls.north === null) desconhecidas.push([x0, y0, x0 + TAM, y0]);
+          if (c.walls.south === true) linhas.push([x0, y0 + TAM, x0 + TAM, y0 + TAM]);
+          else if (c.walls.south === null) desconhecidas.push([x0, y0 + TAM, x0 + TAM, y0 + TAM]);
+          if (c.walls.west === true) linhas.push([x0, y0, x0, y0 + TAM]);
+          else if (c.walls.west === null) desconhecidas.push([x0, y0, x0, y0 + TAM]);
+          if (c.walls.east === true) linhas.push([x0 + TAM, y0, x0 + TAM, y0 + TAM]);
+          else if (c.walls.east === null) desconhecidas.push([x0 + TAM, y0, x0 + TAM, y0 + TAM]);
+          return (
+            <>
+              {desconhecidas.map(([x1, y1, x2, y2], i) => (
+                <line key={`u-${c.x}-${c.y}-${i}`} x1={x1} y1={y1} x2={x2} y2={y2}
+                  className="stroke-slate-500/70 dark:stroke-slate-400/70" strokeWidth={2} strokeDasharray="4 4" />
+              ))}
+              {linhas.map(([x1, y1, x2, y2], i) => (
+                <line key={`p-${c.x}-${c.y}-${i}`} x1={x1} y1={y1} x2={x2} y2={y2}
+                  className="stroke-slate-900 dark:stroke-slate-100" strokeWidth={5} strokeLinecap="round" />
+              ))}
+            </>
+          );
         })}
 
         {/* robô: destaque da célula atual + seta de orientação (CA-03) */}
