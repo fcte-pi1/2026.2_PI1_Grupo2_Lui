@@ -284,6 +284,8 @@ void MotionController::update(float dtSeconds) {
         static_cast<float>(deltaRightCount) / config_.rightCountsPerMm;
     const float leftSpeedMmS = leftDeltaMm / dtSeconds;
     const float rightSpeedMmS = rightDeltaMm / dtSeconds;
+    lastLeftMeasuredMmS_ = leftSpeedMmS;
+    lastRightMeasuredMmS_ = rightSpeedMmS;
 
     previousLeftCount_ = leftCount;
     previousRightCount_ = rightCount;
@@ -564,3 +566,10 @@ MotionFailureReason MotionController::getFailureReason() const { return failureR
 Pose2D MotionController::getPose() const { return odometry_.getPose(); }
 float MotionController::getDistanceTravelledMm() const { return distanceTravelledMm_; }
 float MotionController::getTurnAngleDeg() const { return turnAngleDeg_; }
+float MotionController::getLeftSpeedMmS() const { return lastLeftMeasuredMmS_; }
+float MotionController::getRightSpeedMmS() const { return lastRightMeasuredMmS_; }
+float MotionController::getPidErrorMmS() const {
+    const float leftError = lastLeftTargetMmS_ - lastLeftMeasuredMmS_;
+    const float rightError = lastRightTargetMmS_ - lastRightMeasuredMmS_;
+    return (leftError + rightError) * 0.5f;
+}

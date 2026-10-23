@@ -2,13 +2,19 @@
 #include <Wire.h>
 #include <math.h>
 #include <nvs_flash.h>
+#include <esp_random.h>
+#include <stdio.h>
+#include <string.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
 #include "config/board_pins.hpp"
 #include "config/maze_config.hpp"
+#include "config/network_config.hpp"
+#include "communication/TelemetryClient.h"
 #include "hal/encoder_n20.hpp"
 #include "hal/imu_mpu6500.hpp"
+#include "hal/ina226.hpp"
 #include "hal/motor_drv8833.hpp"
 #include "hal/ultrasonic_us100.hpp"
 #include "hal/NvsMapStorage.h"
@@ -39,9 +45,21 @@ MotorDRV8833 motors;
 EncoderN20 encoderLeft;
 EncoderN20 encoderRight;
 IMUMPU6500 imu;
+INA226 powerMonitor;
 UltrasonicUS100 sensorFront;
 UltrasonicUS100 sensorLeft;
 UltrasonicUS100 sensorRight;
+mm::TelemetryClient telemetryClient;
+
+bool telemetryClientReady = false;
+bool terminalTelemetryPublished = false;
+uint32_t telemetrySessionId = 0;
+uint32_t telemetrySessionStartedMs = 0;
+uint32_t lastTelemetryPublishMs = 0;
+uint32_t lastPowerSampleMs = 0;
+bool powerMonitorReady = false;
+bool powerReadingValid = false;
+INA226Reading latestPowerReading{};
 
 Odometry odometry;
 PIDController leftPid(0.8f, 0.10f, 0.0f, -120.0f, 120.0f);
@@ -279,6 +297,176 @@ void updateWallAlignmentFeedback() {
     }
 }
 
+uint32_t generateTelemetrySessionId() {
+    uint32_t id = static_cast<uint32_t>(esp_random() ^ micros() ^ millis());
+    if (id == 0) id = 1;
+    return id;
+}
+
+const char* mazeFormatName() {
+    if (mazeConfig.cols == 4 && mazeConfig.rows == 4) return "4x4";
+    if (mazeConfig.cols == 8 && mazeConfig.rows == 4) return "8x4";
+    if (mazeConfig.cols == 12 && mazeConfig.rows == 4) return "12x4";
+    return "desconhecido";
+}
+
+const char* telemetryRobotState() {
+    switch (mission.state()) {
+        case nav::MissionState::AwaitingObservation:
+            return "MAPPING";
+        case nav::MissionState::Turning:
+        case nav::MissionState::Moving:
+            return "NAVIGATING";
+        case nav::MissionState::Completed:
+            return "FINISHED";
+        case nav::MissionState::Failed:
+            return "ERROR";
+        case nav::MissionState::NotStarted:
+        default:
+            return "STOPPED";
+    }
+}
+
+void formatNullableFloat(bool valid, float value, char* output, size_t capacity,
+                         unsigned decimals = 2) {
+    if (!valid || !isfinite(value)) {
+        snprintf(output, capacity, "null");
+        return;
+    }
+    snprintf(output, capacity, decimals == 3 ? "%.3f" : "%.2f", value);
+}
+
+void samplePowerMonitor(uint32_t nowMs, bool force = false) {
+    if (!powerMonitorReady) {
+        powerReadingValid = false;
+        return;
+    }
+    if (!force && static_cast<uint32_t>(nowMs - lastPowerSampleMs) <
+                      mm::network::POWER_SAMPLE_PERIOD_MS) {
+        return;
+    }
+
+    lastPowerSampleMs = nowMs;
+    INA226Reading reading{};
+    powerReadingValid = powerMonitor.read(reading) &&
+                        isfinite(reading.busVoltageV) && isfinite(reading.currentA);
+    if (powerReadingValid) latestPowerReading = reading;
+}
+
+void publishTelemetryIfDue(uint32_t nowMs) {
+    if (!telemetryClientReady || telemetrySessionId == 0) return;
+    const nav::MissionState currentMissionState = mission.state();
+    const bool terminalState = currentMissionState == nav::MissionState::Completed ||
+                               currentMissionState == nav::MissionState::Failed;
+    if (terminalState && terminalTelemetryPublished) return;
+    if (lastTelemetryPublishMs != 0 &&
+        static_cast<uint32_t>(nowMs - lastTelemetryPublishMs) <
+            mm::network::TELEMETRY_PERIOD_MS) {
+        return;
+    }
+    lastTelemetryPublishMs = nowMs;
+    if (terminalState && !telemetryClient.connected()) return;
+
+    const LateralSnapshot snapshot = getLateralSnapshot();
+    const uint32_t sensorAge = snapshot.ready
+        ? static_cast<uint32_t>(nowMs - snapshot.sampledAtMs)
+        : UINT32_MAX;
+    const bool snapshotFresh = snapshot.ready && sensorAge <= MAX_LATERAL_SAMPLE_AGE_MS;
+
+    char batteryVoltage[20];
+    char batteryCurrent[20];
+    char frontDistance[20];
+    char leftDistance[20];
+    char rightDistance[20];
+    formatNullableFloat(powerReadingValid, latestPowerReading.busVoltageV,
+                        batteryVoltage, sizeof(batteryVoltage), 2);
+    formatNullableFloat(powerReadingValid, latestPowerReading.currentA,
+                        batteryCurrent, sizeof(batteryCurrent), 3);
+    formatNullableFloat(snapshotFresh && snapshot.front.valid,
+                        snapshot.front.distanceCm * 10.0f,
+                        frontDistance, sizeof(frontDistance), 2);
+    formatNullableFloat(snapshotFresh && snapshot.left.valid,
+                        snapshot.left.distanceCm * 10.0f,
+                        leftDistance, sizeof(leftDistance), 2);
+    formatNullableFloat(snapshotFresh && snapshot.right.valid,
+                        snapshot.right.distanceCm * 10.0f,
+                        rightDistance, sizeof(rightDistance), 2);
+
+    const Pose2D pose = motion.getPose();
+    float headingDegrees = pose.headingRad * 180.0f / 3.14159265358979323846f;
+    while (headingDegrees > 180.0f) headingDegrees -= 360.0f;
+    while (headingDegrees < -180.0f) headingDegrees += 360.0f;
+    if (!isfinite(headingDegrees)) headingDegrees = 0.0f;
+
+    // Os controladores operam em mm/s; o dashboard apresenta velocidades em m/s.
+    const bool motionActive = motion.getStatus() == MotionStatus::Running;
+    const float leftSpeedMps = motionActive ? motion.getLeftSpeedMmS() / 1000.0f : 0.0f;
+    const float rightSpeedMps = motionActive ? motion.getRightSpeedMmS() / 1000.0f : 0.0f;
+    const float pidErrorMps = motionActive ? motion.getPidErrorMmS() / 1000.0f : 0.0f;
+
+    char payload[440];
+    const int length = snprintf(
+        payload, sizeof(payload),
+        "{\"type\":\"telemetry\",\"session_id\":%lu,"
+        "\"t_ms\":%lu,\"battery_voltage\":%s,"
+        "\"battery_current_a\":%s,\"pid_error\":%.5f,"
+        "\"wheels_speed\":{\"left\":%.5f,\"right\":%.5f},"
+        "\"heading_deg\":%.2f,\"robot_state\":\"%s\","
+        "\"sensor_distances_mm\":{\"front\":%s,"
+        "\"left\":%s,\"right\":%s}}",
+        static_cast<unsigned long>(telemetrySessionId),
+        static_cast<unsigned long>(static_cast<uint32_t>(nowMs - telemetrySessionStartedMs)),
+        batteryVoltage, batteryCurrent,
+        isfinite(pidErrorMps) ? pidErrorMps : 0.0f,
+        isfinite(leftSpeedMps) ? leftSpeedMps : 0.0f,
+        isfinite(rightSpeedMps) ? rightSpeedMps : 0.0f,
+        headingDegrees, telemetryRobotState(),
+        frontDistance, leftDistance, rightDistance);
+
+    if (length <= 0 || static_cast<size_t>(length) >= sizeof(payload)) {
+        Serial.println("HU-10: falha ao serializar a telemetria; amostra descartada.");
+        return;
+    }
+    if (!telemetryClient.publishTelemetry(payload, static_cast<size_t>(length))) {
+        Serial.printf("HU-10: fila de telemetria indisponível/cheia (descartes=%lu).\n",
+                      static_cast<unsigned long>(telemetryClient.droppedMessages()));
+    } else if (terminalState) {
+        terminalTelemetryPublished = true;
+    }
+}
+
+void initializeTelemetry() {
+    if (MM_WIFI_SSID[0] == '\0') {
+        Serial.println("HU-10: telemetria desativada; configure MM_WIFI_SSID/MM_WIFI_PASSWORD em network_config.local.hpp.");
+        return;
+    }
+
+    if (!telemetryClient.begin()) {
+        Serial.println("HU-10: não foi possível iniciar o cliente de telemetria.");
+        return;
+    }
+
+    telemetrySessionId = generateTelemetrySessionId();
+    telemetrySessionStartedMs = millis();
+    char sessionStart[160];
+    const int length = snprintf(
+        sessionStart, sizeof(sessionStart),
+        "{\"type\":\"session_start\",\"device_session_id\":%lu,"
+        "\"tipo_labirinto\":\"%s\",\"tentativa\":1}",
+        static_cast<unsigned long>(telemetrySessionId), mazeFormatName());
+    if (length <= 0 || static_cast<size_t>(length) >= sizeof(sessionStart) ||
+        !telemetryClient.publishSessionStart(sessionStart, static_cast<size_t>(length))) {
+        telemetrySessionId = 0;
+        Serial.println("HU-10: falha ao preparar o início da sessão; telemetria desativada.");
+        return;
+    }
+
+    telemetryClientReady = true;
+    Serial.printf("HU-10: cliente iniciado; sessão do dispositivo=%lu; envio nominal a cada %lu ms.\n",
+                  static_cast<unsigned long>(telemetrySessionId),
+                  static_cast<unsigned long>(mm::network::TELEMETRY_PERIOD_MS));
+}
+
 }  // namespace
 
 void setup() {
@@ -305,8 +493,20 @@ void setup() {
 
         return;
     }
-    
+
     Wire.setClock(BoardPins::I2C_CLOCK_HZ);
+
+    powerMonitorReady = powerMonitor.begin(
+        Wire,
+        mm::network::INA226_SHUNT_RESISTANCE_OHMS,
+        mm::network::INA226_MAX_EXPECTED_CURRENT_A,
+        BoardPins::INA226_ADDRESS);
+    if (powerMonitorReady) {
+        Serial.println("HU-09: INA226 inicializado.");
+        samplePowerMonitor(millis(), true);
+    } else {
+        Serial.println("HU-09: INA226 ausente/não calibrado; bateria será publicada como null.");
+    }
 
     const bool motorsOK = motors.begin(
         BoardPins::MOTOR_LEFT.in1, BoardPins::MOTOR_LEFT.in2,
@@ -317,7 +517,7 @@ void setup() {
         BoardPins::ENCODER_LEFT_A, BoardPins::ENCODER_LEFT_B);
     const bool rightEncoderOK = encoderRight.begin(
         BoardPins::ENCODER_RIGHT_A, BoardPins::ENCODER_RIGHT_B);
-    
+
     // HU-02: verifica se a IMU responde antes de tentar ler seus registradores.
     Wire.beginTransmission(BoardPins::MPU6500_ADDRESS);
 
@@ -412,6 +612,7 @@ void setup() {
 
     observationStartedAtMs = millis();
     attemptStartedMs = observationStartedAtMs;
+    initializeTelemetry();
     motors.setEnabled(true);
     ready = true;
     Serial.printf("Labirinto %ux%u; início=(%u,%u); objetivo=(%u,%u).\n",
@@ -422,12 +623,16 @@ void setup() {
 }
 
 void loop() {
+    const uint32_t nowMs = millis();
+    samplePowerMonitor(nowMs);
+    publishTelemetryIfDue(nowMs);
+
     if (!ready) {
         delay(2);
         return;
     }
 
-    if (static_cast<uint32_t>(millis() - attemptStartedMs) >=
+    if (static_cast<uint32_t>(nowMs - attemptStartedMs) >=
         mazeConfig.attemptTimeoutMs) {
         mission.fail();
         safeStop("tempo máximo da tentativa excedido");
