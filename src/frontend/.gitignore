@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Playwright E2E outputs
+playwright-report/
+test-results/
+playwright/.cache/
