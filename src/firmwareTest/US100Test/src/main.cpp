@@ -29,7 +29,7 @@ SensorDiagnostic sensors[] = {
 };
 
 constexpr uint32_t ECHO_TIMEOUT_US = 25000UL;
-constexpr float MIN_DISTANCE_CM = 2.0f;
+constexpr float MIN_DISTANCE_CM = 0.1f;
 constexpr float MAX_DISTANCE_CM = 400.0f; // faixa nominal do HC-SR04
 constexpr uint8_t PREFLIGHT_ATTEMPTS = 5;
 constexpr uint8_t REQUIRED_VALID_READINGS = 3;
@@ -98,7 +98,7 @@ float medianOf(float* values, uint8_t count) {
 }
 
 void printSensorPins(const SensorDiagnostic& sensor) {
-    Serial.printf("[%8lu ms] [INFO ] Sensor %s (HC-SR04): TRIG=GPIO%u, ECHO=GPIO%u; faixa=%.0f-%.0f cm; timeout=%lu us.\n",
+    Serial.printf("[%8lu ms] [INFO ] Sensor %s (HC-SR04): TRIG=GPIO%u, ECHO=GPIO%u; faixa=%.1f-%.1f cm; timeout=%lu us.\n",
                   static_cast<unsigned long>(millis()),
                   sensor.name,
                   static_cast<unsigned int>(sensor.triggerPin),
@@ -161,7 +161,7 @@ void runConnectionPreflight(SensorDiagnostic& sensor) {
                           reading.distanceCm,
                           static_cast<unsigned long>(reading.pulseUs));
         } else if (reading.pulseUs > 0) {
-            Serial.printf("[%8lu ms] [WARN ] %s pre-check %u/%u: pulso recebido (%lu us), mas distancia fora da faixa %.0f-%.0f cm.\n",
+            Serial.printf("[%8lu ms] [WARN ] %s pre-check %u/%u: pulso recebido (%lu us), mas distancia fora da faixa %.1f-%.1f cm.\n",
                           static_cast<unsigned long>(millis()), sensor.name,
                           static_cast<unsigned int>(attempt + 1U),
                           static_cast<unsigned int>(PREFLIGHT_ATTEMPTS),

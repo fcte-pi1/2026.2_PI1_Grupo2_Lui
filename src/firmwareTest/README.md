@@ -15,8 +15,11 @@ Cada projeto segue a ordem **inicialização segura → teste de conexão → di
 | `EncoderN20Test/` | Encoders dos dois motores N20 | Esquerdo A/B: GPIO 32/33; direito A/B: GPIO 25/26 |
 | `MPU6500Test/` | IMU MPU6500 (aceita identificação compatível MPU6050, como faz o driver do projeto) | I²C SDA/SCL: GPIO 21/22; endereços 0x68 ou 0x69 |
 | `INA226Test/` | Medidor de tensão/corrente INA226 | I²C SDA/SCL: GPIO 21/22; endereço padrão 0x40 |
+| `BluetoothTest/` | Bluetooth Classic SPP; descoberta, conexão e troca bidirecional de mensagens | Sem pinos externos; nome anunciado `MicroMouse_BT_Test` |
 
 O regulador MP1584 não possui sinal de diagnóstico conectado à ESP32 neste esquema; valide sua tensão de saída com multímetro conforme a documentação elétrica. O teste do DRV8833 não lê um pino de falha, pois o projeto não possui um sinal de feedback desse tipo ligado à ESP32: a confirmação de movimento é manual e explicitamente registrada.
+
+O `BluetoothTest/` verifica Bluetooth Classic SPP (não BLE) e é direcionado à ESP32 DevKit V1 baseada no ESP32 original. Consulte o README específico do teste para validar a conexão pelo celular/computador.
 
 ## Como executar
 
