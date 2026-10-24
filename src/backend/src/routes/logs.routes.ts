@@ -1,30 +1,26 @@
 import { Router } from "express";
-import { prisma } from "../lib/prisma";
-import {
-  createLogEventoService,
-  type LogEventoDb
-} from "../services/logEvento.service";
-import { createSessionListService, type SessionListDb } from "../services/sessionList.service";
-import {
-  createSessionNavigationService,
-  type SessionNavigationDb
-} from "../services/sessionNavigation.service";
 import { createLogsController } from "../controllers/logs.controller";
-import { createTelemetryService, type TelemetryDb } from "../services/telemetry.service";
+import type { LogEventoService } from "../services/logEvento.service";
+import type { SessionListService } from "../services/sessionList.service";
+import type { SessionNavigationService } from "../services/sessionNavigation.service";
 
-// Instâncias compartilhadas: o gateway recebe o serviço no ponto de composição do servidor.
-export const logEventoService = createLogEventoService(prisma as unknown as LogEventoDb);
-const sessionListService = createSessionListService(prisma as unknown as SessionListDb);
-export const sessionNavigationService = createSessionNavigationService(prisma as unknown as SessionNavigationDb);
-export const telemetryPersistenceService = createTelemetryService(prisma as unknown as TelemetryDb);
-const controller = createLogsController(logEventoService, sessionListService, sessionNavigationService);
+export interface LogsRouterServices {
+  logs: LogEventoService;
+  sessoes: SessionListService;
+  navegacao: SessionNavigationService;
+}
 
-/** HU-11: início/finalização e caminho; HU-12: consulta cronológica de eventos. */
-const router = Router();
-router.get("/", controller.listarSessoes);
-router.post("/", controller.iniciarSessao);
-router.post("/navigation", controller.finalizarSessao);
-router.get("/:id/navigation", controller.listarPontos);
-router.get("/:id/logs", controller.listarLogs);
+/** Cria as rotas HTTP com serviços injetados; não exige PostgreSQL para testar. */
+export function createLogsRouter(services: LogsRouterServices) {
+  const router = Router();
+  const controller = createLogsController(services.logs, services.sessoes, services.navegacao);
 
-export default router;
+  // HU-11: início/finalização e caminho; HU-12: consulta cronológica de eventos.
+  router.get("/", controller.listarSessoes);
+  router.post("/", controller.iniciarSessao);
+  router.post("/navigation", controller.finalizarSessao);
+  router.get("/:id/navigation", controller.listarPontos);
+  router.get("/:id/logs", controller.listarLogs);
+
+  return router;
+}

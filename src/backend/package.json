@@ -6,10 +6,11 @@
   "keywords": [],
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
+    "dev": "tsx watch src/main.ts",
     "build": "tsc",
-    "start": "node dist/server.js",
-    "test": "tsx --test src/services/__tests__/*.test.ts"
+    "start": "node dist/main.js",
+    "test": "tsx --test src/services/__tests__/*.test.ts src/controllers/__tests__/*.test.ts src/ws/__tests__/*.test.ts src/routes/__tests__/*.test.ts src/__tests__/*.test.ts src/lib/__tests__/*.test.ts",
+    "test:coverage": "bash scripts/test-coverage.sh"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",

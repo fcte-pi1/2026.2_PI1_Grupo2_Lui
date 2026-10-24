@@ -11,10 +11,15 @@ type GatewayServices = {
 };
 type Packet = Record<string, unknown>;
 
+/** Evita enviar em sockets fechados ou em encerramento. */
+export function sendIfOpen(socket: WebSocket, serialized: string): void {
+  if (socket.readyState === WebSocket.OPEN) socket.send(serialized);
+}
+
 function isPacket(value: unknown): value is Packet {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
-function connectionRole(request: IncomingMessage): "device" | "dashboard" {
+export function connectionRole(request: Pick<IncomingMessage, "url">): "device" | "dashboard" {
   try {
     const url = new URL(request.url ?? "/ws", "http://localhost");
     return url.searchParams.get("role") === "dashboard" ? "dashboard" : "device";
@@ -33,28 +38,26 @@ export function createTelemetryGateway(server: Server, services: GatewayServices
   let latestRobot: Packet | null = null;
   const latestCells = new Map<string, Packet>();
 
-  const broadcast = (packet: unknown) => {
-    if (isPacket(packet)) {
-      if (packet.type === "maze") {
-        // Uma nova configuração inicia outra corrida: nunca misturar células ou
-        // telemetria da sessão anterior no snapshot servido a um dashboard novo.
-        latestMaze = packet;
-        latestCells.clear();
-        latestRobot = null;
-        latestTelemetry = null;
-      }
-      if (packet.type === "telemetry") latestTelemetry = packet;
-      if (isPacket(packet.robot) && isPacket(packet.cell)) {
-        latestRobot = packet.robot;
-        const x = packet.cell.x;
-        const y = packet.cell.y;
-        if (typeof x === "number" && typeof y === "number") latestCells.set(`${x},${y}`, packet);
-      }
+  const broadcast = (packet: Packet) => {
+    if (packet.type === "maze") {
+      // Uma nova configuração inicia outra corrida: nunca misturar células ou
+      // telemetria da sessão anterior no snapshot servido a um dashboard novo.
+      latestMaze = packet;
+      latestCells.clear();
+      latestRobot = null;
+      latestTelemetry = null;
+    }
+    if (packet.type === "telemetry") latestTelemetry = packet;
+    if (isPacket(packet.cell)) {
+      // Atualizações de célula podem chegar sem o bloco de posição do robô.
+      // O snapshot ainda deve conservar a célula e incluir o robô apenas quando conhecido.
+      if (isPacket(packet.robot)) latestRobot = packet.robot;
+      const x = packet.cell.x;
+      const y = packet.cell.y;
+      if (typeof x === "number" && typeof y === "number") latestCells.set(`${x},${y}`, packet);
     }
     const serialized = JSON.stringify(packet);
-    for (const client of dashboards) {
-      if (client.readyState === WebSocket.OPEN) client.send(serialized);
-    }
+    for (const client of dashboards) sendIfOpen(client, serialized!);
   };
 
   wss.on("connection", (socket: WebSocket, request: IncomingMessage) => {
@@ -143,9 +146,7 @@ export function createTelemetryGateway(server: Server, services: GatewayServices
         } catch (error) {
           if (error instanceof LogInvalidoError || error instanceof SessionNavigationError || error instanceof TelemetryInvalidaError) {
             console.error("Pacote de telemetria rejeitado:", error.message);
-            if (socket.readyState === WebSocket.OPEN) {
-              socket.send(JSON.stringify({ type: "gateway_error", message: error.message }));
-            }
+            sendIfOpen(socket, JSON.stringify({ type: "gateway_error", message: error.message })!);
             return;
           }
           console.error("Mensagem WebSocket inválida ou erro de persistência", error);

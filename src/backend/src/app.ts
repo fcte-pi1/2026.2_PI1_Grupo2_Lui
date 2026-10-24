@@ -1,19 +1,21 @@
-import express from "express";
+import express, { type Router } from "express";
 import cors from "cors";
-import logsRouter from "./routes/logs.routes";
 
-const app = express();
+/** Constrói a aplicação HTTP. O roteador é opcional para isolar /health em testes. */
+export function createApp(logsRouter?: Router) {
+  const app = express();
+  app.use(cors());
+  app.use(express.json());
 
-app.use(cors());
-app.use(express.json());
-
-app.get("/health", (_req, res) => {
-  res.json({
-    status: "ok",
-    service: "micromouse-backend"
+  app.get("/health", (_req, res) => {
+    res.json({
+      status: "ok",
+      service: "micromouse-backend"
+    });
   });
-});
 
-app.use("/api/sessions", logsRouter);
+  if (logsRouter) app.use("/api/sessions", logsRouter);
+  return app;
+}
 
-export default app;
+export default createApp;
