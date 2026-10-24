@@ -186,6 +186,99 @@ void test_resolve_labirintos_oficiais(void)
     TEST_ASSERT_TRUE(reachesGoal(12, 4, false));
 }
 
+
+void test_begin_rejeita_origem_e_objetivo_fora_do_mapa(void)
+{
+    mm::MazeMap map;
+    FakeStorage storage;
+    TEST_ASSERT_TRUE(map.init(4, 4));
+    AutonomousNavigator navigator(map, storage);
+
+    TEST_ASSERT_FALSE(navigator.begin(4, 0, 3, 3)); // origem inválida
+    TEST_ASSERT_FALSE(navigator.begin(0, 0, 4, 3)); // objetivo inválido
+    TEST_ASSERT_FALSE(navigator.initialized());
+    TEST_ASSERT_TRUE(navigator.begin(0, 0, 3, 3));
+}
+
+void test_observacoes_repetidas_e_movimento_nas_quatro_direcoes(void)
+{
+    mm::MazeMap map;
+    FakeStorage storage;
+    TEST_ASSERT_TRUE(map.init(4, 4));
+    AutonomousNavigator navigator(map, storage);
+    TEST_ASSERT_TRUE(navigator.begin(0, 0, 3, 3));
+
+    // Primeira observação (sem posição anterior) e repetição na mesma célula.
+    navigator.observeCell(1, 1, Dir::East, {false, false, false});
+    navigator.observeCell(1, 1, Dir::East, {false, false, false});
+
+    // Alternar vizinhos cobre os ramos East, West, South e North do delta.
+    navigator.observeCell(2, 1, Dir::East, {false, false, false});
+    navigator.observeCell(1, 1, Dir::West, {false, false, false});
+    navigator.observeCell(1, 2, Dir::South, {false, false, false});
+    navigator.observeCell(1, 1, Dir::North, {false, false, false});
+
+    TEST_ASSERT_TRUE(map.get(1, 1)->visited);
+    TEST_ASSERT_TRUE(map.get(1, 1)->isKnown(Dir::East));
+    TEST_ASSERT_TRUE(map.get(1, 1)->isKnown(Dir::West));
+    TEST_ASSERT_TRUE(map.get(1, 1)->isKnown(Dir::North));
+    TEST_ASSERT_TRUE(map.get(1, 1)->isKnown(Dir::South));
+}
+
+void test_observacao_saliente_e_salto_nao_adjacente_sao_rejeitados(void)
+{
+    mm::MazeMap map;
+    FakeStorage storage;
+    TEST_ASSERT_TRUE(map.init(4, 4));
+    AutonomousNavigator navigator(map, storage);
+    TEST_ASSERT_TRUE(navigator.begin(0, 0, 3, 3));
+
+    TEST_ASSERT_EQUAL(NavigationStatus::InvalidObservation,
+        navigator.observeCell(-1, 0, Dir::East, {false, false, false}).status);
+    TEST_ASSERT_EQUAL(NavigationStatus::Move,
+        navigator.observeCell(0, 0, Dir::East, {false, false, false}).status);
+    TEST_ASSERT_EQUAL(NavigationStatus::InvalidObservation,
+        navigator.observeCell(2, 0, Dir::East, {false, false, false}).status);
+}
+
+void test_decide_sem_caminho(void)
+{
+    mm::MazeMap map;
+    FakeStorage storage;
+    TEST_ASSERT_TRUE(map.init(4, 4));
+    AutonomousNavigator navigator(map, storage);
+    TEST_ASSERT_TRUE(navigator.begin(0, 0, 3, 3));
+
+    // No canto (0,0), fecha as duas saídas internas; as outras duas são bordas.
+    const nav::NavigationResult result = navigator.observeCell(
+        0, 0, Dir::East, {true, true, true});
+    TEST_ASSERT_EQUAL(NavigationStatus::NoPath, result.status);
+}
+
+
+void test_deltas_diagonais_exercitam_falhas_das_condicoes_de_adjacencia(void)
+{
+    const int deltas[][2] = {
+        {1, 1},   // dx == 1, mas dy != 0
+        {-1, 1},  // dx == -1, mas dy != 0
+        {0, 2},   // dx == 0, mas dy não é +1 nem -1
+        {2, 0},   // dx não corresponde a nenhum vizinho
+    };
+
+    for (const auto& delta : deltas) {
+        mm::MazeMap map;
+        FakeStorage storage;
+        TEST_ASSERT_TRUE(map.init(4, 4));
+        AutonomousNavigator navigator(map, storage);
+        TEST_ASSERT_TRUE(navigator.begin(0, 0, 3, 3));
+        TEST_ASSERT_EQUAL(NavigationStatus::Move,
+            navigator.observeCell(1, 1, Dir::East, {false, false, false}).status);
+        TEST_ASSERT_EQUAL(NavigationStatus::InvalidObservation,
+            navigator.observeCell(1 + delta[0], 1 + delta[1], Dir::East,
+                                  {false, false, false}).status);
+    }
+}
+
 int main(int, char **)
 {
     UNITY_BEGIN();
@@ -194,5 +287,10 @@ int main(int, char **)
     RUN_TEST(test_movimento_confirmado_marca_corredor_como_livre);
     RUN_TEST(test_nao_emite_movimento_se_persistencia_falha);
     RUN_TEST(test_resolve_labirintos_oficiais);
+    RUN_TEST(test_begin_rejeita_origem_e_objetivo_fora_do_mapa);
+    RUN_TEST(test_observacoes_repetidas_e_movimento_nas_quatro_direcoes);
+    RUN_TEST(test_observacao_saliente_e_salto_nao_adjacente_sao_rejeitados);
+    RUN_TEST(test_decide_sem_caminho);
+    RUN_TEST(test_deltas_diagonais_exercitam_falhas_das_condicoes_de_adjacencia);
     return UNITY_END();
 }

@@ -1,5 +1,8 @@
 #include <unity.h>
 
+#include <cstring>
+#include <string>
+
 #include "communication/Logger.h"
 #include "mock_log_transport.h"
 
@@ -106,6 +109,75 @@ static void test_transport_failure_propagates(void) {
     TEST_ASSERT_EQUAL_UINT32(0, mock.sentMessages.size());
 }
 
+
+// Conversão do texto para nível: valores reconhecidos, nulos e desconhecidos.
+static void test_string_to_log_level_all_paths(void) {
+    LogLevel level = LogLevel::Info;
+    TEST_ASSERT_FALSE(stringToLogLevel(nullptr, level));
+
+    TEST_ASSERT_TRUE(stringToLogLevel("INFO", level));
+    TEST_ASSERT_EQUAL(static_cast<int>(LogLevel::Info), static_cast<int>(level));
+    TEST_ASSERT_TRUE(stringToLogLevel("WARN", level));
+    TEST_ASSERT_EQUAL(static_cast<int>(LogLevel::Warn), static_cast<int>(level));
+    TEST_ASSERT_TRUE(stringToLogLevel("ERROR", level));
+    TEST_ASSERT_EQUAL(static_cast<int>(LogLevel::Error), static_cast<int>(level));
+    TEST_ASSERT_TRUE(stringToLogLevel("SUCCESS", level));
+    TEST_ASSERT_EQUAL(static_cast<int>(LogLevel::Success), static_cast<int>(level));
+    TEST_ASSERT_FALSE(stringToLogLevel("DEBUG", level));
+}
+
+// Cobre as validações do formatador e os dois caminhos de buffer insuficiente.
+static void test_format_json_rejects_invalid_arguments_and_small_buffers(void) {
+    char buffer[128] = "conteudo anterior";
+    TEST_ASSERT_EQUAL_UINT32(0, Logger::formatJson(nullptr, sizeof(buffer), 1,
+                                                   LogLevel::Info, "x", 0));
+    TEST_ASSERT_EQUAL_UINT32(0, Logger::formatJson(buffer, 0, 1,
+                                                   LogLevel::Info, "x", 0));
+    TEST_ASSERT_EQUAL_UINT32(0, Logger::formatJson(buffer, sizeof(buffer), 1,
+                                                   LogLevel::Info, nullptr, 0));
+    TEST_ASSERT_EQUAL_UINT32(0, Logger::formatJson(buffer, sizeof(buffer), 0,
+                                                   LogLevel::Info, "x", 0));
+
+    char prefixTooSmall[1] = {'x'};
+    TEST_ASSERT_EQUAL_UINT32(0, Logger::formatJson(prefixTooSmall, sizeof(prefixTooSmall),
+                                                   1, LogLevel::Info, "", 0));
+
+    const char *prefix = "{\"type\":\"log\",\"session_id\":1,\"nivel\":\"INFO\",\"mensagem\":\"";
+    const size_t prefixLength = std::strlen(prefix);
+    // O prefixo cabe, mas não há espaço para o sufixo e o terminador.
+    TEST_ASSERT_EQUAL_UINT32(0, Logger::formatJson(buffer, prefixLength + 2,
+                                                   1, LogLevel::Info, "", 0));
+    TEST_ASSERT_EQUAL_CHAR('\0', buffer[0]);
+
+    MockLogTransport mock;
+    Logger logger(mock);
+    logger.setSessionId(1);
+    const std::string oversized(Logger::kMaxPayloadSize + 32, 'x');
+    TEST_ASSERT_FALSE(logger.log(LogLevel::Info, oversized.c_str(), 1));
+    TEST_ASSERT_EQUAL_UINT32(0, mock.sentMessages.size());
+}
+
+// Todos os caracteres de controle que o formatador escapa, incluindo o caso \u00XX.
+static void test_format_json_escapes_every_control_character(void) {
+    const char message[] = {'"', '\\', '\b', '\f', '\n', '\r', '\t',
+                            static_cast<char>(0x01), static_cast<char>(0x1f), 'A', '\0'};
+    char buffer[256];
+    const size_t length = Logger::formatJson(buffer, sizeof(buffer), 3,
+                                              LogLevel::Info, message, 9);
+    TEST_ASSERT_GREATER_THAN(0, length);
+    TEST_ASSERT_EQUAL_STRING(
+        "{\"type\":\"log\",\"session_id\":3,\"nivel\":\"INFO\",\"mensagem\":\"\\\"\\\\\\b\\f\\n\\r\\t\\u0001\\u001fA\",\"t_ms\":9}",
+        buffer);
+}
+
+static void test_logger_rejects_missing_session_and_unknown_log_level(void) {
+    MockLogTransport mock;
+    Logger logger(mock);
+    TEST_ASSERT_EQUAL_STRING("INFO", logLevelToString(static_cast<LogLevel>(99)));
+    TEST_ASSERT_FALSE(logger.info("sem sessao", 1));
+    TEST_ASSERT_EQUAL_UINT32(0, mock.callCount);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_mock_transport_behavior);
@@ -115,5 +187,9 @@ int main(void) {
     RUN_TEST(test_reject_empty_or_null_message);
     RUN_TEST(test_escapa_mensagem_json);
     RUN_TEST(test_transport_failure_propagates);
+    RUN_TEST(test_string_to_log_level_all_paths);
+    RUN_TEST(test_format_json_rejects_invalid_arguments_and_small_buffers);
+    RUN_TEST(test_format_json_escapes_every_control_character);
+    RUN_TEST(test_logger_rejects_missing_session_and_unknown_log_level);
     return UNITY_END();
 }
