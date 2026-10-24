@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html class="theme-green">
+
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>GCC Code Coverage Report</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="coverage.css"/>
+  </head>
+
+  <body>
+    <header>
+      <h1>GCC Code Coverage Report</h1>
+
+      <hr/>
+
+      <div class="summary">
+<div>
+  <table class="legend">
+    <tr>
+      <th scope="row">Directory:</th>
+      <td>src/</td>
+    </tr>
+    <tr>
+      <th scope="row">Date:</th>
+      <td>2026-10-23 21:24:12</td>
+    </tr>
+  </table>
+</div>
+
+<div>
+  <table class="coverage">
+    <tr>
+      <th></th>
+      <th scope="col">Exec</th>
+      <th scope="col">Total</th>
+      <th scope="col">Coverage</th>
+    </tr>
+    <tr>
+      <th scope="row">Lines:</th>
+      <td>757</td>
+      <td>778</td>
+      <td class="coverage-high">97.3%</td>
+    </tr>
+    <tr>
+      <th scope="row">Functions:</th>
+      <td>80</td>
+      <td>80</td>
+      <td class="coverage-high">100.0%</td>
+    </tr>
+    <tr>
+      <th scope="row">Branches:</th>
+      <td>482</td>
+      <td>581</td>
+      <td class="coverage-medium">83.0%</td>
+    </tr>
+  </table>
+</div>
+      </div>
+
+      <hr/>
+    </header>
+
+    <nav>
+    </nav>
+
+    <main>
+<table class="listOfFunctions">
+  <tr>
+    <th>Function (File:Line)</th>
+    <th>Call count</th>
+    <th>Block coverage</th>
+  </tr>
+  <tr><td><a href="coverage.MazeMap.cpp.42cf4357e18ee6c935eba93e1812b980.html#l18">mm::(anonymous namespace)::crc32(unsigned char const*, unsigned long) (src/navigation/MazeMap.cpp:18)</a></td><td>called 208 times, returned 208 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.SessionBuffer.cpp.d4eff6fa1f954345e376ba25e0722660.html#l114">mm::(anonymous namespace)::headingStr(unsigned char) (src/navigation/SessionBuffer.cpp:114)</a></td><td>called 10 times, returned 10 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.MazeMap.cpp.42cf4357e18ee6c935eba93e1812b980.html#l31">mm::(anonymous namespace)::setSide(mm::Cell&amp;, Direction, bool) (src/navigation/MazeMap.cpp:31)</a></td><td>called 2206 times, returned 2206 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.SessionBuffer.cpp.d4eff6fa1f954345e376ba25e0722660.html#l163">mm::(anonymous namespace)::storageWrite(char const*, unsigned long, void*) (src/navigation/SessionBuffer.cpp:163)</a></td><td>called 16 times, returned 16 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.Logger.cpp.fe09655cca65410355c945543c6ac08d.html#l43">mm::Logger::formatJson(char*, unsigned long, unsigned int, mm::LogLevel, char const*, unsigned int) (src/communication/Logger.cpp:43)</a></td><td>called 37 times, returned 37 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.Logger.cpp.fe09655cca65410355c945543c6ac08d.html#l96">mm::Logger::log(mm::LogLevel, char const*, unsigned int) (src/communication/Logger.cpp:96)</a></td><td>called 31 times, returned 31 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.MazeMap.cpp.42cf4357e18ee6c935eba93e1812b980.html#l122">mm::MazeMap::cellPacketJson(int, int, Direction, char*, unsigned long) const (src/navigation/MazeMap.cpp:122)</a></td><td>called 6 times, returned 6 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.MazeMap.cpp.42cf4357e18ee6c935eba93e1812b980.html#l128">mm::MazeMap::cellPacketJson(int, int, Direction, char*, unsigned long) const::{lambda(Direction)#1}::operator()(Direction) const (src/navigation/MazeMap.cpp:128)</a></td><td>called 16 times, returned 16 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.MazeMap.cpp.42cf4357e18ee6c935eba93e1812b980.html#l132">mm::MazeMap::cellPacketJson(int, int, Direction, char*, unsigned long) const::{lambda(bool)#1}::operator()(bool) const (src/navigation/MazeMap.cpp:132)</a></td><td>called 4 times, returned 4 times</td><td>80.0%</td></tr>
+  <tr><td><a href="coverage.MazeMap.cpp.42cf4357e18ee6c935eba93e1812b980.html#l66">mm::MazeMap::dirStr(Direction) (src/navigation/MazeMap.cpp:66)</a></td><td>called 4 times, returned 4 times</td><td>43.0%</td></tr>
+  <tr><td><a href="coverage.MazeMap.cpp.42cf4357e18ee6c935eba93e1812b980.html#l77">mm::MazeMap::get(int, int) const (src/navigation/MazeMap.cpp:77)</a></td><td>called 13301 times, returned 13301 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.MazeMap.cpp.42cf4357e18ee6c935eba93e1812b980.html#l44">mm::MazeMap::init(unsigned char, unsigned char) (src/navigation/MazeMap.cpp:44)</a></td><td>called 176 times, returned 176 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.MazeMap.cpp.42cf4357e18ee6c935eba93e1812b980.html#l214">mm::MazeMap::load(mm::IMapStorage&amp;) (src/navigation/MazeMap.cpp:214)</a></td><td>called 22 times, returned 22 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.MazeMap.cpp.42cf4357e18ee6c935eba93e1812b980.html#l143">mm::MazeMap::pack(unsigned char*, unsigned long) const (src/navigation/MazeMap.cpp:143)</a></td><td>called 184 times, returned 184 times</td><td>92.0%</td></tr>
+  <tr><td><a href="coverage.MazeMap.cpp.42cf4357e18ee6c935eba93e1812b980.html#l61">mm::MazeMap::relToAbs(Direction, mm::Rel) (src/navigation/MazeMap.cpp:61)</a></td><td>called 7139 times, returned 7139 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.MazeMap.cpp.42cf4357e18ee6c935eba93e1812b980.html#l207">mm::MazeMap::save(mm::IMapStorage&amp;) const (src/navigation/MazeMap.cpp:207)</a></td><td>called 182 times, returned 182 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.MazeMap.cpp.42cf4357e18ee6c935eba93e1812b980.html#l82">mm::MazeMap::setWall(int, int, Direction, bool) (src/navigation/MazeMap.cpp:82)</a></td><td>called 1541 times, returned 1541 times</td><td>88.0%</td></tr>
+  <tr><td><a href="coverage.MazeMap.cpp.42cf4357e18ee6c935eba93e1812b980.html#l173">mm::MazeMap::unpack(unsigned char const*, unsigned long) (src/navigation/MazeMap.cpp:173)</a></td><td>called 28 times, returned 28 times</td><td>96.0%</td></tr>
+  <tr><td><a href="coverage.MazeMap.cpp.42cf4357e18ee6c935eba93e1812b980.html#l97">mm::MazeMap::updateCell(int, int, Direction, bool, bool, bool, bool, bool, bool) (src/navigation/MazeMap.cpp:97)</a></td><td>called 248 times, returned 248 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.MazeMap.cpp.42cf4357e18ee6c935eba93e1812b980.html#l111">mm::MazeMap::visitedCount() const (src/navigation/MazeMap.cpp:111)</a></td><td>called 20 times, returned 20 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.SessionBuffer.cpp.d4eff6fa1f954345e376ba25e0722660.html#l56">mm::SessionBuffer::compact() (src/navigation/SessionBuffer.cpp:56)</a></td><td>called 6 times, returned 6 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.SessionBuffer.cpp.d4eff6fa1f954345e376ba25e0722660.html#l103">mm::SessionBuffer::reasonStr(mm::EndReason) (src/navigation/SessionBuffer.cpp:103)</a></td><td>called 10 times, returned 10 times</td><td>83.0%</td></tr>
+  <tr><td><a href="coverage.SessionBuffer.cpp.d4eff6fa1f954345e376ba25e0722660.html#l66">mm::SessionBuffer::record(unsigned int, short, short, unsigned char) (src/navigation/SessionBuffer.cpp:66)</a></td><td>called 10050 times, returned 10050 times</td><td>90.0%</td></tr>
+  <tr><td><a href="coverage.SessionBuffer.cpp.d4eff6fa1f954345e376ba25e0722660.html#l10">mm::SessionBuffer::reset() (src/navigation/SessionBuffer.cpp:10)</a></td><td>called 89 times, returned 89 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.SessionBuffer.cpp.d4eff6fa1f954345e376ba25e0722660.html#l169">mm::SessionBuffer::saveFallback(mm::ISessionStorage&amp;) const (src/navigation/SessionBuffer.cpp:169)</a></td><td>called 10 times, returned 10 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.SessionBuffer.cpp.d4eff6fa1f954345e376ba25e0722660.html#l48">mm::SessionBuffer::setBatteryConsumedMah(float) (src/navigation/SessionBuffer.cpp:48)</a></td><td>called 2 times, returned 2 times</td><td>89.0%</td></tr>
+  <tr><td><a href="coverage.SessionBuffer.cpp.d4eff6fa1f954345e376ba25e0722660.html#l27">mm::SessionBuffer::start(unsigned int, unsigned int, char const*, unsigned short) (src/navigation/SessionBuffer.cpp:27)</a></td><td>called 46 times, returned 46 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.SessionBuffer.cpp.d4eff6fa1f954345e376ba25e0722660.html#l91">mm::SessionBuffer::stop(unsigned int, mm::EndReason) (src/navigation/SessionBuffer.cpp:91)</a></td><td>called 26 times, returned 26 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.SessionBuffer.cpp.d4eff6fa1f954345e376ba25e0722660.html#l121">mm::SessionBuffer::writeJson(int (*)(char const*, unsigned long, void*), void*) const (src/navigation/SessionBuffer.cpp:121)</a></td><td>called 12 times, returned 12 times</td><td>92.0%</td></tr>
+  <tr><td><a href="coverage.SessionCoordinator.cpp.d6afd9abf78e6d3c8dc7d335f6163058.html#l5">mm::SessionCoordinator::begin(unsigned int, mm::SessionPose const&amp;, unsigned int, char const*, unsigned short) (src/navigation/SessionCoordinator.cpp:5)</a></td><td>called 10 times, returned 10 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.SessionCoordinator.cpp.d6afd9abf78e6d3c8dc7d335f6163058.html#l17">mm::SessionCoordinator::finish(unsigned int, mm::EndReason) (src/navigation/SessionCoordinator.cpp:17)</a></td><td>called 10 times, returned 10 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.SessionRecorder.cpp.ed1816df2f03105f6f9f32614acde617.html#l5">mm::SessionRecorder::begin(unsigned int, mm::SessionPose const&amp;, unsigned int, char const*, unsigned short) (src/navigation/SessionRecorder.cpp:5)</a></td><td>called 24 times, returned 24 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.SessionRecorder.cpp.ed1816df2f03105f6f9f32614acde617.html#l35">mm::SessionRecorder::end(unsigned int, mm::EndReason) (src/navigation/SessionRecorder.cpp:35)</a></td><td>called 12 times, returned 12 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.SessionRecorder.cpp.ed1816df2f03105f6f9f32614acde617.html#l16">mm::SessionRecorder::onTracking(mm::SessionPose const&amp;) (src/navigation/SessionRecorder.cpp:16)</a></td><td>called 22 times, returned 22 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.Logger.cpp.fe09655cca65410355c945543c6ac08d.html#l8">mm::logLevelToString(mm::LogLevel) (src/communication/Logger.cpp:8)</a></td><td>called 42 times, returned 42 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.Logger.cpp.fe09655cca65410355c945543c6ac08d.html#l22">mm::stringToLogLevel(char const*, mm::LogLevel&amp;) (src/communication/Logger.cpp:22)</a></td><td>called 6 times, returned 6 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.MazeSolver.cpp.bf1f5e670b2876db87e1d1198e9cce99.html#l16">nav::(anonymous namespace)::opposite(Direction) (src/navigation/MazeSolver.cpp:16)</a></td><td>called 5691 times, returned 5691 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.AutonomousNavigator.cpp.ca657c4f0ca667dc147e51c985f026e3.html#l5">nav::AutonomousNavigator::begin() (src/navigation/AutonomousNavigator.cpp:5)</a></td><td>called 14 times, returned 14 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.AutonomousNavigator.cpp.ca657c4f0ca667dc147e51c985f026e3.html#l16">nav::AutonomousNavigator::begin(unsigned char, unsigned char, unsigned char, unsigned char) (src/navigation/AutonomousNavigator.cpp:16)</a></td><td>called 49 times, returned 49 times</td><td>92.0%</td></tr>
+  <tr><td><a href="coverage.AutonomousNavigator.cpp.ca657c4f0ca667dc147e51c985f026e3.html#l36">nav::AutonomousNavigator::observeCell(int, int, Direction, nav::WallReadings const&amp;) (src/navigation/AutonomousNavigator.cpp:36)</a></td><td>called 187 times, returned 187 times</td><td>95.0%</td></tr>
+  <tr><td><a href="coverage.MazeMissionController.cpp.306a53fb56112e02790ea1579ac36e97.html#l15">nav::MazeMissionController::begin(MazeConfig const&amp;, short) (src/navigation/MazeMissionController.cpp:15)</a></td><td>called 28 times, returned 28 times</td><td>94.0%</td></tr>
+  <tr><td><a href="coverage.MazeMissionController.cpp.306a53fb56112e02790ea1579ac36e97.html#l42">nav::MazeMissionController::currentPoseInBounds() const (src/navigation/MazeMissionController.cpp:42)</a></td><td>called 166 times, returned 166 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.MazeMissionController.cpp.306a53fb56112e02790ea1579ac36e97.html#l171">nav::MazeMissionController::fail() (src/navigation/MazeMissionController.cpp:171)</a></td><td>called 1 time, returned 1 time</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.MazeMissionController.cpp.306a53fb56112e02790ea1579ac36e97.html#l10">nav::MazeMissionController::failWith(nav::NavigationStatus) (src/navigation/MazeMissionController.cpp:10)</a></td><td>called 16 times, returned 16 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.MazeMissionController.cpp.306a53fb56112e02790ea1579ac36e97.html#l58">nav::MazeMissionController::heading() const (src/navigation/MazeMissionController.cpp:58)</a></td><td>called 190 times, returned 190 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.MazeMissionController.cpp.306a53fb56112e02790ea1579ac36e97.html#l62">nav::MazeMissionController::observeCurrentCell() (src/navigation/MazeMissionController.cpp:62)</a></td><td>called 95 times, returned 95 times</td><td>97.0%</td></tr>
+  <tr><td><a href="coverage.MazeMissionController.cpp.306a53fb56112e02790ea1579ac36e97.html#l147">nav::MazeMissionController::onMotionFinished(bool) (src/navigation/MazeMissionController.cpp:147)</a></td><td>called 88 times, returned 88 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.MazeMissionController.cpp.306a53fb56112e02790ea1579ac36e97.html#l5">nav::MazeMissionController::update(nav::MissionAction, nav::NavigationStatus) const (src/navigation/MazeMissionController.cpp:5)</a></td><td>called 184 times, returned 184 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.MazeMissionController.cpp.306a53fb56112e02790ea1579ac36e97.html#l48">nav::MazeMissionController::x() const (src/navigation/MazeMissionController.cpp:48)</a></td><td>called 413 times, returned 413 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.MazeMissionController.cpp.306a53fb56112e02790ea1579ac36e97.html#l53">nav::MazeMissionController::y() const (src/navigation/MazeMissionController.cpp:53)</a></td><td>called 412 times, returned 412 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.MazeSolver.cpp.bf1f5e670b2876db87e1d1198e9cce99.html#l109">nav::MazeSolver::decide(int, int, Direction, Direction&amp;) (src/navigation/MazeSolver.cpp:109)</a></td><td>called 217 times, returned 217 times</td><td>96.0%</td></tr>
+  <tr><td><a href="coverage.MazeSolver.cpp.bf1f5e670b2876db87e1d1198e9cce99.html#l101">nav::MazeSolver::distance(int, int) const (src/navigation/MazeSolver.cpp:101)</a></td><td>called 189 times, returned 189 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.MazeSolver.cpp.bf1f5e670b2876db87e1d1198e9cce99.html#l34">nav::MazeSolver::passable(int, int, Direction) const (src/navigation/MazeSolver.cpp:34)</a></td><td>called 5955 times, returned 5955 times</td><td>92.0%</td></tr>
+  <tr><td><a href="coverage.MazeSolver.cpp.bf1f5e670b2876db87e1d1198e9cce99.html#l54">nav::MazeSolver::recompute() (src/navigation/MazeSolver.cpp:54)</a></td><td>called 225 times, returned 225 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.MazeSolver.cpp.bf1f5e670b2876db87e1d1198e9cce99.html#l23">nav::MazeSolver::setGoal(unsigned char, unsigned char) (src/navigation/MazeSolver.cpp:23)</a></td><td>called 73 times, returned 73 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.WallPerception.cpp.5bd7492ec0359a5fd528b18aede8a727.html#l11">perception::MovingAverageFilter3::push(unsigned short) (src/navigation/WallPerception.cpp:11)</a></td><td>called 6934 times, returned 6934 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.WallPerception.cpp.5bd7492ec0359a5fd528b18aede8a727.html#l64">perception::WallPerception::WallPerception(perception::IWallSensor&amp;, unsigned short) (src/navigation/WallPerception.cpp:64)</a></td><td>called 52 times, returned 52 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.WallPerception.cpp.5bd7492ec0359a5fd528b18aede8a727.html#l116">perception::WallPerception::hasFault(perception::Direction) const (src/navigation/WallPerception.cpp:116)</a></td><td>called 12 times, returned 12 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.WallPerception.cpp.5bd7492ec0359a5fd528b18aede8a727.html#l112">perception::WallPerception::lateralDistanceMm(perception::Direction) const (src/navigation/WallPerception.cpp:112)</a></td><td>called 10 times, returned 10 times</td><td>80.0%</td></tr>
+  <tr><td><a href="coverage.WallPerception.cpp.5bd7492ec0359a5fd528b18aede8a727.html#l67">perception::WallPerception::update() (src/navigation/WallPerception.cpp:67)</a></td><td>called 2319 times, returned 2319 times</td><td>96.0%</td></tr>
+  <tr><td><a href="coverage.WallPerception.cpp.5bd7492ec0359a5fd528b18aede8a727.html#l25">perception::applyReading(perception::SensorReading&amp;, perception::RawEcho const&amp;, perception::MovingAverageFilter3&amp;) (src/navigation/WallPerception.cpp:25)</a></td><td>called 6948 times, returned 6948 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.WallPerception.cpp.5bd7492ec0359a5fd528b18aede8a727.html#l7">perception::isPhysicallyPlausible(unsigned short) (src/navigation/WallPerception.cpp:7)</a></td><td>called 6470 times, returned 6470 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.WallPerception.cpp.5bd7492ec0359a5fd528b18aede8a727.html#l49">perception::updateFaultState(perception::SensorFaultState&amp;, bool) (src/navigation/WallPerception.cpp:49)</a></td><td>called 6948 times, returned 6948 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.RobotStateEstimator.cpp.0c6cd4480252d0b3488eb93e38b65cd0.html#l8">state_estimation::(anonymous namespace)::indexOf(tracking::Orientation) (src/navigation/RobotStateEstimator.cpp:8)</a></td><td>called 1116 times, returned 1116 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.RobotStateEstimator.cpp.0c6cd4480252d0b3488eb93e38b65cd0.html#l12">state_estimation::(anonymous namespace)::setObservation(state_estimation::RobotStateSnapshot&amp;, tracking::Orientation, bool, bool, unsigned short) (src/navigation/RobotStateEstimator.cpp:12)</a></td><td>called 819 times, returned 819 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.RobotStateEstimator.cpp.0c6cd4480252d0b3488eb93e38b65cd0.html#l34">state_estimation::RobotStateEstimator::RobotStateEstimator(tracking::PositionTracker&amp;, perception::WallPerception&amp;) (src/navigation/RobotStateEstimator.cpp:34)</a></td><td>called 32 times, returned 32 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.RobotStateEstimator.cpp.0c6cd4480252d0b3488eb93e38b65cd0.html#l38">state_estimation::RobotStateEstimator::initialize(tracking::TrackingState const&amp;, short) (src/navigation/RobotStateEstimator.cpp:38)</a></td><td>called 34 times, returned 34 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.RobotStateEstimator.cpp.0c6cd4480252d0b3488eb93e38b65cd0.html#l71">state_estimation::RobotStateEstimator::update() (src/navigation/RobotStateEstimator.cpp:71)</a></td><td>called 4 times, returned 4 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.RobotStateEstimator.cpp.0c6cd4480252d0b3488eb93e38b65cd0.html#l45">state_estimation::RobotStateEstimator::updatePose() (src/navigation/RobotStateEstimator.cpp:45)</a></td><td>called 86 times, returned 86 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.RobotStateEstimator.cpp.0c6cd4480252d0b3488eb93e38b65cd0.html#l50">state_estimation::RobotStateEstimator::updateWalls() (src/navigation/RobotStateEstimator.cpp:50)</a></td><td>called 273 times, returned 273 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.RobotStateEstimator.cpp.0c6cd4480252d0b3488eb93e38b65cd0.html#l30">state_estimation::RobotStateSnapshot::wallAt(tracking::Orientation) const (src/navigation/RobotStateEstimator.cpp:30)</a></td><td>called 297 times, returned 297 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.PositionTracker.cpp.742ad19e16a6c6746bfde340caefdefe.html#l9">tracking::(anonymous namespace)::absoluteValue(short) (src/navigation/PositionTracker.cpp:9)</a></td><td>called 12408 times, returned 12408 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.PositionTracker.cpp.742ad19e16a6c6746bfde340caefdefe.html#l15">tracking::(anonymous namespace)::shortestYawDelta(short, short) (src/navigation/PositionTracker.cpp:15)</a></td><td>called 4130 times, returned 4130 times</td><td>88.0%</td></tr>
+  <tr><td><a href="coverage.PositionTracker.cpp.742ad19e16a6c6746bfde340caefdefe.html#l74">tracking::PositionTracker::PositionTracker(tracking::IOdometryReader&amp;, tracking::IOrientationSensor&amp;) (src/navigation/PositionTracker.cpp:74)</a></td><td>called 54 times, returned 54 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.PositionTracker.cpp.742ad19e16a6c6746bfde340caefdefe.html#l86">tracking::PositionTracker::PositionTracker(tracking::IOdometryReader&amp;, tracking::IOrientationSensor&amp;, tracking::TrackingState const&amp;, short) (src/navigation/PositionTracker.cpp:86)</a></td><td>called 60 times, returned 60 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.PositionTracker.cpp.742ad19e16a6c6746bfde340caefdefe.html#l77">tracking::PositionTracker::reset(tracking::TrackingState const&amp;, short) (src/navigation/PositionTracker.cpp:77)</a></td><td>called 34 times, returned 34 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.PositionTracker.cpp.742ad19e16a6c6746bfde340caefdefe.html#l95">tracking::PositionTracker::update() (src/navigation/PositionTracker.cpp:95)</a></td><td>called 4130 times, returned 4130 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.PositionTracker.cpp.742ad19e16a6c6746bfde340caefdefe.html#l38">tracking::applyCellAdvance(tracking::GridPosition, tracking::Orientation) (src/navigation/PositionTracker.cpp:38)</a></td><td>called 106 times, returned 106 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.PositionTracker.cpp.742ad19e16a6c6746bfde340caefdefe.html#l28">tracking::rotateOrientation(tracking::Orientation, unsigned char, bool) (src/navigation/PositionTracker.cpp:28)</a></td><td>called 772 times, returned 772 times</td><td>100.0%</td></tr>
+  <tr><td><a href="coverage.PositionTracker.cpp.742ad19e16a6c6746bfde340caefdefe.html#l56">tracking::tryConfirmRotation(short, unsigned char&amp;, bool&amp;) (src/navigation/PositionTracker.cpp:56)</a></td><td>called 4136 times, returned 4136 times</td><td>100.0%</td></tr>
+</table>
+
+      <hr/>
+    </main>
+
+    <footer>
+      Generated by: <a href="http://gcovr.com/en/7.2">GCOVR (Version 7.2)</a>
+    </footer>
+  </body>
+</html>
