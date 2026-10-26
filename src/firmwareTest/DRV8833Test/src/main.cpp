@@ -1,93 +1,260 @@
 #include <Arduino.h>
-#include "diagnostic_logger.hpp"
-#include "../../../firmware/include/config/board_pins.hpp"
-#include "../../../firmware/src/hal/motor_drv8833.hpp"
 
-namespace {
-MotorDRV8833 motors;
-constexpr int16_t CONNECTION_PWM = 42;  // ~16% de duty em resolucao de 8 bits
-constexpr int16_t DIAGNOSTIC_PWM = 64;  // ~25% de duty em resolucao de 8 bits
-constexpr uint32_t CONNECTION_PULSE_MS = 350;
-constexpr uint32_t DIAGNOSTIC_PULSE_MS = 400;
-bool initialized = false;
+// ============================================================================
+// 1. MAPEAMENTO DE PINOS
+// ============================================================================
 
-void stopAndDisable(const char* reason) {
-    motors.stop();
-    motors.setEnabled(false);
-    DiagnosticLog::log("INFO", "Saida segura aplicada (%s): PWM=0, nSLEEP=LOW.", reason);
+// Motor esquerdo
+#define MOTOR_L_PWM_PIN  16  // AIN1: PWM
+#define MOTOR_L_DIR_PIN  17  // AIN2: direção
+
+// Motor direito
+#define MOTOR_R_PWM_PIN  18  // BIN1: PWM
+#define MOTOR_R_DIR_PIN  19  // BIN2: direção
+
+// Habilitação do driver
+#define DRV8833_EEP_PIN   5  // nSLEEP: HIGH habilita; LOW desabilita
+
+// ============================================================================
+// 2. CONFIGURAÇÕES DO PWM
+// ============================================================================
+
+constexpr uint32_t PWM_FREQ = 20000;       // 20 kHz
+constexpr uint8_t PWM_RESOLUTION = 8;      // Resolução de 8 bits
+constexpr uint16_t PWM_MAX = 255;          // Duty cycle máximo
+
+// ============================================================================
+// 3. CONTROLE DA PONTE H
+// ============================================================================
+
+// Habilita ou desabilita o DRV8833.
+void enableDRV8833(bool state) {
+  digitalWrite(DRV8833_EEP_PIN, state ? HIGH : LOW);
 }
 
-void pulseMotor(const char* name, bool left, int16_t speed, uint32_t durationMs, const char* phase) {
-    DiagnosticLog::log("ACTION", "%s | motor %s | comando=%d/255 | duracao=%lu ms.",
-        phase, name, static_cast<int>(speed), static_cast<unsigned long>(durationMs));
-    if (left) motors.setLeftSpeed(speed); else motors.setRightSpeed(speed);
-    delay(durationMs);
-    motors.stop();
-    delay(350);
-    DiagnosticLog::log("INFO", "Motor %s parado entre acionamentos.", name);
+// Para os dois motores por roda livre (coast).
+void stopMotors() {
+  digitalWrite(MOTOR_L_DIR_PIN, LOW);
+  digitalWrite(MOTOR_R_DIR_PIN, LOW);
+
+  ledcWrite(MOTOR_L_PWM_PIN, 0);
+  ledcWrite(MOTOR_R_PWM_PIN, 0);
 }
 
-void abortTest(const char* reason) {
-    stopAndDisable(reason);
-    DiagnosticLog::log("ERROR", "Diagnostico funcional BLOQUEADO: pre-verificacao de conexao nao foi aprovada.");
+// Define a velocidade e o sentido dos motores.
+//
+// Valores aceitos: -255 a +255.
+//
+// Valor positivo: sentido direto.
+// Valor negativo: sentido reverso.
+// Valor zero: motor sem acionamento.
+void setMotorsSpeed(int leftSpeed, int rightSpeed) {
+
+  // Limita os valores recebidos ao intervalo permitido.
+  leftSpeed = constrain(leftSpeed, -255, 255);
+  rightSpeed = constrain(rightSpeed, -255, 255);
+
+  // --------------------------------------------------------------------------
+  // MOTOR ESQUERDO
+  // --------------------------------------------------------------------------
+
+  if (leftSpeed > 0) {
+    // Sentido direto: AIN2 em LOW e PWM em AIN1.
+    digitalWrite(MOTOR_L_DIR_PIN, LOW);
+    ledcWrite(MOTOR_L_PWM_PIN, leftSpeed);
+
+  } else if (leftSpeed < 0) {
+    // Sentido reverso: AIN2 em HIGH.
+    //
+    // Como o PWM está aplicado a AIN1, o estado LOW de AIN1,
+    // combinado com AIN2 em HIGH, aciona o sentido reverso.
+    // O duty é invertido para ajustar a proporção de acionamento.
+    digitalWrite(MOTOR_L_DIR_PIN, HIGH);
+    ledcWrite(MOTOR_L_PWM_PIN, PWM_MAX + leftSpeed);
+
+  } else {
+    // Motor sem acionamento.
+    digitalWrite(MOTOR_L_DIR_PIN, LOW);
+    ledcWrite(MOTOR_L_PWM_PIN, 0);
+  }
+
+  // --------------------------------------------------------------------------
+  // MOTOR DIREITO
+  // --------------------------------------------------------------------------
+
+  if (rightSpeed > 0) {
+    // Sentido direto: BIN2 em LOW e PWM em BIN1.
+    digitalWrite(MOTOR_R_DIR_PIN, LOW);
+    ledcWrite(MOTOR_R_PWM_PIN, rightSpeed);
+
+  } else if (rightSpeed < 0) {
+    // Sentido reverso: BIN2 em HIGH.
+    digitalWrite(MOTOR_R_DIR_PIN, HIGH);
+    ledcWrite(MOTOR_R_PWM_PIN, PWM_MAX + rightSpeed);
+
+  } else {
+    // Motor sem acionamento.
+    digitalWrite(MOTOR_R_DIR_PIN, LOW);
+    ledcWrite(MOTOR_R_PWM_PIN, 0);
+  }
 }
-}  // namespace
+
+// ============================================================================
+// 4. CONFIGURAÇÃO
+// ============================================================================
 
 void setup() {
-    Serial.begin(115200);
-    delay(300);
-    Serial.setTimeout(30000);
-    DiagnosticLog::banner("DRV8833 + 2 motores N20");
-    DiagnosticLog::log("INFO", "Pinos: motor esquerdo IN1/IN2=GPIO%u/%u; direito=GPIO%u/%u; nSLEEP=GPIO%u.",
-        BoardPins::MOTOR_LEFT.in1, BoardPins::MOTOR_LEFT.in2,
-        BoardPins::MOTOR_RIGHT.in1, BoardPins::MOTOR_RIGHT.in2,
-        BoardPins::MOTOR_NSLEEP);
-    DiagnosticLog::log("INFO", "PWM configurado: %lu Hz, resolucao %u bits. O driver sera inicializado com nSLEEP em LOW.",
-        static_cast<unsigned long>(BoardPins::MOTOR_PWM_HZ), BoardPins::MOTOR_PWM_BITS);
+  Serial.begin(115200);
+  delay(1000);
 
-    initialized = motors.begin(BoardPins::MOTOR_LEFT.in1, BoardPins::MOTOR_LEFT.in2,
-        BoardPins::MOTOR_RIGHT.in1, BoardPins::MOTOR_RIGHT.in2,
-        BoardPins::MOTOR_NSLEEP, BoardPins::MOTOR_PWM_HZ, BoardPins::MOTOR_PWM_BITS);
-    if (!initialized) {
-        DiagnosticLog::log("ERROR", "Inicializacao/configuracao do driver falhou. Nenhum motor sera acionado.");
-        return;
+  Serial.println();
+  Serial.println("==============================================");
+  Serial.println(" TESTE UNITARIO - MOTORES E PONTE H DRV8833");
+  Serial.println("==============================================");
+
+  // Configura os pinos de direção e habilitação.
+  pinMode(DRV8833_EEP_PIN, OUTPUT);
+  pinMode(MOTOR_L_DIR_PIN, OUTPUT);
+  pinMode(MOTOR_R_DIR_PIN, OUTPUT);
+
+  // Mantém o driver desabilitado durante a configuração.
+  enableDRV8833(false);
+
+  // --------------------------------------------------------------------------
+  // Configuração do PWM para Arduino-ESP32 3.x
+  // --------------------------------------------------------------------------
+
+  // A função ledcAttach associa automaticamente um canal LEDC ao pino.
+  bool pwmLeftOK = ledcAttach(
+    MOTOR_L_PWM_PIN,
+    PWM_FREQ,
+    PWM_RESOLUTION
+  );
+
+  bool pwmRightOK = ledcAttach(
+    MOTOR_R_PWM_PIN,
+    PWM_FREQ,
+    PWM_RESOLUTION
+  );
+
+  // Verifica se os dois sinais PWM foram configurados.
+  if (!pwmLeftOK || !pwmRightOK) {
+    Serial.println("[ERRO] Falha ao configurar o PWM.");
+
+    stopMotors();
+    enableDRV8833(false);
+
+    while (true) {
+      delay(1000);
     }
-    motors.stop();
-    motors.setEnabled(false);
-    DiagnosticLog::log("PASS", "Inicializacao local OK; nSLEEP=%s; PWM=0.", motors.isEnabled() ? "HIGH" : "LOW (seguro)");
+  }
 
-    DiagnosticLog::log("STAGE", "FASE 1 - pre-verificacao de conexao do driver/motores.");
-    DiagnosticLog::log("WARN", "O DRV8833 nao fornece retorno digital de presenca/falha ligado a ESP32. A conexao sera verificada por pulso de baixa potencia + confirmacao visual do operador.");
-    if (!DiagnosticLog::answerYes("CONFIRME: bateria/fonte e GND comum estao corretos, chassi esta preso e AMBAS as rodas estao suspensas?")) {
-        abortTest("operador nao confirmou as condicoes de seguranca");
-        return;
-    }
+  // Garante que os motores comecem sem acionamento.
+  stopMotors();
 
-    DiagnosticLog::waitForEnter("Somente agora: habilitarei o driver e aplicarei pulsos curtos. Pressione ENTER para iniciar a PRE-VERIFICACAO.");
-    motors.setEnabled(true);
-    DiagnosticLog::log("INFO", "nSLEEP habilitado. Se houver ruido, travamento ou movimento inesperado, desligue a alimentacao imediatamente.");
-    pulseMotor("ESQUERDO", true, CONNECTION_PWM, CONNECTION_PULSE_MS, "PRE-CHECK DE CONEXAO");
-    pulseMotor("DIREITO", false, CONNECTION_PWM, CONNECTION_PULSE_MS, "PRE-CHECK DE CONEXAO");
-    motors.setEnabled(false);
+  Serial.println("[OK] Pinos configurados.");
+  Serial.println("[OK] PWM do motor esquerdo configurado.");
+  Serial.println("[OK] PWM do motor direito configurado.");
+  Serial.println("[OK] Frequencia PWM: 20000 Hz.");
+  Serial.println("[OK] Resolucao PWM: 8 bits.");
+  Serial.println();
+  Serial.println("O teste iniciara em 3 segundos...");
 
-    if (!DiagnosticLog::answerYes("O teste preliminar confirmou que AMBOS os motores giraram durante os pulsos?")) {
-        abortTest("movimento dos motores nao confirmado pelo operador");
-        DiagnosticLog::log("ERROR", "Inspecione alimentacao dos motores, GND comum, pinos IN, nSLEEP, soldas, cabos e polaridade. Nao prossiga para o diagnostico funcional.");
-        return;
-    }
-    DiagnosticLog::log("PASS", "PRE-CHECK de conexao aprovado manualmente para ponte DRV8833 e os dois canais de motor.");
-
-    DiagnosticLog::log("STAGE", "FASE 2 - diagnostico funcional (direcao/frente-reverso) liberado apos conexao confirmada.");
-    motors.setEnabled(true);
-    pulseMotor("ESQUERDO", true, DIAGNOSTIC_PWM, DIAGNOSTIC_PULSE_MS, "DIAGNOSTICO SENTIDO A");
-    pulseMotor("ESQUERDO", true, -DIAGNOSTIC_PWM, DIAGNOSTIC_PULSE_MS, "DIAGNOSTICO SENTIDO B");
-    pulseMotor("DIREITO", false, DIAGNOSTIC_PWM, DIAGNOSTIC_PULSE_MS, "DIAGNOSTICO SENTIDO A");
-    pulseMotor("DIREITO", false, -DIAGNOSTIC_PWM, DIAGNOSTIC_PULSE_MS, "DIAGNOSTICO SENTIDO B");
-    stopAndDisable("fim do teste");
-    DiagnosticLog::log("PASS", "Sequencia de comandos concluida. Confirme visualmente que os sentidos correspondem a frente/re; isso depende da montagem dos motores.");
-    DiagnosticLog::log("INFO", "Nao foi possivel medir rpm/torque automaticamente: o circuito nao retorna feedback eletrico do driver/motor neste teste.");
+  delay(3000);
 }
 
+// ============================================================================
+// 5. ROTINA DE DIAGNÓSTICO
+// ============================================================================
+
 void loop() {
-    delay(1000);
+
+  // Habilita a Ponte H.
+  enableDRV8833(true);
+
+  // --------------------------------------------------------------------------
+  // TESTE 1: MOVIMENTO PARA FRENTE
+  // --------------------------------------------------------------------------
+
+  Serial.println("1. Movendo para FRENTE (PWM: 120)...");
+
+  setMotorsSpeed(120, 120);
+  delay(2000);
+
+  Serial.println("   Parando motores...");
+  stopMotors();
+  delay(1000);
+
+  // --------------------------------------------------------------------------
+  // TESTE 2: MOVIMENTO PARA TRÁS
+  // --------------------------------------------------------------------------
+
+  Serial.println("2. Movendo para TRAS (PWM: -120)...");
+
+  setMotorsSpeed(-120, -120);
+  delay(2000);
+
+  stopMotors();
+  delay(1000);
+
+  // --------------------------------------------------------------------------
+  // TESTE 3: GIRO PARA A ESQUERDA
+  // --------------------------------------------------------------------------
+
+  Serial.println(
+    "3. Girando para ESQUERDA "
+    "(Motor Esq: -100, Motor Dir: +100)..."
+  );
+
+  setMotorsSpeed(-100, 100);
+  delay(1500);
+
+  stopMotors();
+  delay(1000);
+
+  // --------------------------------------------------------------------------
+  // TESTE 4: GIRO PARA A DIREITA
+  // --------------------------------------------------------------------------
+
+  Serial.println(
+    "4. Girando para DIREITA "
+    "(Motor Esq: +100, Motor Dir: -100)..."
+  );
+
+  setMotorsSpeed(100, -100);
+  delay(1500);
+
+  stopMotors();
+  delay(1000);
+
+  // --------------------------------------------------------------------------
+  // TESTE 5: RAMPA DE ACELERAÇÃO
+  // --------------------------------------------------------------------------
+
+  Serial.println("5. Acelerando progressivamente de 0 a 255...");
+
+  for (int speed = 0; speed <= PWM_MAX; speed += 15) {
+    setMotorsSpeed(speed, speed);
+    delay(100);
+  }
+
+  // Garante que o último valor também alcance 255.
+  setMotorsSpeed(255, 255);
+  delay(1000);
+
+  // --------------------------------------------------------------------------
+  // ENCERRAMENTO
+  // --------------------------------------------------------------------------
+
+  Serial.println(
+    "Ciclo concluido. Parando motores e desabilitando o driver."
+  );
+
+  stopMotors();
+  enableDRV8833(false);
+
+  Serial.println("Driver desabilitado. Aguardando 5 segundos.");
+  Serial.println();
+
+  delay(5000);
 }
