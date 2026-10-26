@@ -25,7 +25,7 @@ nav:
   - 7 - Testes:
       - Estrutura: 7.1 - Testes de estrutura.md
       - Energia: 7.2 - Testes de energia.md
-      - Hardware: 7.3 - Testes de hardware.md
+      - Hardware: 7.3 - Testes de hardware/7.3 - Testes de hardware.md
       - Software: 7.4 - Testes de software.md
       - Integração: 7.5 - Testes de integração.md
   - 8 - Avaliação de Desempenho: 8 - Avaliação de desempenho.md
