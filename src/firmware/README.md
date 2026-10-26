@@ -12,3 +12,4 @@ Evite incluir:
 
 > [!WARNING]
 > **Não acrescente arquivos referentes a _hardware_ nesta pasta.** Eles deverão ser armazenados na pasta [hw](https://github.com/fcte-pi1/template/tree/main/hw) deste repositório.
+
