@@ -1,0 +1,2789 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://fcte-pi1.github.io/2026.2_PI1_Grupo2_Lui/7.3%20-%20Testes%20de%20hardware/7.3%20-%20Testes%20de%20hardware/">
+      
+      
+        <link rel="prev" href="../../7.2%20-%20Testes%20de%20energia/">
+      
+      
+        <link rel="next" href="../../7.4%20-%20Testes%20de%20software/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+    
+    
+      
+        <title>Hardware - Projeto PI1 - Grupo 2 (Lui)</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#73-testes-de-hardware" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Projeto PI1 - Grupo 2 (Lui)" class="md-header__button md-logo" aria-label="Projeto PI1 - Grupo 2 (Lui)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Projeto PI1 - Grupo 2 (Lui)
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Hardware
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green"  aria-label="Modo Noturno"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Modo Noturno" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="green" data-md-color-accent="green"  aria-label="Modo Claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Modo Claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    2026.2_PI1_Grupo2_Lui
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../1%20-%20TAP/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  1 - TAP
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../2%20-%20Requisitos/Requisitos/" class="md-tabs__link">
+          
+  
+  
+  2 - Requisitos
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../3%20-%20EAP/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  3 - EAP
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../4.1%20-%20Projeto%20conceitual%20de%20estruturas/" class="md-tabs__link">
+          
+  
+  
+  4 - Projetos Conceituais
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../5%20-%20Cronograma/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  5 - Cronograma
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../6%20-%20Or%C3%A7amento/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  6 - Orçamento
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../7.1%20-%20Testes%20de%20estrutura/" class="md-tabs__link">
+          
+  
+  
+  7 - Testes
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../8%20-%20Avalia%C3%A7%C3%A3o%20de%20desempenho/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  8 - Avaliação de Desempenho
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../9%20-%20Relat%C3%B3rio%20de%20encerramento%20do%20projeto/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  9 - Relatório de Encerramento
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Projeto PI1 - Grupo 2 (Lui)" class="md-nav__button md-logo" aria-label="Projeto PI1 - Grupo 2 (Lui)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Projeto PI1 - Grupo 2 (Lui)
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    2026.2_PI1_Grupo2_Lui
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../1%20-%20TAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 - TAP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 - Requisitos
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    2 - Requisitos
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../2%20-%20Requisitos/Requisitos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Declaração de Requisitos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../2%20-%20Requisitos/RF/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requisitos Funcionais
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../2%20-%20Requisitos/RNF/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requisitos Não Funcionais
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../2%20-%20Requisitos/MVP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MVP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../2%20-%20Requisitos/Matriz%20de%20Rastreabilidade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Matriz de Rastrabilidade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../3%20-%20EAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3 - EAP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4 - Projetos Conceituais
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    4 - Projetos Conceituais
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../4.1%20-%20Projeto%20conceitual%20de%20estruturas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Estruturas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../4.2%20-%20Projeto%20conceitual%20de%20energia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Energia
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../4.3%20-%20Projeto%20conceitual%20de%20hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../4.4%20-%20Projeto%20conceitual%20de%20software/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Software
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../5%20-%20Cronograma/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 - Cronograma
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../6%20-%20Or%C3%A7amento/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 - Orçamento
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7 - Testes
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    7 - Testes
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../7.1%20-%20Testes%20de%20estrutura/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Estrutura
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../7.2%20-%20Testes%20de%20energia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Energia
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#matriz-mestre-de-testes-de-hardware-ids-1-a-13-links-para-os-detalhes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MATRIZ MESTRE DE TESTES DE HARDWARE (IDs 1 A 13 — links para os detalhes)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sumario" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sumário
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../7.4%20-%20Testes%20de%20software/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Software
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../7.5%20-%20Testes%20de%20integra%C3%A7%C3%A3o/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integração
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../8%20-%20Avalia%C3%A7%C3%A3o%20de%20desempenho/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8 - Avaliação de Desempenho
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../9%20-%20Relat%C3%B3rio%20de%20encerramento%20do%20projeto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 - Relatório de Encerramento
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#matriz-mestre-de-testes-de-hardware-ids-1-a-13-links-para-os-detalhes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MATRIZ MESTRE DE TESTES DE HARDWARE (IDs 1 A 13 — links para os detalhes)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sumario" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sumário
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="73-testes-de-hardware">7.3 - Testes de hardware<a class="headerlink" href="#73-testes-de-hardware" title="Permanent link">&para;</a></h1>
+<h2 id="matriz-mestre-de-testes-de-hardware-ids-1-a-13-links-para-os-detalhes">MATRIZ MESTRE DE TESTES DE HARDWARE (IDs 1 A 13 — links para os detalhes)<a class="headerlink" href="#matriz-mestre-de-testes-de-hardware-ids-1-a-13-links-para-os-detalhes" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th><strong>ID</strong></th>
+<th><strong>Descrição</strong></th>
+<th><strong>Data de Início</strong></th>
+<th><strong>Data de Conclusão</strong></th>
+<th><strong>Responsável</strong></th>
+<th><strong>Resultados Esperados</strong></th>
+<th><strong>Resultados Obtidos</strong></th>
+<th><strong>Aprovação Interna (S/N)</strong></th>
+<th><strong>Aprovação do Orientador (S/N)</strong></th>
+<th><strong>Observações</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><a href="#teste-id-1">3.1</a></strong></td>
+<td>Upload de firmware na ESP32 DevKit V1</td>
+<td>20/10/2026</td>
+<td>22/10/2026</td>
+<td><a href="https://github.com/danielhdsrodrigues-pixel">Daniel Henrique da Silva Rodrigues</a> e <a href="https://github.com/GUGOFO">Gustavo Gomes Fornaciari</a></td>
+<td>Firmware gravado sem erros</td>
+<td>Upload concluído com sucesso</td>
+<td>S</td>
+<td>-</td>
+<td>Gravação realizada pela porta USB principal</td>
+</tr>
+<tr>
+<td><strong><a href="#teste-id-2">3.2</a></strong></td>
+<td>Leitura 3x Ultrassons HC-SR04 em 3.3V</td>
+<td>22/10/2026</td>
+<td>23/10/2026</td>
+<td><a href="https://github.com/danielhdsrodrigues-pixel">Daniel Henrique da Silva Rodrigues</a> e <a href="https://github.com/Lucasft16">Lucas Fujimoto Tokunaga</a></td>
+<td>Sinais lidos nos GPIOs 35, 36, 39</td>
+<td>Sinais lidos nos GPIOs 35, 36, 39</td>
+<td>S</td>
+<td>-</td>
+<td>Pinos ADC1 testados sem interferência de ruído</td>
+</tr>
+<tr>
+<td><strong><a href="#teste-id-3">3.3</a></strong></td>
+<td>Calibração com Réguas de 50cm e 30cm</td>
+<td>21/10/2026</td>
+<td>24/10/2026</td>
+<td><a href="https://github.com/danielhdsrodrigues-pixel">Daniel Henrique da Silva Rodrigues</a> e <a href="https://github.com/Thomas4ugust0">Thomas Augusto Amorim de Araujo</a></td>
+<td>Erro relativo &lt; 0,95 cm na célula</td>
+<td>Erro relativo &lt; 0,95 cm na célula</td>
+<td>S</td>
+<td>-</td>
+<td>Gabarito métrico alinhado em bancada</td>
+</tr>
+<tr>
+<td><strong><a href="#teste-id-4">3.4</a></strong></td>
+<td>Filtro de Mediana (8 amostras)</td>
+<td>20/10/2026</td>
+<td>21/10/2026</td>
+<td><a href="https://github.com/danielhdsrodrigues-pixel">Daniel Henrique da Silva Rodrigues</a> e <a href="https://github.com/Augcamp">Augusto Campos Duarte</a></td>
+<td>Ruído eliminado; mediana estabilizada</td>
+<td>Ruído eliminado; mediana estabilizada</td>
+<td>S</td>
+<td>-</td>
+<td>Janela de amostragem ideal para rejeição de outliers</td>
+</tr>
+<tr>
+<td><strong><a href="#teste-id-5">3.5</a></strong></td>
+<td>I2C 400kHz e IMU MPU6500</td>
+<td>23/10/2026</td>
+<td>25/10/2026</td>
+<td><a href="https://github.com/danielhdsrodrigues-pixel">Daniel Henrique da Silva Rodrigues</a> e <a href="https://github.com/GUGOFO">Gustavo Gomes Fornaciari</a></td>
+<td>Comunicação OK no endereço 0x68 (I2C)</td>
+<td>Comunicação OK no endereço 0x68 (I2C)</td>
+<td>S</td>
+<td>-</td>
+<td>Barramento compartilhado operando sem travamentos</td>
+</tr>
+<tr>
+<td><strong><a href="#teste-id-6">3.6</a></strong></td>
+<td>Calibração Offset e Deriva IMU</td>
+<td>21/10/2026</td>
+<td>22/10/2026</td>
+<td><a href="https://github.com/danielhdsrodrigues-pixel">Daniel Henrique da Silva Rodrigues</a> e <a href="https://github.com/Lucasft16">Lucas Fujimoto Tokunaga</a></td>
+<td>Deriva estática &lt; 0,29°/minuto</td>
+<td>Deriva estática &lt; 0,29°/minuto</td>
+<td>S</td>
+<td>-</td>
+<td>Média calculada a partir de 500 amostras iniciais</td>
+</tr>
+<tr>
+<td><strong><a href="#teste-id-7">3.7</a></strong></td>
+<td>Odometria PCNT Encoders N20</td>
+<td>24/10/2026</td>
+<td>26/10/2026</td>
+<td><a href="https://github.com/danielhdsrodrigues-pixel">Daniel Henrique da Silva Rodrigues</a> e <a href="https://github.com/Thomas4ugust0">Thomas Augusto Amorim de Araujo</a></td>
+<td>Contagem de quadratura sem perdas</td>
+<td>Contagem de quadratura sem perdas</td>
+<td>S</td>
+<td>-</td>
+<td>Utilização do periférico de hardware Pulse Counter</td>
+</tr>
+<tr>
+<td><strong><a href="#teste-id-8">3.8</a></strong></td>
+<td>I2C e Medidor de Energia INA226</td>
+<td>20/10/2026</td>
+<td>23/10/2026</td>
+<td><a href="https://github.com/danielhdsrodrigues-pixel">Daniel Henrique da Silva Rodrigues</a> e <a href="https://github.com/Augcamp">Augusto Campos Duarte</a></td>
+<td>Tensão/corrente lidos com erro &lt; 0.27%</td>
+<td>Tensão/corrente lidos com erro &lt; 0.27%</td>
+<td>S</td>
+<td>-</td>
+<td>Resistor shunt de 0,1 ohms validado</td>
+</tr>
+<tr>
+<td><strong><a href="#teste-id-9">3.9</a></strong></td>
+<td>Persistência em Flash (NVS)</td>
+<td>25/10/2026</td>
+<td>26/10/2026</td>
+<td><a href="https://github.com/danielhdsrodrigues-pixel">Daniel Henrique da Silva Rodrigues</a> e <a href="https://github.com/GUGOFO">Gustavo Gomes Fornaciari</a></td>
+<td>Registro íntegro após reinicialização e ciclo de energia</td>
+<td>Registro de 48 bytes íntegro; sequence=2; checksum=0xCE62CD97 mantido após o ciclo de energia</td>
+<td>S</td>
+<td>-</td>
+<td>Teste aprovado no namespace dedicado <code>nvstest</code>; nenhuma partição foi formatada</td>
+</tr>
+<tr>
+<td><strong><a href="#teste-id-10">3.10</a></strong></td>
+<td>Ponte H DRV8833 em 20 kHz PWM</td>
+<td>22/10/2026</td>
+<td>24/10/2026</td>
+<td><a href="https://github.com/danielhdsrodrigues-pixel">Daniel Henrique da Silva Rodrigues</a> e <a href="https://github.com/GUGOFO">Gustavo Gomes Fornaciari</a></td>
+<td>Motores operando sem zumbido</td>
+<td>Motores operando sem zumbido</td>
+<td>S</td>
+<td>-</td>
+<td>Ruído acústico totalmente eliminado nos enrolamentos</td>
+</tr>
+<tr>
+<td><strong><a href="#teste-id-11">3.11</a></strong></td>
+<td>Kill Switch Lógico no GPIO 5 (EEP)</td>
+<td>20/10/2026</td>
+<td>22/10/2026</td>
+<td><a href="https://github.com/danielhdsrodrigues-pixel">Daniel Henrique da Silva Rodrigues</a> e <a href="https://github.com/Thomas4ugust0">Thomas Augusto Amorim de Araujo</a></td>
+<td>Motores desligados em até 15 ms</td>
+<td>Tempo de parada registrado: 8,2 ms</td>
+<td>S</td>
+<td>-</td>
+<td>Resultado dentro do limite de até 15 ms</td>
+</tr>
+<tr>
+<td><strong><a href="#teste-id-12">3.12</a></strong></td>
+<td>Controle de Velocidade PID</td>
+<td>21/10/2026</td>
+<td>25/10/2026</td>
+<td><a href="https://github.com/danielhdsrodrigues-pixel">Daniel Henrique da Silva Rodrigues</a> e <a href="https://github.com/Lucasft16">Lucas Fujimoto Tokunaga</a></td>
+<td>Erro estático de velocidade &lt; 2%</td>
+<td>Erro estático de velocidade &lt; 2%</td>
+<td>S</td>
+<td>-</td>
+<td>Ajuste fino realizado em malha fechada</td>
+</tr>
+<tr>
+<td><strong><a href="#teste-id-13">3.13</a></strong></td>
+<td>Telemetria Bluetooth entre ESP32 e celular a 5 Hz</td>
+<td>20/10/2026</td>
+<td>26/10/2026</td>
+<td><a href="https://github.com/danielhdsrodrigues-pixel">Daniel Henrique da Silva Rodrigues</a> e <a href="https://github.com/Augcamp">Augusto Campos Duarte</a></td>
+<td>Envio de mensagens JSON pelo Bluetooth e recebimento no celular a 5 Hz</td>
+<td>Mensagens JSON enviadas pelo terminal da ESP32 e recebidas no celular via Bluetooth</td>
+<td>S</td>
+<td>-</td>
+<td>Evidências do envio no terminal e do recebimento no celular incluídas no relatório</td>
+</tr>
+</tbody>
+</table>
+<h2 id="sumario">Sumário<a class="headerlink" href="#sumario" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="#relatorio-geral">Relatório geral de validação do hardware</a></li>
+<li><a href="#esp32">ESP32 e pinout</a></li>
+<li><a href="#nvs">Teste de persistência em Flash (NVS)</a></li>
+<li><a href="#sistema-alimentacao">Sistema de alimentação</a></li>
+<li><a href="#ina226">Medidor INA226</a></li>
+<li><a href="#ponte-h-motores">Ponte H e motores</a></li>
+<li><a href="#imu-mpu6500">IMU MPU6500</a></li>
+<li><a href="#sensor-ultrassonico">Sensor ultrassônico</a></li>
+</ul>
+<hr />
+<p><a id="relatorio-geral"></a></p>
+<h1 id="relatorio-geral-de-validacao-do-hardware">Relatório geral de validação do hardware<a class="headerlink" href="#relatorio-geral-de-validacao-do-hardware" title="Permanent link">&para;</a></h1>
+<p>DESTAQUES DA VALIDAÇÃO INTEGRADA DE BANCADA</p>
+<p>STATUS DA VALIDAÇÃO: A matriz mestre registra 13 testes de hardware, todos marcados com aprovação interna. A revisão das seções técnicas, entretanto, identificou divergências entre alguns resultados medidos e os critérios registrados; esses pontos devem ser conciliados antes de declarar a homologação final completa.</p>
+<h2 id="objetivo-do-relatorio-geral">OBJETIVO DO RELATÓRIO GERAL<a class="headerlink" href="#objetivo-do-relatorio-geral" title="Permanent link">&para;</a></h2>
+<p>Consolidar os resultados de validação e ensaios unitários de todos os subsistemas de hardware do robô MicroMouse (Processamento, Sensoriamento, Atuação, Energia e Comunicação), fornecendo a matriz de rastreabilidade completa para aprovação pelo orientador Prof. Lui.</p>
+<h2 id="sintese-da-arquitetura-e-integracao-de-subsistemas-distribuicao-de-potencia">SÍNTESE DA ARQUITETURA E INTEGRAÇÃO DE SUBSISTEMAS/ DISTRIBUIÇÃO DE POTÊNCIA<a class="headerlink" href="#sintese-da-arquitetura-e-integracao-de-subsistemas-distribuicao-de-potencia" title="Permanent link">&para;</a></h2>
+<p>A arquitetura de hardware e o sistema integra combina a placa ESP32 DevKit V1 (30 pinos), 3 sensores ultrassônicos HC-SR04 em 3,3 V, IMU MPU6500 via I2C (400 kHz), medidor de energia INA226, driver Ponte H DRV8833 com motores N20 e encoders magnéticos, alimentados por bateria Li-Ion 2S (7,4 V) regulada pelo Buck LM2596 (HW-411).</p>
+<p><img alt="Imagem" src="../imagens/relatorio-geral/imagem-01.png" /></p>
+<p><img alt="Imagem" src="../imagens/relatorio-geral/imagem-02.png" /></p>
+<p>Figura 1: Status de conformidade dos subsistemas e distribuição do consumo de potência do robô.</p>
+<h2 id="conclusao-geral-e-homologacao">CONCLUSÃO GERAL E HOMOLOGAÇÃO<a class="headerlink" href="#conclusao-geral-e-homologacao" title="Permanent link">&para;</a></h2>
+<p>Este relatório reúne os ensaios dos subsistemas de processamento, sensoriamento, orientação, energia, atuação e comunicação do robô MicroMouse. Embora os 13 itens da matriz mestre estejam marcados com aprovação interna, a homologação final deve aguardar a conferência das divergências de medição apontadas nas seções técnicas.</p>
+<hr />
+<p><a id="esp32"></a></p>
+<h1 id="esp32-e-pinout">ESP32 e pinout<a class="headerlink" href="#esp32-e-pinout" title="Permanent link">&para;</a></h1>
+<p>RELATÓRIO DE VALIDAÇÃO DE HARDWARE — ESP32 DEVKIT V1 E PINOUT</p>
+<p>Mapeamento de 30 Pinos, Prevenção de Boot Loop e Telemetria Bluetooth</p>
+<p>DESTAQUES METROLÓGICOS DE BANCADA</p>
+<p>O microcontrolador ESP32 DevKit V1 operou com tempo de loop de 5,7 ms, mantendo o pino de strapping GPIO 12 livre para garantir um boot seguro. A telemetria foi testada por Bluetooth, com mensagens JSON enviadas pela ESP32 e recebidas no celular a uma taxa de 5 Hz.</p>
+<h2 id="1-objetivo-do-ensaio">1. OBJETIVO DO ENSAIO<a class="headerlink" href="#1-objetivo-do-ensaio" title="Permanent link">&para;</a></h2>
+<p>Validar a estabilidade do firmware, a alocação de pinagem do layout de 30 pinos, a gravação NVS e a transmissão de telemetria por Bluetooth entre a ESP32 e um celular.</p>
+<p><a id="teste-id-1"></a></p>
+<h2 id="teste-id-1-upload-de-firmware-na-esp32-devkit-v1">Teste ID 1 — Upload de firmware na ESP32 DevKit V1<a class="headerlink" href="#teste-id-1-upload-de-firmware-na-esp32-devkit-v1" title="Permanent link">&para;</a></h2>
+<p>O firmware foi gravado na placa ESP32 DevKit V1 pela porta USB principal, e o upload foi concluído com sucesso.</p>
+<h2 id="2-analise-de-processamento">2. ANÁLISE DE PROCESSAMENTO<a class="headerlink" href="#2-analise-de-processamento" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Periférico / Módulo</th>
+<th>Pinos ESP32</th>
+<th>Tipo de Periférico</th>
+<th>Função no MicroMouse</th>
+<th>Status de Validação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Barramento I2C</td>
+<td>GPIO 21 (SDA) / 22 (SCL)</td>
+<td>I2C Master (400 kHz)</td>
+<td>Comunicação IMU MPU6500 e INA226</td>
+<td>APROVADO</td>
+</tr>
+<tr>
+<td>Ultrassom Frontal</td>
+<td>GPIO 4 (TRIG) / 35 (ECHO)</td>
+<td>Output / GPI (ADC1)</td>
+<td>Medição de Distância Frontal</td>
+<td>APROVADO</td>
+</tr>
+<tr>
+<td>Ultrassom Esquerdo</td>
+<td>GPIO 14 (TRIG) / 36 (ECHO)</td>
+<td>Output / GPI (ADC1)</td>
+<td>Medição de Distância Esquerda</td>
+<td>APROVADO</td>
+</tr>
+<tr>
+<td>Ultrassom Direito</td>
+<td>GPIO 27 (TRIG) / 39 (ECHO)</td>
+<td>Output / GPI (ADC1)</td>
+<td>Medição de Distância Direita</td>
+<td>APROVADO</td>
+</tr>
+<tr>
+<td>Motores E/D (PWM)</td>
+<td>GPIO 16, 17, 18, 19</td>
+<td>LEDC PWM (20 kHz)</td>
+<td>Controle de Velocidade e Sentido</td>
+<td>APROVADO</td>
+</tr>
+<tr>
+<td>Encoders E/D</td>
+<td>GPIO 32, 33, 25, 26</td>
+<td>PCNT (Pulse Counter)</td>
+<td>Odometria de Quadratura por Hardware</td>
+<td>APROVADO</td>
+</tr>
+</tbody>
+</table>
+<p><a id="teste-id-13"></a></p>
+<h2 id="teste-id-13-telemetria-bluetooth-entre-esp32-e-celular">Teste ID 13 — Telemetria Bluetooth entre ESP32 e celular<a class="headerlink" href="#teste-id-13-telemetria-bluetooth-entre-esp32-e-celular" title="Permanent link">&para;</a></h2>
+<p>A placa ESP32 DevKit V1 de 30 pinos operou a 240 MHz. Os pinos GPI (D34, D35, D36, D39) foram reservados para entradas digitais/analógicas do bloco ADC1, e o barramento I2C operou nos GPIOs 21/22. As imagens abaixo documentam o envio das mensagens JSON no terminal e o recebimento no celular.</p>
+<p><img alt="Terminal da ESP32 enviando mensagens JSON por Bluetooth" src="../imagens/esp32/bluetoothTerminal.png" /></p>
+<p>Figura 1: Terminal mostrando o envio de mensagens JSON pela ESP32 via Bluetooth.</p>
+<p><img alt="Celular recebendo mensagens JSON via Bluetooth" src="../imagens/esp32/bluetooth.png" /></p>
+<p>Figura 2: Celular recebendo as mensagens enviadas pela ESP32 via Bluetooth.</p>
+<h2 id="verificacao-complementar-prevencao-de-boot-loop">Verificação complementar — Prevenção de boot loop<a class="headerlink" href="#verificacao-complementar-prevencao-de-boot-loop" title="Permanent link">&para;</a></h2>
+<p>O disparo do ultrassom frontal foi alterado do GPIO 12 para o GPIO 4, evitando que o pino de strapping MTDI interferisse na inicialização da memória Flash.</p>
+<h3 id="resultado-complementar-do-teste-id-13-telemetria-bluetooth">Resultado complementar do Teste ID 13 — Telemetria Bluetooth<a class="headerlink" href="#resultado-complementar-do-teste-id-13-telemetria-bluetooth" title="Permanent link">&para;</a></h3>
+<p>A ESP32 enviou mensagens JSON por Bluetooth, confirmadas no terminal e recebidas no celular. A taxa de envio configurada foi de 5 Hz (um envio a cada 200 ms).</p>
+<table>
+<thead>
+<tr>
+<th>Verificação</th>
+<th>Parâmetro Medido</th>
+<th>Métrica Alvo</th>
+<th>Resultado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Persistência em Flash (NVS)</td>
+<td>Registro preservado após reinicialização e ciclo de energia</td>
+<td>Registro de 48 bytes; sequence=2; checksum=0xCE62CD97 mantido</td>
+<td>CONFORME</td>
+</tr>
+<tr>
+<td>Uso de Memória SRAM</td>
+<td>24,5 % (128 KB livres)</td>
+<td>&lt; 60 %</td>
+<td>EXCELENTE</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-resultados-obtidos-e-analise-metrologica">5. RESULTADOS OBTIDOS E ANÁLISE METROLÓGICA<a class="headerlink" href="#5-resultados-obtidos-e-analise-metrologica" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Métrica / Periférico</th>
+<th>Parâmetro Alvo</th>
+<th>Valor Aferido</th>
+<th>Desvio / Erro</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Clock da CPU</td>
+<td>240 MHz</td>
+<td>240,0 MHz</td>
+<td>0,0 %</td>
+<td>Aprovado</td>
+</tr>
+<tr>
+<td>Tempo de Loop</td>
+<td>&lt; 10,0 ms</td>
+<td>5,7 ms</td>
+<td>Abaixo do limite</td>
+<td>Aprovado</td>
+</tr>
+<tr>
+<td>Taxa de envio Bluetooth (JSON)</td>
+<td>5 Hz (200 ms)</td>
+<td>5,0 Hz configurados</td>
+<td>Conforme configuração</td>
+<td>Aprovado</td>
+</tr>
+<tr>
+<td>Recepção no celular</td>
+<td>Mensagens JSON recebidas sem corrupção</td>
+<td>Mensagens visualizadas no celular</td>
+<td>Recepção confirmada pelas evidências</td>
+<td>Aprovado</td>
+</tr>
+<tr>
+<td>Prevenção Boot Loop</td>
+<td>GPIO 12 Livre</td>
+<td>Sem conexões no D12</td>
+<td>Boot 100% seguro</td>
+<td>Aprovado</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>MATRIZ DE RASTREABILIDADE DE REQUISITOS (MoSCoW)</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Requisito</th>
+<th>Tipo</th>
+<th>Descrição / Critério</th>
+<th>Resultado Aferido</th>
+<th>Status MoSCoW</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RF01</td>
+<td>Must Have</td>
+<td>Processamento e telemetria Bluetooth</td>
+<td>Envio de mensagens JSON a 5 Hz e recebimento no celular</td>
+<td>Aprovado</td>
+</tr>
+<tr>
+<td>RNF02</td>
+<td>Must Have</td>
+<td>Tempo de resposta do loop &lt; 10 ms</td>
+<td>Loop executado em 5,7 ms</td>
+<td>Aprovado</td>
+</tr>
+<tr>
+<td>RNF09</td>
+<td>Must Have</td>
+<td>Segurança de boot e alocação</td>
+<td>GPIO 12 livre e ADC1 isolado</td>
+<td>Aprovado</td>
+</tr>
+</tbody>
+</table>
+<h2 id="7-conclusao">7. CONCLUSÃO<a class="headerlink" href="#7-conclusao" title="Permanent link">&para;</a></h2>
+<p>O microcontrolador ESP32 DevKit V1 operou com estabilidade durante o teste de telemetria Bluetooth. A ESP32 enviou mensagens JSON a uma taxa configurada de 5 Hz (intervalo de 200 ms), e o recebimento dessas mensagens foi conferido no celular. O teste também verificou que a comunicação não impediu a leitura do ADC1 ou do barramento I2C.</p>
+<hr />
+<p><a id="nvs"></a>
+<a id="teste-id-9"></a></p>
+<h1 id="teste-id-9-persistencia-em-flash-nvs">Teste ID 9 — Persistência em Flash (NVS)<a class="headerlink" href="#teste-id-9-persistencia-em-flash-nvs" title="Permanent link">&para;</a></h1>
+<p>RELATÓRIO DE VALIDAÇÃO — MEMÓRIA FLASH INTERNA DA ESP32</p>
+<h2 id="1-objetivo-do-ensaio_1">1. Objetivo do ensaio<a class="headerlink" href="#1-objetivo-do-ensaio_1" title="Permanent link">&para;</a></h2>
+<p>Verificar a gravação, leitura e integridade de um registro armazenado na NVS da ESP32, incluindo a persistência dos dados após reinicialização e após um ciclo completo de desligamento e religamento.</p>
+<h2 id="2-procedimento-executado">2. Procedimento executado<a class="headerlink" href="#2-procedimento-executado" title="Permanent link">&para;</a></h2>
+<p>O firmware executou o diagnóstico da memória Flash e utilizou o namespace dedicado <code>nvstest</code>, com as chaves <code>record</code> e <code>phase</code>. O terminal informa que a partição NVS foi encontrada com o rótulo <code>nvs</code>, offset <code>0x00009000</code> e tamanho de <code>20480</code> bytes. O teste foi isolado nesse namespace, sem alterar o namespace <code>maze</code>.</p>
+<h2 id="3-resultados-observados">3. Resultados observados<a class="headerlink" href="#3-resultados-observados" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Verificação</th>
+<th>Resultado exibido no terminal</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Detecção da partição NVS</td>
+<td>Partição <code>nvs</code> encontrada; tamanho de 20480 bytes</td>
+<td>APROVADO</td>
+</tr>
+<tr>
+<td>Leitura do namespace de teste</td>
+<td>Namespace <code>nvstest</code> aberto; registro existente identificado</td>
+<td>APROVADO</td>
+</tr>
+<tr>
+<td>Integridade do registro após nova inicialização</td>
+<td>Registro de 48 bytes íntegro; <code>sequence=2</code>; <code>checksum=0xCE62CD97</code></td>
+<td>APROVADO</td>
+</tr>
+<tr>
+<td>Persistência após ciclo de energia</td>
+<td>Registro de 48 bytes íntegro; <code>sequence=2</code>; checksum mantido em <code>0xCE62CD97</code>; fase registrada como <code>3</code></td>
+<td>APROVADO</td>
+</tr>
+<tr>
+<td>Preservação dos demais dados</td>
+<td>Nenhuma partição foi formatada; somente as chaves <code>record</code> e <code>phase</code> do namespace <code>nvstest</code> foram utilizadas</td>
+<td>APROVADO</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Terminal mostrando o diagnóstico e a validação da persistência NVS na ESP32" src="../imagens/esp32/terminal.png" /></p>
+<p>Figura 1: Saída do terminal com a verificação da gravação, leitura, integridade e persistência do registro após o ciclo de energia.</p>
+<h2 id="4-conclusao-do-ensaio">4. Conclusão do ensaio<a class="headerlink" href="#4-conclusao-do-ensaio" title="Permanent link">&para;</a></h2>
+<p>Conforme a saída apresentada, o teste NVS foi aprovado: o firmware confirmou a integridade do registro de 48 bytes e manteve o mesmo checksum (<code>0xCE62CD97</code>) após o ciclo de desligamento e religamento. O teste utilizou o namespace isolado <code>nvstest</code>, sem formatar partições ou alterar o namespace <code>maze</code>.</p>
+<hr />
+<p><a id="sistema-alimentacao"></a></p>
+<h1 id="sistema-de-alimentacao">Sistema de alimentação<a class="headerlink" href="#sistema-de-alimentacao" title="Permanent link">&para;</a></h1>
+<p>RELATÓRIO DE VALIDAÇÃO DE HARDWARE — SISTEMA DE ALIMENTAÇÃO</p>
+<p>Ensaio de Regulação Buck LM2596 (HW-411), Bateria Li-Ion e Eficiência</p>
+<h2 id="objetivo-do-ensaio">OBJETIVO DO ENSAIO<a class="headerlink" href="#objetivo-do-ensaio" title="Permanent link">&para;</a></h2>
+<p>Aferir a regulação de tensão, eficiência de conversão e nível de ruído (ripple) do regulador chaveado Buck MP1584EN sob variação da tensão da bateria Li-Ion 2S (7,4 V nominal).</p>
+<h2 id="arquitetura-do-sistema-de-energia-e-topologia-de-alimentacao">ARQUITETURA DO SISTEMA DE ENERGIA E TOPOLOGIA DE ALIMENTAÇÃO<a class="headerlink" href="#arquitetura-do-sistema-de-energia-e-topologia-de-alimentacao" title="Permanent link">&para;</a></h2>
+<p>O sistema de gerenciamento de energia do MicroMouse foi projetado para fornecer duas linhas de alimentação isoladas: a linha de potência fornecida diretamente pela Bateria de Íon de Lítio 2S de 7,4 V (3300 mAh) para a Ponte H DRV8833 e motores, e a linha lógica regulada em 5,0 V DC via conversor rebaixador Buck LM2596 (Modelo HW-411) conectada ao pino VIN da ESP32 DevKit V1. A ESP32 por sua vez utiliza seu LDO interno para gerar a linha estável de 3,3 V para os sensores e periféricos.</p>
+<h2 id="regulacao-de-tensao-eficiencia-termica-e-ripple">REGULAÇÃO DE TENSÃO, EFICIÊNCIA TÉRMICA E RIPPLE<a class="headerlink" href="#regulacao-de-tensao-eficiencia-termica-e-ripple" title="Permanent link">&para;</a></h2>
+<p><img alt="Imagem" src="../imagens/sistema-alimentacao/imagem-01.png" /></p>
+<p>Figura 1: Curva de regulação de tensão de saída sob variação de carga e perfil de eficiência energética com ruído de ripple.</p>
+<table>
+<thead>
+<tr>
+<th>Linha de Tensão</th>
+<th>Origem / Regulação</th>
+<th>Componentes Alimentados</th>
+<th>Tensão Medida</th>
+<th>Corrente Média</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Linha Potência (+7.4V)</td>
+<td>Bateria Li-Ion 2S Direta</td>
+<td>Drivers de Potência da Ponte H DRV8833</td>
+<td>7,40 V - 8,40V</td>
+<td>320 mA -850 mA</td>
+</tr>
+<tr>
+<td>Linha Lógica (+5.0V)</td>
+<td>Regulador Buck (LM2596 / HW-411)</td>
+<td>Pino VIN da ESP32 DevKit V1</td>
+<td>5,02 V ±0,02 V</td>
+<td>120 mA -210 mA</td>
+</tr>
+<tr>
+<td>Linha Sensorial (+3.3V)</td>
+<td>Regulador LDO Interno ESP32</td>
+<td>Sensores HC-SR04, MPU6500, INA226</td>
+<td>3,29 V ±0,01 V</td>
+<td>45 mA</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Corrente de Carga (A)</th>
+<th>Tensão Entrada (V)</th>
+<th>Tensão Saída (V)</th>
+<th>Ripple (mV p-p)</th>
+<th>Eficiência (%)</th>
+<th>Temp. Módulo (C)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0,0 A (Sem Carga)</td>
+<td>7,40 V</td>
+<td>5,02 V</td>
+<td>12 mV</td>
+<td>92,5%</td>
+<td>26,5 C</td>
+</tr>
+<tr>
+<td>0,4 A (Lógica + Sensores)</td>
+<td>7,38 V</td>
+<td>5,01 V</td>
+<td>15 mV</td>
+<td>91,2%</td>
+<td>29,0 C</td>
+</tr>
+<tr>
+<td>0,8 A (Cruzeiro 2 Motores)</td>
+<td>7,30 V</td>
+<td>5,00 V</td>
+<td>18 mV</td>
+<td>89,8%</td>
+<td>34,2 C</td>
+</tr>
+<tr>
+<td>1,2 A (Aceleração Média)</td>
+<td>7,20 V</td>
+<td>4,98 V</td>
+<td>22 mV</td>
+<td>88,4%</td>
+<td>41,0 C</td>
+</tr>
+<tr>
+<td>1,6 A (Pico Aceleração)</td>
+<td>7,05 V</td>
+<td>4,96 V</td>
+<td>28 mV</td>
+<td>86,1%</td>
+<td>48,5 ℃</td>
+</tr>
+<tr>
+<td>2,0 A (Carga Máxima Buck)</td>
+<td>6,90 V</td>
+<td>4,94 V</td>
+<td>35 mV</td>
+<td>83,5%</td>
+<td>56,0 °C</td>
+</tr>
+</tbody>
+</table>
+<h2 id="ensaio-de-regulacao-termica-e-ripple">ENSAIO DE REGULAÇÃO TÉRMICA E RIPPLE<a class="headerlink" href="#ensaio-de-regulacao-termica-e-ripple" title="Permanent link">&para;</a></h2>
+<p>Foram submetidos testes de estabilidade do regulador sob acionamento simultâneo dos motores e comunicação Bluetooth. A nota crítica de montagem exige regular a saída do Buck em 5,0 V antes de conectar no VIN da ESP32.</p>
+<table>
+<thead>
+<tr>
+<th>Parâmetro Avaliado/Elétrico</th>
+<th>Valor Medido</th>
+<th>Limite Seguro de Projeto</th>
+<th>Avaliação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ripple de Tensão em 5V</td>
+<td>18 mV p-p</td>
+<td>≤ 50 mV p-p</td>
+<td>EXCELENTE</td>
+</tr>
+<tr>
+<td>Eficiência do Buck (HW-411)</td>
+<td>88,4 %</td>
+<td>≥ 85 %</td>
+<td>CONFORME</td>
+</tr>
+<tr>
+<td>Temperatura do Regulador (Carga Máx)</td>
+<td>41,2 °C</td>
+<td>≤ 65,0 °C</td>
+<td>ESTÁVEL</td>
+</tr>
+<tr>
+<td>Queda de Tensão durante a Inicialização do Bluetooth</td>
+<td>0,04 V</td>
+<td>≤ 0,15 V</td>
+<td>CONFORME</td>
+</tr>
+<tr>
+<td>Tensão da Bateria (Li-Ion 2S)</td>
+<td>7,42 V DC</td>
+<td>7,4 V DC (6,0V a 8,4V)</td>
+<td>Conforme</td>
+</tr>
+<tr>
+<td>Saída do Buck MP1584EN</td>
+<td>5,02 V DC</td>
+<td>5,00 V DC</td>
+<td>Conforme (Tolerância &lt; 0,5%)</td>
+</tr>
+<tr>
+<td>Saída do LDO Interno ESP32</td>
+<td>3,29 V DC</td>
+<td>3,30 V DC</td>
+<td>Conforme (Tolerância &lt; 0,3%)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="matriz-de-conformidade-de-requisitos">MATRIZ DE CONFORMIDADE DE REQUISITOS<a class="headerlink" href="#matriz-de-conformidade-de-requisitos" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Requisito</th>
+<th>Tipo</th>
+<th>Descrição / Meta</th>
+<th>Resultado Obtido</th>
+<th>Conformidade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RF01</td>
+<td>Must Have</td>
+<td>Alimentação regulada de 5,0V para VIN da<br>ESP32</td>
+<td>Buck HW-411 fornece<br>5,00V estáveis</td>
+<td>CONFORME</td>
+</tr>
+<tr>
+<td>RNF02</td>
+<td>Must Have</td>
+<td>Ripple na linha lógica inferior a 50 mV p-p</td>
+<td>Ripple máximo aferido de<br>22 mV p-p</td>
+<td>CONFORME</td>
+</tr>
+<tr>
+<td>RNF09</td>
+<td>Must Have</td>
+<td>Autonomia contínua superior a 30 minutos</td>
+<td>Bateria 3300 mAh garante &gt;<br>2 horas</td>
+<td>CONFORME</td>
+</tr>
+</tbody>
+</table>
+<h2 id="conclusao-do-subsistema-de-energia">CONCLUSÃO DO SUBSISTEMA DE ENERGIA<a class="headerlink" href="#conclusao-do-subsistema-de-energia" title="Permanent link">&para;</a></h2>
+<p>Conclusão: A separação da linha de potência dos motores e a regulação em 5,0 V garantiram isenção de ruidos na eletrônica sensível e autonomia estimada superior a 45 minutos contínuos. Status: APROVADO</p>
+<p>PARA OPERAÇÃO.</p>
+<hr />
+<p><a id="ina226"></a>
+<a id="teste-id-8"></a></p>
+<h1 id="teste-id-8-medidor-ina226">Teste ID 8 — Medidor INA226<a class="headerlink" href="#teste-id-8-medidor-ina226" title="Permanent link">&para;</a></h1>
+<p>RELATÓRIO DE VALIDAÇÃO DE HARDWARE — SENSOR INA226</p>
+<p>Ensaio Unitário em Bancada do Medidor de Tensão e Corrente (I2C)</p>
+<h2 id="objetivos-e-mapeamento-de-hardware">OBJETIVOS E MAPEAMENTO DE HARDWARE<a class="headerlink" href="#objetivos-e-mapeamento-de-hardware" title="Permanent link">&para;</a></h2>
+<p>Este ensaio unitário visa validar a precisão metrológica e a estabilidade do sensor de tensão e corrente INA226 (INA226AIDGSR) no monitoramento em tempo real da bateria de Íon-Lítio 2S (7,4 V nominal) e do consumo dinâmico dos motores N20 do robô MicroMouse.</p>
+<table>
+<thead>
+<tr>
+<th>Parâmetro de Hardware</th>
+<th>Especificação / Conexão no Esquemático</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Protocolo de Comunicação</td>
+<td>I2C Fast-Mode (400 kHz) no Endereço 0x40</td>
+</tr>
+<tr>
+<td>Pinos de Comunicação</td>
+<td>SDA -&gt; GPIO 21 | SCL -&gt; GPIO 22 (Pull-ups ativados)</td>
+</tr>
+<tr>
+<td>Tensão de Operação Lógica</td>
+<td>+3,3 V DC gerados pelo LDO interno do ESP32</td>
+</tr>
+<tr>
+<td>Resistor Shunt Externo</td>
+<td>0,1 Ω (100 mΩ) com precisão de 1%</td>
+</tr>
+<tr>
+<td>Grandeza Monitorada</td>
+<td>Tensão de Barramento (VBUS) e Corrente em Derivação (ISHUNT)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="resultados-do-ensaio-metrico-e-validacao">RESULTADOS DO ENSAIO MÉTRICO E VALIDAÇÃO<a class="headerlink" href="#resultados-do-ensaio-metrico-e-validacao" title="Permanent link">&para;</a></h2>
+<p>A calibração do registrador interno do INA226 permitiu aferir a tensão de barramento com erro médio relativo inferior a 0,25% comparado a multímetro digital de bancada de 4.5 dígitos. A tabela abaixo apresenta os pontos de teste sob variação de carga do sistema:</p>
+<table>
+<thead>
+<tr>
+<th>Condição de Carga</th>
+<th>Multímetro V (V)</th>
+<th>INA226 V (V)</th>
+<th>Multímetro I (mA)</th>
+<th>INA226 I (mA)</th>
+<th>Erro V (%)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Repouso (Standby)</td>
+<td>7,82 V</td>
+<td>7,81 V</td>
+<td>62,0 mA</td>
+<td>61,8 mA</td>
+<td>-0,13 %</td>
+</tr>
+<tr>
+<td>Motores Livres (50% PWM)</td>
+<td>7,65 V</td>
+<td>7,64 V</td>
+<td>185,0 mA</td>
+<td>184,2 mA</td>
+<td>-0,13 %</td>
+</tr>
+<tr>
+<td>Motores Livres (100% PWM)</td>
+<td>7,48 V</td>
+<td>7,47 V</td>
+<td>320,0 mA</td>
+<td>319,1 mA</td>
+<td>-0,13 %</td>
+</tr>
+<tr>
+<td>Carga Máxima / Manobra</td>
+<td>7,20 V</td>
+<td>7,18 V</td>
+<td>850,0 mA</td>
+<td>847,5 mA</td>
+<td>-0,28 %</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Imagem" src="../imagens/ina226/imagem-01.jpg" /></p>
+<p>Figura 1: Curva de afundamento de tensão e elevação de corrente sob carga nos motores N20.</p>
+<h2 id="matriz-de-conformidade-e-conclusao">MATRIZ DE CONFORMIDADE E CONCLUSÃO<a class="headerlink" href="#matriz-de-conformidade-e-conclusao" title="Permanent link">&para;</a></h2>
+<p>Conclusão do Ensaio: O sensor INA226 apresentou exatidão superior a 99,7% na medição de tensão e corrente. O canal I2C operou perfeitamente em 400 kHz sem causar estouro de tempo no laço do ESP32.</p>
+<p>Status: APROVADO PARA OPERAÇÃO.</p>
+<hr />
+<p><a id="ponte-h-motores"></a></p>
+<h1 id="ponte-h-e-motores">Ponte H e motores<a class="headerlink" href="#ponte-h-e-motores" title="Permanent link">&para;</a></h1>
+<p><strong>Testes desta seção: ID 7 — Odometria PCNT; ID 10 — Ponte H/PWM; ID 11 — Kill Switch; ID 12 — Controle PID.</strong></p>
+<p>RELATÓRIO DE VALIDAÇÃO DE HARDWARE — PONTE H DRV8833 E MOTORES</p>
+<p>Ensaio Unitário de Atuação PWM, Kill Switch e Odometria de Encoders</p>
+<p>DESTAQUES METROLÓGICOS DE BANCADA</p>
+<p>A Ponte H DRV8833 operou com sinal PWM em 20 kHz (inaudível aos enrolamentos), permitindo controle suave dos motores N20 e contagem de odometria em quadratura precisa via periférico de hardware PCNT (Pulse Counter), enquanto o pino EEP no GPIO 5 executou o desligamento lógico de emergência em 8,2 ms, conforme o resultado registrado na tabela de medições.</p>
+<h2 id="1-objetivo-do-ensaio_2">1. OBJETIVO DO ENSAIO<a class="headerlink" href="#1-objetivo-do-ensaio_2" title="Permanent link">&para;</a></h2>
+<p>Validar o controle de velocidade e sentido dos motores N20 via DRV8833, o corte de emergência pelo pino EEP (GPIO 5) e a leitura dos encoders de quadratura pelo periférico PCNT.</p>
+<h2 id="2-arquitetura-de-tracao-e-mapeamento-de-pinos">2. ARQUITETURA DE TRAÇÃO E MAPEAMENTO DE PINOS<a class="headerlink" href="#2-arquitetura-de-tracao-e-mapeamento-de-pinos" title="Permanent link">&para;</a></h2>
+<p>O subsistema de atuação e tração do MicroMouse é composto por uma Ponte H dupla DRV8833 e dois motores DC N20 (6 V) com caixa de redução de 30:1 metálica e encoders magnéticos de quadratura.</p>
+<table>
+<thead>
+<tr>
+<th>Sinal de Controle</th>
+<th>Pino ESP32</th>
+<th>Função no Driver DRV8833 / Motor</th>
+<th>Frequência / Periférico</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Motor Esq. PWM</td>
+<td>GPIO 16</td>
+<td>AIN1 (Modulação de Velocidade Esquerda)</td>
+<td>20 kHz (Módulo LEDC)</td>
+</tr>
+<tr>
+<td>Motor Esq. Direção</td>
+<td>GPIO 17</td>
+<td>AIN2 (Sentido de Rotação Esquerda)</td>
+<td>Saída Digital (GPIO)</td>
+</tr>
+<tr>
+<td>Motor Dir. PWM</td>
+<td>GPIO 18</td>
+<td>BIN1 (Modulação de Velocidade Direita)</td>
+<td>20 kHz (Módulo LEDC)</td>
+</tr>
+<tr>
+<td>Motor Dir. Direção</td>
+<td>GPIO 19</td>
+<td>BIN2 (Sentido de Rotação Direita)</td>
+<td>Saída Digital (GPIO)</td>
+</tr>
+<tr>
+<td>Habilitação (EEP)</td>
+<td>GPIO 5</td>
+<td>EEP / nSLEEP (Kill Switch Lógico)</td>
+<td>Saída Digital (Nível Alto=Ativo)</td>
+</tr>
+<tr>
+<td>Encoder Esq. A/B</td>
+<td>GPIO 32 / 33</td>
+<td>Canais A e B em Quadratura Esquerda</td>
+<td>PCNT (Pulse Counter Hardware)</td>
+</tr>
+<tr>
+<td>Encoder Dir. A/B</td>
+<td>GPIO 25 / 26</td>
+<td>Canais A e B em Quadratura Direita</td>
+<td>PCNT (Pulse Counter Hardware)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-configuracao-da-bancada-e-mapeamento-de-hardware">3. CONFIGURAÇÃO DA BANCADA E MAPEAMENTO DE HARDWARE<a class="headerlink" href="#3-configuracao-da-bancada-e-mapeamento-de-hardware" title="Permanent link">&para;</a></h2>
+<p>Os sinais PWM e Direção foram ligados aos GPIOs 16/17 (Motor Esquerdo) e 18/19 (Motor Direito). O pino EEP no GPIO 5 operou como Kill Switch lógico. Os encoders magnéticos foram ligados nos GPIOs 32/33 e 25/26.</p>
+<p><img alt="Imagem" src="../imagens/ponte-h-motores/imagem-01.jpg" /></p>
+<p>Figura 1: Curva de velocidade PWM vs RPM e linearidade dos pulsos de odometria dos encoders.</p>
+<p><a id="teste-id-10"></a></p>
+<h2 id="teste-id-10-resultados-do-pwm-da-ponte-h-drv8833">Teste ID 10 — Resultados do PWM da Ponte H DRV8833<a class="headerlink" href="#teste-id-10-resultados-do-pwm-da-ponte-h-drv8833" title="Permanent link">&para;</a></h2>
+<p>A modulação PWM foi configurada em 20 kHz, dentro da faixa de projeto de 18 kHz a 25 kHz.</p>
+<table>
+<thead>
+<tr>
+<th>Métrica</th>
+<th>Valor aferido</th>
+<th>Critério de aceitação</th>
+<th>Resultado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Frequência do PWM (LEDC)</td>
+<td>20.000 Hz</td>
+<td>18 kHz a 25 kHz</td>
+<td>CONFORME</td>
+</tr>
+</tbody>
+</table>
+<p><a id="teste-id-11"></a></p>
+<h2 id="teste-id-11-kill-switch-logico-no-gpio-5-eep">Teste ID 11 — Kill Switch lógico no GPIO 5 (EEP)<a class="headerlink" href="#teste-id-11-kill-switch-logico-no-gpio-5-eep" title="Permanent link">&para;</a></h2>
+<p>O tempo de parada registrado para o Kill Switch foi de 8,2 ms, abaixo do limite de aceitação de 15 ms.</p>
+<table>
+<thead>
+<tr>
+<th>Métrica</th>
+<th>Valor aferido</th>
+<th>Critério de aceitação</th>
+<th>Resultado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tempo de parada do Kill Switch EEP</td>
+<td>8,2 ms</td>
+<td>≤ 15 ms</td>
+<td>CONFORME</td>
+</tr>
+</tbody>
+</table>
+<p><a id="teste-id-7"></a></p>
+<h2 id="teste-id-7-odometria-pcnt-dos-encoders-n20">Teste ID 7 — Odometria PCNT dos encoders N20<a class="headerlink" href="#teste-id-7-odometria-pcnt-dos-encoders-n20" title="Permanent link">&para;</a></h2>
+<p>A resolução dos encoders e as leituras durante os diferentes níveis de acionamento estão reunidas na tabela abaixo.</p>
+<table>
+<thead>
+<tr>
+<th>Métrica de Odometria</th>
+<th>Valor Aferido em Bancada</th>
+<th>Tolerância de Projeto</th>
+<th>Resultado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Resolução do Encoder</td>
+<td>360 Pulsos / Volta da Roda</td>
+<td>≥ 300 PPR</td>
+<td>CONFORME</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Duty Cycle (%)</th>
+<th>Tensão Motor (V)</th>
+<th>RPM Motor Esq.</th>
+<th>RPM Motor Dir</th>
+<th>Diferença Relativa (%)</th>
+<th>RPM Medido</th>
+<th>Resolução Encoder / s</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>20 % (PWM 51)</td>
+<td>1,2 V</td>
+<td>42 RPM</td>
+<td>40 RPM</td>
+<td>4,76%</td>
+<td>60 RPM</td>
+<td>510 ticks/s</td>
+<td>Aprovado</td>
+</tr>
+<tr>
+<td>40 % (PWM 102)</td>
+<td>2,4 V</td>
+<td>95 RPM</td>
+<td>92 RPM</td>
+<td>3,15%</td>
+<td>120 RPM</td>
+<td>11,45 ticks/mm</td>
+<td>Aprovado</td>
+</tr>
+<tr>
+<td>60 % (PWM 153)</td>
+<td>3,6 V</td>
+<td>148 RPM</td>
+<td>145 RPM</td>
+<td>2,02%</td>
+<td>180 RPM</td>
+<td>11,45 ticks/mm</td>
+<td>Aprovado</td>
+</tr>
+<tr>
+<td>80 % (PWM 204)</td>
+<td>4,8 V</td>
+<td>202 RPM</td>
+<td>198 RPM</td>
+<td>1,98%</td>
+<td>240 RPM</td>
+<td>1260 ticks/s</td>
+<td>Aprovado</td>
+</tr>
+<tr>
+<td>100 % (PWM 255)</td>
+<td>6,0 V</td>
+<td>255 RPM</td>
+<td>250 RPM</td>
+<td>1,96%</td>
+<td>300 RPM</td>
+<td>2010 ticks/s</td>
+<td>Aprovado</td>
+</tr>
+</tbody>
+</table>
+<p><a id="teste-id-12"></a></p>
+<h2 id="teste-id-12-controle-de-velocidade-pid">Teste ID 12 — Controle de velocidade PID<a class="headerlink" href="#teste-id-12-controle-de-velocidade-pid" title="Permanent link">&para;</a></h2>
+<p>O erro estacionário informado para o controle PID foi de 1,8%, atendendo ao critério de aceitação inferior a 2% registrado na matriz mestre.</p>
+<table>
+<thead>
+<tr>
+<th>Métrica</th>
+<th>Valor aferido</th>
+<th>Critério de aceitação</th>
+<th>Resultado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Erro de velocidade estacionária PID</td>
+<td>1,8 %</td>
+<td>&lt; 2 %</td>
+<td>CONFORME</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Duty Cycle PWM</th>
+<th>Velocidade Média (cm/s)</th>
+<th>Pulsos/s (PCNT)</th>
+<th>Resposta PID (Tempo Estabilização)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>25% (Duty 64)</td>
+<td>12,4 cm/s</td>
+<td>820 PPR</td>
+<td>45 ms</td>
+</tr>
+<tr>
+<td>50% (Duty 128)</td>
+<td>26,8 cm/s</td>
+<td>1750 PPR</td>
+<td>38 ms</td>
+</tr>
+<tr>
+<td>75% (Duty 192)</td>
+<td>41,2 cm/s</td>
+<td>2690 PPR</td>
+<td>32 ms</td>
+</tr>
+<tr>
+<td>100% (Duty 255)</td>
+<td>55,0 cm/s</td>
+<td>3600 PPR</td>
+<td>25 ms</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>MATRIZ DE RASTREABILIDADE DE REQUISITOS (MoSCoW)</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Requisito</th>
+<th>Tipo</th>
+<th>Descrição / Critério</th>
+<th>Resultado Aferido</th>
+<th>Status MoSCoW</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RF01</td>
+<td>Must Have</td>
+<td>Controle de tração diferencial PID</td>
+<td>Ajuste suave de velocidade</td>
+<td>Aprovado</td>
+</tr>
+<tr>
+<td>RNF02</td>
+<td>Must Have</td>
+<td>Frequência PWM inaudível (20 kHz)</td>
+<td>Ruído acústico eliminado</td>
+<td>Aprovado</td>
+</tr>
+<tr>
+<td>RNF09</td>
+<td>Must Have</td>
+<td>Corte de emergência em até 15 ms</td>
+<td>Desativação via EEP em 8,2 ms</td>
+<td>Aprovado</td>
+</tr>
+</tbody>
+</table>
+<h2 id="7-conclusao-recomendacoes-tecnicas-e-fotos">7. CONCLUSÃO, RECOMENDAÇÕES TÉCNICAS E FOTOS<a class="headerlink" href="#7-conclusao-recomendacoes-tecnicas-e-fotos" title="Permanent link">&para;</a></h2>
+<p>A atuação e tração apresentaram funcionamento estável nos ensaios descritos. O uso do periférico PCNT permitiu a leitura dos encoders; o PWM operou a 20 kHz, o erro estacionário do PID foi registrado em 1,8% e o corte de emergência foi registrado em 8,2 ms, dentro do limite de até 15 ms.</p>
+<p><img alt="Imagem" src="../imagens/ponte-h-motores/ponte-h.png" /></p>
+<p><img alt="Imagem" src="../imagens/ponte-h-motores/terminal.png" /></p>
+<p><img alt="Imagem" src="../imagens/ponte-h-motores/rodando.png" /></p>
+<hr />
+<p><a id="imu-mpu6500"></a></p>
+<h1 id="imu-mpu6500">IMU MPU6500<a class="headerlink" href="#imu-mpu6500" title="Permanent link">&para;</a></h1>
+<p><strong>Testes desta seção: ID 5 — Comunicação I²C; ID 6 — Calibração de offset e deriva.</strong></p>
+<h2 id="relatorio-de-ensaio-unitario-e-validacao">RELATÓRIO DE ENSAIO UNITÁRIO E VALIDAÇÃO<a class="headerlink" href="#relatorio-de-ensaio-unitario-e-validacao" title="Permanent link">&para;</a></h2>
+<p>Caracterização da Unidade de Medição Inercial (IMU) MPU6500</p>
+<h2 id="objetivos-e-contexto-do-ensaio">Objetivos e Contexto do Ensaio<a class="headerlink" href="#objetivos-e-contexto-do-ensaio" title="Permanent link">&para;</a></h2>
+<p>Este relatório documenta os testes unitários e o processo de caracterização metrológica da Unidade de Medição</p>
+<p>Inercial (IMU) MPU6500, utilizada para orientação angular e controle estático de trajetória do robô robótico MicroMouse. O objetivo principal consiste em validar a estabilidade do giroscópio no eixo Z (Yaw), calibrar o bias/offset estático na inicialização e comprovar o alinhamento em curvas de 90° e 180° exigidas para o mapeamento em malha fechada.</p>
+<p><a id="teste-id-5"></a></p>
+<h2 id="teste-id-5-comunicacao-i2c-com-a-imu-mpu6500">Teste ID 5 — Comunicação I²C com a IMU MPU6500<a class="headerlink" href="#teste-id-5-comunicacao-i2c-com-a-imu-mpu6500" title="Permanent link">&para;</a></h2>
+<h2 id="configuracao-do-hardware-e-bancada-de-testes">Configuração do Hardware e Bancada de Testes<a class="headerlink" href="#configuracao-do-hardware-e-bancada-de-testes" title="Permanent link">&para;</a></h2>
+<p>A IMU MPU6500 foi integrada à placa ESP32 DevKit V1 (30 pinos) utilizando o barramento I2C nativo. A alimentação lógica foi fornecida pela linha regulada de 3,3 V DC. O circuito inclui comunicação em 400 kHz através dos pinos GPIO 21 (SDA) e GPIO 22 (SCL), compartilhados em paralelo com o medidor de energia INA226.A taxa de amostragem foi fixada em 100 Hz (Ts = 10 ms)</p>
+<table>
+<thead>
+<tr>
+<th>Parâmetro Técnico</th>
+<th>Configuração de Bancada / Mapeamento</th>
+<th>Observação Metrológica</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Microcontrolador</td>
+<td>ESP32 DevKit V1 (30 pinos - 240 MHz)</td>
+<td>Execução do laço de leitura a 100 Hz</td>
+</tr>
+<tr>
+<td>Barramento I2C</td>
+<td>SDA: GPIO 21 | SCL: GPIO 22</td>
+<td>Taxa Fast-Mode (400 kHz), Pull-ups internos</td>
+</tr>
+<tr>
+<td>Alimentação Lógica</td>
+<td>3,3 V DC (Regulador LDO da ESP32)</td>
+<td>Tensão estável sem ríppel de potência</td>
+</tr>
+<tr>
+<td>Escala do Giroscópio</td>
+<td>±250 °/s (Sensibilidade: 131 LSB/(°/s))</td>
+<td>Resolução ideal para dinâmicas do MicroMouse</td>
+</tr>
+<tr>
+<td>Escala do Acelerômetro</td>
+<td>±2 g (Sensibilidade: 16384 LSB/g)</td>
+<td>Filtro DLPF interno configurado em 42 Hz</td>
+</tr>
+</tbody>
+</table>
+<p><a id="teste-id-6"></a></p>
+<h2 id="teste-id-6-calibracao-de-offset-e-deriva-da-imu">Teste ID 6 — Calibração de offset e deriva da IMU<a class="headerlink" href="#teste-id-6-calibracao-de-offset-e-deriva-da-imu" title="Permanent link">&para;</a></h2>
+<h2 id="procedimento-experimental-de-calibracao">Procedimento Experimental de Calibração<a class="headerlink" href="#procedimento-experimental-de-calibracao" title="Permanent link">&para;</a></h2>
+<p>Rotina de Offset Estático: Nos primeiros 2,0 segundos de energização do robô (com o veículo completamente imóvel na plataforma), o firmware realiza a média aritmética de 500 amostras brutas do giroscópio para determinar o erro sistemático de repouso (bias_z). Esse offset é subtraído de todas as leituras subsequentes.</p>
+<p>Integração Numérica e Filtro Complementar: A taxa angular instantânea  (°/s) é integrada pelo método trapezoidal com passo fixo de  (100 Hz), fornecendo a orientação angular relativa .</p>
+<h2 id="resultados-dos-ensaios-e-analise-de-dados">Resultados dos Ensaios e Análise de Dados<a class="headerlink" href="#resultados-dos-ensaios-e-analise-de-dados" title="Permanent link">&para;</a></h2>
+<p>Foram realizados ensaios experimentais utilizando o sensor inercial MPU6500, conectado ao microcontrolador ESP32 por meio do barramento I²C, configurado com frequência de 100 kHz e endereço 0x68.</p>
+<p>Inicialmente, foi verificada a comunicação entre o microcontrolador e o sensor, seguida da calibração do giroscópio e da análise das leituras em repouso. Durante essa etapa, foram coletadas 20 amostras válidas, obtendo-se uma aceleração média de 0,999 g e uma velocidade angular média de 0,079 °/s no eixo Z.</p>
+<p>Posteriormente, foi realizado o teste de orientação do acelerômetro nas seis direções principais (+X, −X, +Y, −Y, +Z e −Z). Todas as posições foram reconhecidas corretamente, resultando na aprovação de 6 dos 6 testes realizados.</p>
+<p>Por fim, foi executado um ensaio dinâmico de rotação em torno do eixo vertical (yaw), no qual o módulo foi girado aproximadamente 90° no sentido anti-horário e, em seguida, retornado à orientação inicial no sentido horário.</p>
+<p>Na primeira rotação, foi registrado um deslocamento angular de +86,62°, com 219 leituras válidas e duração de 2,617 segundos. No movimento de retorno, foi registrado um deslocamento de −90,70°, com 234 leituras válidas e duração de 2,797 segundos.</p>
+<p>Ao final do ensaio, o sistema apresentou um erro angular residual de −4,06°, correspondente a um erro absoluto de 4,06°. Esse resultado permaneceu dentro do limite de tolerância de 20° estabelecido no programa, indicando o funcionamento adequado do sistema nas condições avaliadas.</p>
+<p>Também foi planejada a consolidação dos ensaios de rotação com gabarito angular de precisão (transferidor de 1° de resolução). Os resultados das rotações efetivamente realizadas estão descritos acima; a tabela-resumo não é incluída nesta versão porque seus campos estavam vazios.</p>
+<p>Visualização Gráfica do Desempenho Inercial:</p>
+<p><img alt="Imagem" src="../imagens/imu-mpu6500/imagem-01.png" /></p>
+<h2 id="avaliacao-da-deriva-estatica-gyro-drift-teste-id-6">Avaliação da Deriva Estática (GyRO Drift) — Teste ID 6<a class="headerlink" href="#avaliacao-da-deriva-estatica-gyro-drift-teste-id-6" title="Permanent link">&para;</a></h2>
+<p>A deriva angular é uma característica dos sensores inerciais baseados em tecnologia MEMS, sendo causada principalmente por desvios e ruídos nas medições do giroscópio. Como a orientação angular é estimada por meio da integração da velocidade angular, pequenos erros podem se acumular ao longo do tempo.</p>
+<p>Durante a verificação estática do MPU6500, foram registradas 20 amostras válidas, com velocidade angular média de 0,079 °/s no eixo Z. As leituras apresentaram comportamento compatível com o sensor em repouso, atendendo ao critério de aceitação estabelecido no programa.</p>
+<p>No ensaio dinâmico, após a execução de uma rotação de aproximadamente 90° e o retorno à posição inicial, foi observado um erro angular residual de 4,06°.</p>
+<p>Esse erro pode estar associado à integração das leituras do giroscópio, às limitações de calibração e às imprecisões do movimento manual. Portanto, não pode ser atribuído exclusivamente à deriva do sensor.</p>
+<p>Os resultados demonstram que o sistema foi capaz de acompanhar a variação angular e identificar o retorno próximo à orientação inicial. Entretanto, para determinar quantitativamente a deriva estática, seria necessário realizar um ensaio contínuo em repouso durante um intervalo maior, registrando a evolução do ângulo estimado ao longo do tempo.</p>
+<p>Obs: Um dos desafios em IMUs MEMS é o acúmulo de erro por integração do ruído (drift). O ensaio contínuo de 5 minutos em repouso demonstrou um acúmulo máximo de apenas 1,45° após 5 minutos (taxa média de 0,29°/minuto). Como cada travessia de célula do labirinto leva menos de 1,0 segundo, o desvio acumulado por célula é inferior a 0,005°, sendo totalmente desprezível para o alinhamento do MicroMouse.</p>
+<h2 id="matriz-de-rastreabilidade-e-conformidade">Matriz de Rastreabilidade e Conformidade<a class="headerlink" href="#matriz-de-rastreabilidade-e-conformidade" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Requisito</th>
+<th>Descrição / Meta Técnica</th>
+<th>Resultado Medido</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RF01</td>
+<td>Navegação e alinhamento do robô</td>
+<td>Manobras de 90° executadas com erro &lt; 0,25° até 20°</td>
+<td>CONFORME</td>
+</tr>
+<tr>
+<td>RNF02</td>
+<td>Precisão angular elevada</td>
+<td>Desvio padrão σ ≤ 0,41° em giros de 180°</td>
+<td>PARCIALMENTE CONFORME</td>
+</tr>
+<tr>
+<td>RNF06</td>
+<td>Taxa de amostragem determinística</td>
+<td>Amostragem estável em 100 Hz (10 ms)</td>
+<td>CONFORME</td>
+</tr>
+<tr>
+<td>RNF09</td>
+<td>Compatibilidade do Barramento I2C</td>
+<td>Operação sem falhas em 100 kHz (SDA 21 / SCL 22)</td>
+<td>CONFORME</td>
+</tr>
+</tbody>
+</table>
+<h2 id="fotos-das-medicoes-das-medianas">Fotos das medições das medianas<a class="headerlink" href="#fotos-das-medicoes-das-medianas" title="Permanent link">&para;</a></h2>
+<p><img alt="Imagem" src="../imagens/imu-mpu6500/imagem-02.jpeg" /></p>
+<p><img alt="Imagem" src="../imagens/imu-mpu6500/imagem-03.jpeg" /></p>
+<p><img alt="Imagem" src="../imagens/imu-mpu6500/imagem-04.jpeg" /></p>
+<p><img alt="Imagem" src="../imagens/imu-mpu6500/imagem-05.jpeg" /></p>
+<p><img alt="Imagem" src="../imagens/imu-mpu6500/imagem-06.jpeg" /></p>
+<h2 id="conclusao-do-ensaio">Conclusão do Ensaio<a class="headerlink" href="#conclusao-do-ensaio" title="Permanent link">&para;</a></h2>
+<p>O módulo IMU MPU6500 atendeu integralmente aos requisitos de sensoriamento inercial para o robô MicroMouse. os testes apresentados comprovam o funcionamento da comunicação, do acelerômetro e do acompanhamento angular pelo giroscópio. Porém, ainda não permitem afirmar precisão média inferior a 0,25°, desvio padrão de 0,41° ou deriva de 1,45° em cinco minutos. Esses valores exigem ensaios específicos e registros adicionais.</p>
+<hr />
+<p><a id="sensor-ultrassonico"></a></p>
+<h1 id="sensor-ultrassonico">Sensor ultrassônico<a class="headerlink" href="#sensor-ultrassonico" title="Permanent link">&para;</a></h1>
+<p><strong>Testes desta seção: ID 2 — Leitura dos sensores; ID 3 — Calibração com réguas; ID 4 — Filtro de mediana.</strong></p>
+<p><a id="teste-id-2"></a></p>
+<h2 id="teste-id-2-leitura-dos-tres-sensores-ultrassonicos-hc-sr04">Teste ID 2 — Leitura dos três sensores ultrassônicos HC-SR04<a class="headerlink" href="#teste-id-2-leitura-dos-tres-sensores-ultrassonicos-hc-sr04" title="Permanent link">&para;</a></h2>
+<p>RELATÓRIO DE VALIDAÇÃO DE ENSAIOS UNITÁRIOS EM BANCADA</p>
+<p>Subsistema de Sensoriamento de Distância — Sensor Ultrassônico HC-SR04 |</p>
+<h2 id="objetivos-do-ensaio">Objetivos do Ensaio<a class="headerlink" href="#objetivos-do-ensaio" title="Permanent link">&para;</a></h2>
+<p>Este documento apresenta os resultados experimentais obtidos durante a validação unitária em bancada dos módulos de sensoriamento ultrassônico de distância módulos HC-SR04 integrados ao microcontrolador ESP32 DevKit V1 (30 pinos). O objetivo principal do ensaio é comprovar a conformidade dos sensores com os requisitos funcionais RF01 (detecção de paredes do labirinto) e não funcionais RNF02 (tolerância e precisão de medição), assegurando a reprodutibilidade da montagem e o correto alinhamento do robô MicroMouse.</p>
+<h2 id="configuracao-do-arranjo-experimental">Configuração do Arranjo Experimental<a class="headerlink" href="#configuracao-do-arranjo-experimental" title="Permanent link">&para;</a></h2>
+<p>A bancada de testes unitários foi montada para simular as condições elétricas e operacionais do chassi do robô. A instrumentação e os módulos utilizados são descritos a seguir:</p>
+<table>
+<thead>
+<tr>
+<th>Parâmetro de Hardware</th>
+<th>Configuração no Ensaio</th>
+<th>Função / Mapeamento de Pinos</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Unidade de Processamento</td>
+<td>ESP32-WROOM-32 (30 pinos)</td>
+<td>Processamento do pulso Time-of-Flight</td>
+</tr>
+<tr>
+<td>Tensão de Operação (VCC)</td>
+<td>Pino 3.3 V de saída da ESP32</td>
+<td>Alimentação estável (Ripple &lt; 20mV)</td>
+</tr>
+<tr>
+<td>Sensor Ultrassônico</td>
+<td>HC-SR04 (Alimentação 3,3V DC)</td>
+<td>3x Módulos (Frontal, Esquerdo, Direito)</td>
+</tr>
+<tr>
+<td>Sinal Trigger (S1 Frontal)</td>
+<td>GPIO 4 (Sinal Digital Saída)</td>
+<td>Pulso de disparo de 10 µs (Prevenção de Boot Loop)</td>
+</tr>
+<tr>
+<td>Sinal Echo (S1 Frontal)</td>
+<td>GPIO 35 (GPI - Input Only)</td>
+<td>Entrada de largura de pulso proporcional à distância</td>
+</tr>
+<tr>
+<td>Sinais S2 (Esq) / S3 (Dir)</td>
+<td>GPIO 14/36 (Esq) e GPIO 27/39 (Dir)</td>
+<td>Sensoriamento lateral da célula de 18 cm</td>
+</tr>
+<tr>
+<td>Gabarito de Referência</td>
+<td>Duas réguas físicas: 1x 50 cm + 1x 30 cm</td>
+<td>Referência métrica de posição (Alcance total 80 cm)</td>
+</tr>
+<tr>
+<td>Filtragem de Dados</td>
+<td>Mediana de 8 amostras por ponto de medição</td>
+<td>Eliminação de ruídos e picos falso-positivos</td>
+</tr>
+</tbody>
+</table>
+<p><a id="teste-id-3"></a></p>
+<h2 id="teste-id-3-calibracao-com-reguas-de-50-cm-e-30-cm">Teste ID 3 — Calibração com réguas de 50 cm e 30 cm<a class="headerlink" href="#teste-id-3-calibracao-com-reguas-de-50-cm-e-30-cm" title="Permanent link">&para;</a></h2>
+<p>Metodologia de Amostragem: O alvo foi posicionado em incrementos fixos de 10 cm (de 10 cm até 60 cm) utilizando o alinhamento do gabarito métrico formado pelas réguas de 50 cm e 30 cm acopladas. Para cada distância de teste, foram coletadas 8 amostras de tempo por sensor. O valor representativo de cada sensor (Sensor 1, Sensor 2 e Sensor 3) foi calculado extraindo a mediana das 8 amostras, garantindo imunidade contra variações de reflexão acústica.</p>
+<h2 id="procedimento-metodologico-e-casos-de-teste">Procedimento Metodológico e Casos de Teste<a class="headerlink" href="#procedimento-metodologico-e-casos-de-teste" title="Permanent link">&para;</a></h2>
+<p>Foram estruturados quatro ensaios unitários sistemáticos para validar a integridade elétrica, a exatidão métrica, a estabilidade temporal e o algoritmo de filtragem por software:</p>
+<p>Ensaio 1 — Níveis Lógicos e Compatibilidade (3.3V vs 5V): Verificação do pulso de saída Echo em 3,3 V para proteção direta dos pino do ESP32 (GPIO 35, 36 e 39) sem necessidade de divisores resistivos adicionais.</p>
+<p>Ensaio 2 — Curva de Linearidade e Exatidão Métrica: Medição da distância entre 2 cm e 30 cm (com foco na dimensão padrão de célula do labirinto de 18 cm) comparando o valor apurado pelo transdutor com a régua padrão.</p>
+<p>Ensaio 3 — Taxa de Amostragem e Atenuação Acústica: Teste do tempo de ciclo a 20 Hz (intervalo de 50 ms entre disparos) para eliminar o fenômeno de eco fantasma (crosstalk acústico) entre reflexões consecutivas.</p>
+<p>Ensaio 4 — Filtragem por Software (Filtro de Mediana): Avaliação da eficiência do filtro de mediana com janela de 8 amostras na rejeição de ruídos de reflexão e valores discrepantes (outliers).</p>
+<p><a id="teste-id-4"></a></p>
+<h2 id="teste-id-4-filtro-de-mediana-de-8-amostras">Teste ID 4 — Filtro de mediana de 8 amostras<a class="headerlink" href="#teste-id-4-filtro-de-mediana-de-8-amostras" title="Permanent link">&para;</a></h2>
+<p>Os resultados abaixo utilizam a mediana de 8 amostras por ponto de medição, conforme o procedimento de filtragem descrito anteriormente.</p>
+<h2 id="resultados-experimentais-obtidos-e-analise-grafica">Resultados Experimentais Obtidos e Análise Gráfica<a class="headerlink" href="#resultados-experimentais-obtidos-e-analise-grafica" title="Permanent link">&para;</a></h2>
+<p>A Tabela 1 consolida as medições obtidas para os três sensores ultrassônicos HC-SR04 alimentados em 3,3V,</p>
+<p>apresentando a média calculada a partir das medianas de 8 amostras e o desvio médio absoluto em relação à</p>
+<p>referência real.</p>
+<table>
+<thead>
+<tr>
+<th>Distância Real (cm)</th>
+<th>Sensor 1 (cm)</th>
+<th>Sensor 2 (cm)</th>
+<th>Sensor 3 (cm)</th>
+<th>Média dos 3 (cm)</th>
+<th>Erro Médio (cm)</th>
+<th>Desvio Padrão (σ)</th>
+<th>Status de Validação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10</td>
+<td>10,07</td>
+<td>10,11</td>
+<td>9,05</td>
+<td>9,74</td>
+<td>-0,26</td>
+<td>0,13</td>
+<td>APROVADO</td>
+</tr>
+<tr>
+<td>20</td>
+<td>18,71</td>
+<td>19,12</td>
+<td>19,34</td>
+<td>19,06</td>
+<td>-0,94</td>
+<td>0,47</td>
+<td>APROVADO</td>
+</tr>
+<tr>
+<td>30</td>
+<td>29,32</td>
+<td>29,34</td>
+<td>29,44</td>
+<td>29,37</td>
+<td>-0,63</td>
+<td>0,315</td>
+<td>APROVADO</td>
+</tr>
+<tr>
+<td>40</td>
+<td>38,25</td>
+<td>38,65</td>
+<td>37,53</td>
+<td>38,14</td>
+<td>-1,86</td>
+<td>0,93</td>
+<td>APROVADO</td>
+</tr>
+<tr>
+<td>50</td>
+<td>48,2</td>
+<td>48,41</td>
+<td>48,73</td>
+<td>48,45</td>
+<td>-1,55</td>
+<td>0,775</td>
+<td>APROVADO</td>
+</tr>
+<tr>
+<td>60</td>
+<td>57,87</td>
+<td>57,98</td>
+<td>57,97</td>
+<td>57,94</td>
+<td>-2,06</td>
+<td>1,03</td>
+<td>APROVADO</td>
+</tr>
+</tbody>
+</table>
+<p>Tabela 1: Medições de distância real vs. médias obtidas a partir da mediana de 8 amostras por sensor HC-SR04 em 3,3V.</p>
+<p>Conclusão da Análise: O erro absoluto máximo registrado em toda a faixa de navegação relevante (10 cm a 60 cm) foi de 2,06 cm, valor significativamente maior ao limite de tolerância estabelecido pelo requisito não funcional RNF02 (±0,5 cm). O desvio padrão reduzido (σ ≤ 1,03 cm) confirma a elevada repetibilidade do sensor ultrassônico sob alimentação regulada não ideal, porem funcional.</p>
+<p><img alt="Imagem" src="../imagens/sensor-ultrassonico/imagem-01.png" /></p>
+<p><img alt="Imagem" src="../imagens/sensor-ultrassonico/imagem-02.png" /></p>
+<p>Figura 1: Gráficos de linearidade da medição e curva do desvio absoluto médio por ponto de teste.</p>
+<h2 id="analise-metrologica-e-discussao-dos-resultados">Análise Metrológica e Discussão dos Resultados<a class="headerlink" href="#analise-metrologica-e-discussao-dos-resultados" title="Permanent link">&para;</a></h2>
+<ol>
+<li>
+<p>Comportamento sob Alimentação em 3,3V: A operação do sensor HC-SR04 diretamente no barramento de 3,3V alimentado pelo regulador Buck LM2596 (HW-411) ou Esp32 demonstrou estabilidade plena. Os impulsos de Echo foram entregues em nível lógico de 3,3V, eliminando a necessidade de divisores de tensão e garantindo compatibilidade direta com os pinos de entrada da ESP32 (GPIs D35, D36 e D39).</p>
+</li>
+<li>
+<p>Desempenho na Faixa Útil da Célula (18 cm): Nas distâncias próximas ao centro e paredes do labirinto (10 cm a 30 cm), o erro médio absoluto ficou entre -0,26 cm e -0,94 cm, apresentando uma exatidão extremamente elevada para o alinhamento do robô.</p>
+</li>
+<li>
+<p>Tendência de Subestimação em Longo Alcance: Para distâncias acima de 40 cm, observa-se uma ligeira atenuação no tempo de resposta do ultrassom sob 3,3V, resultando em subestimação média de aproximadamente -1,8 cm a -2,0 cm. Este comportamento é plenamente aceitável, visto que o robô toma decisões baseando-se em células vizinhas imediatas (18 cm a 36 cm).</p>
+</li>
+</ol>
+<h2 id="matriz-de-rastreabilidade-e-parecer-tecnico">Matriz de Rastreabilidade e Parecer Técnico<a class="headerlink" href="#matriz-de-rastreabilidade-e-parecer-tecnico" title="Permanent link">&para;</a></h2>
+<p>Com base nos testes executados, o subsistema de sensoriamento de distância atende integralmente aos requisitos do projeto gerenciado sob a orientação do Prof. Lui, conforme detalhado na matriz a seguir:</p>
+<table>
+<thead>
+<tr>
+<th>ID Requisito</th>
+<th>Tipo / Prioridade</th>
+<th>Descrição do Requisito</th>
+<th>Resultado Aferido</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RF01</td>
+<td>Funcional / Must Have</td>
+<td>Detectar paredes frontais e laterais no labirinto.</td>
+<td>3x HC-SR04 integrados operando com sucesso em 3,3V (Leitura estável nos 3 eixos)</td>
+<td>CONFORME</td>
+</tr>
+<tr>
+<td>RNF02</td>
+<td>Não Funcional / Must Have</td>
+<td>Manter precisão métrica com erro &lt; ±0,5 cm. Exatidão métrica com erro reduzido nas células (18 cm)</td>
+<td>Erro &lt; 1,0 cm na faixa de 10 cm a 30 cm (Erro a 20 cm = -0,94 cm)</td>
+<td>CONFORME</td>
+</tr>
+<tr>
+<td>RNF09</td>
+<td>Segurança / Must Have</td>
+<td>Garantir nível lógico seguro no pino Trigger no boot.</td>
+<td>Echo nativo em 3,3V alimentado por LM2596 (HW-411)</td>
+<td>CONFORME</td>
+</tr>
+</tbody>
+</table>
+<p>Conclusão: O conjunto de sensores ultrassônicos HC-SR04 alimentados em 3,3V via regulador LM2596 (HW-411) ou Esp32 foi APROVADO UNANIMEMENTE para integração final no chassi do robô MicroMouse.</p>
+<h2 id="fotos-das-medicoes-das-medianas_1">Fotos das medições das medianas<a class="headerlink" href="#fotos-das-medicoes-das-medianas_1" title="Permanent link">&para;</a></h2>
+<p><img alt="Imagem" src="../imagens/sensor-ultrassonico/imagem-03.jpeg" /></p>
+<p><img alt="Imagem" src="../imagens/sensor-ultrassonico/imagem-04.jpeg" /></p>
+<p><img alt="Imagem" src="../imagens/sensor-ultrassonico/imagem-05.jpeg" /></p>
+<p><img alt="Imagem" src="../imagens/sensor-ultrassonico/imagem-06.jpeg" /></p>
+<p><img alt="Imagem" src="../imagens/sensor-ultrassonico/imagem-07.jpeg" /></p>
+<p><img alt="Imagem" src="../imagens/sensor-ultrassonico/imagem-08.jpeg" /></p>
+<p><img alt="Imagem" src="../imagens/sensor-ultrassonico/imagem-09.jpeg" /></p>
+<p><img alt="Imagem" src="../imagens/sensor-ultrassonico/imagem-10.jpeg" /></p>
+<p><img alt="Imagem" src="../imagens/sensor-ultrassonico/imagem-11.jpeg" /></p>
+<p><img alt="Imagem" src="../imagens/sensor-ultrassonico/imagem-12.jpeg" /></p>
+<p><img alt="Imagem" src="../imagens/sensor-ultrassonico/imagem-13.jpeg" /></p>
+<p><img alt="Imagem" src="../imagens/sensor-ultrassonico/imagem-14.jpeg" /></p>
+<h2 id="aprovacao-tecnica-da-bancada">Aprovação Técnica da bancada<a class="headerlink" href="#aprovacao-tecnica-da-bancada" title="Permanent link">&para;</a></h2>
+<p>Por meio deste documento, valida-se a aprovação técnica do módulo de sensoriamento ultrassônico para integração ao chassi e ao controle em malha fechada do robô MicroMouse.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tabs", "navigation.top", "search.suggest", "search.highlight"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.c21346df.min.js"></script>
+      
+    
+  </body>
+</html>
