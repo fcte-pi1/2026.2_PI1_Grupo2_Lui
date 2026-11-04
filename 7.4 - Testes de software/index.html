@@ -1,0 +1,1997 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://fcte-pi1.github.io/2026.2_PI1_Grupo2_Lui/7.4%20-%20Testes%20de%20software/">
+      
+      
+        <link rel="prev" href="../7.3%20-%20Testes%20de%20hardware/7.3%20-%20Testes%20de%20hardware/">
+      
+      
+        <link rel="next" href="../7.5%20-%20Testes%20de%20integra%C3%A7%C3%A3o/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+    
+    
+      
+        <title>Software - Projeto PI1 - Grupo 2 (Lui)</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#74-testes-de-software" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Projeto PI1 - Grupo 2 (Lui)" class="md-header__button md-logo" aria-label="Projeto PI1 - Grupo 2 (Lui)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Projeto PI1 - Grupo 2 (Lui)
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Software
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green"  aria-label="Modo Noturno"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Modo Noturno" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="green" data-md-color-accent="green"  aria-label="Modo Claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Modo Claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    2026.2_PI1_Grupo2_Lui
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../1%20-%20TAP/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  1 - TAP
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../2%20-%20Requisitos/Requisitos/" class="md-tabs__link">
+          
+  
+  
+  2 - Requisitos
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../3%20-%20EAP/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  3 - EAP
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../4.1%20-%20Projeto%20conceitual%20de%20estruturas/" class="md-tabs__link">
+          
+  
+  
+  4 - Projetos Conceituais
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../5%20-%20Cronograma/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  5 - Cronograma
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../6%20-%20Or%C3%A7amento/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  6 - Orçamento
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../7.1%20-%20Testes%20de%20estrutura/" class="md-tabs__link">
+          
+  
+  
+  7 - Testes
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../8%20-%20Avalia%C3%A7%C3%A3o%20de%20desempenho/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  8 - Avaliação de Desempenho
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../9%20-%20Relat%C3%B3rio%20de%20encerramento%20do%20projeto/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  9 - Relatório de Encerramento
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Projeto PI1 - Grupo 2 (Lui)" class="md-nav__button md-logo" aria-label="Projeto PI1 - Grupo 2 (Lui)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Projeto PI1 - Grupo 2 (Lui)
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    2026.2_PI1_Grupo2_Lui
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../1%20-%20TAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 - TAP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 - Requisitos
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    2 - Requisitos
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2%20-%20Requisitos/Requisitos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Declaração de Requisitos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2%20-%20Requisitos/RF/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requisitos Funcionais
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2%20-%20Requisitos/RNF/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requisitos Não Funcionais
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2%20-%20Requisitos/MVP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MVP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2%20-%20Requisitos/Matriz%20de%20Rastreabilidade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Matriz de Rastrabilidade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3%20-%20EAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3 - EAP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4 - Projetos Conceituais
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    4 - Projetos Conceituais
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4.1%20-%20Projeto%20conceitual%20de%20estruturas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Estruturas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4.2%20-%20Projeto%20conceitual%20de%20energia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Energia
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4.3%20-%20Projeto%20conceitual%20de%20hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4.4%20-%20Projeto%20conceitual%20de%20software/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Software
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5%20-%20Cronograma/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 - Cronograma
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../6%20-%20Or%C3%A7amento/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 - Orçamento
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7 - Testes
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    7 - Testes
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7.1%20-%20Testes%20de%20estrutura/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Estrutura
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7.2%20-%20Testes%20de%20energia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Energia
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7.3%20-%20Testes%20de%20hardware/7.3%20-%20Testes%20de%20hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Software
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Software
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#objetivo-e-estrategia-de-testes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objetivo e estratégia de testes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#historias-de-usuario-prototipos-e-casos-funcionais" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Histórias de usuário, protótipos e casos funcionais
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Histórias de usuário, protótipos e casos funcionais">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prototipos-da-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Protótipos da interface
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testes-unitarios-e-de-integracao-do-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testes unitários e de integração do backend
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testes unitários e de integração do backend">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#como-executar-os-testes-do-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Como executar os testes do backend
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testes-unitarios-e-de-integracao-do-firmware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testes unitários e de integração do firmware
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testes unitários e de integração do firmware">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#como-executar-os-testes-do-firmware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Como executar os testes do firmware
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#diagnosticos-de-hardware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagnósticos de hardware
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cobertura-de-codigo-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cobertura de código (coverage)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Cobertura de código (coverage)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cobertura-do-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cobertura do backend
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cobertura-do-firmware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cobertura do firmware
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testes-funcionais-e2e-da-interface-web" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testes funcionais E2E da interface web
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testes funcionais E2E da interface web">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#como-executar-os-testes-e2e" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Como executar os testes E2E
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#limitacoes-e-interpretacao-dos-resultados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitações e interpretação dos resultados
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7.5%20-%20Testes%20de%20integra%C3%A7%C3%A3o/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integração
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../8%20-%20Avalia%C3%A7%C3%A3o%20de%20desempenho/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8 - Avaliação de Desempenho
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../9%20-%20Relat%C3%B3rio%20de%20encerramento%20do%20projeto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 - Relatório de Encerramento
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#objetivo-e-estrategia-de-testes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objetivo e estratégia de testes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#historias-de-usuario-prototipos-e-casos-funcionais" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Histórias de usuário, protótipos e casos funcionais
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Histórias de usuário, protótipos e casos funcionais">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prototipos-da-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Protótipos da interface
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testes-unitarios-e-de-integracao-do-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testes unitários e de integração do backend
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testes unitários e de integração do backend">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#como-executar-os-testes-do-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Como executar os testes do backend
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testes-unitarios-e-de-integracao-do-firmware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testes unitários e de integração do firmware
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testes unitários e de integração do firmware">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#como-executar-os-testes-do-firmware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Como executar os testes do firmware
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#diagnosticos-de-hardware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagnósticos de hardware
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cobertura-de-codigo-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cobertura de código (coverage)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Cobertura de código (coverage)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cobertura-do-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cobertura do backend
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cobertura-do-firmware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cobertura do firmware
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testes-funcionais-e2e-da-interface-web" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testes funcionais E2E da interface web
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testes funcionais E2E da interface web">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#como-executar-os-testes-e2e" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Como executar os testes E2E
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#limitacoes-e-interpretacao-dos-resultados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitações e interpretação dos resultados
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="74-testes-de-software">7.4 — Testes de software<a class="headerlink" href="#74-testes-de-software" title="Permanent link">&para;</a></h1>
+<h2 id="objetivo-e-estrategia-de-testes">Objetivo e estratégia de testes<a class="headerlink" href="#objetivo-e-estrategia-de-testes" title="Permanent link">&para;</a></h2>
+<p>Os testes de software verificam as regras de negócio, a comunicação entre os componentes e os fluxos que o usuário executa pela interface. A estratégia combina testes unitários, testes de integração entre módulos e testes funcionais de ponta a ponta (<em>end-to-end</em>, E2E). Os testes de diagnóstico de hardware são documentados separadamente, pois exigem a ESP32 e componentes físicos.</p>
+<p>A suíte do backend utiliza o executor de testes nativo do Node.js com TypeScript carregado por <code>tsx</code>. O firmware dispõe de um ambiente nativo do PlatformIO para executar testes no computador, sem gravar o programa na ESP32. Para a interface web, a suíte E2E utiliza Playwright Test com TypeScript.</p>
+<h2 id="historias-de-usuario-prototipos-e-casos-funcionais">Histórias de usuário, protótipos e casos funcionais<a class="headerlink" href="#historias-de-usuario-prototipos-e-casos-funcionais" title="Permanent link">&para;</a></h2>
+<p>A tabela relaciona as histórias de usuário de software com os protótipos disponíveis e com os cenários E2E implementados.</p>
+<table>
+<thead>
+<tr>
+<th>História de usuário</th>
+<th>Protótipo relacionado</th>
+<th>Casos funcionais E2E</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>HU-08 — Exibição dos dados estruturais e do mapa do labirinto.</strong></td>
+<td>Painel da corrida com labirintos 4×4, 8×4 e 12×4, apresentados nas figuras abaixo.</td>
+<td><code>dashboard.spec.ts</code>: abertura do painel, seleção do tamanho do labirinto e reinício. <code>simulacao.spec.ts</code>: apresentação e evolução do mapa no modo de simulação.</td>
+</tr>
+<tr>
+<td><strong>HU-09 — Exibição das informações de status e telemetria do robô.</strong></td>
+<td>Painel da corrida, com indicadores e informações do estado do robô.</td>
+<td><code>simulacao.spec.ts</code>: estado e indicadores exibidos. <code>telemetria.spec.ts</code>: atualização da interface a partir de mensagens WebSocket controladas.</td>
+</tr>
+<tr>
+<td><strong>HU-10 — Transmissão de dados de bordo para o dashboard.</strong></td>
+<td>Painel da corrida com o mapa e os indicadores atualizados.</td>
+<td><code>telemetria.spec.ts</code>: recepção e interpretação de mensagens WebSocket. <code>integracao.spec.ts</code>: envio de mensagens de teste ao backend e verificação da informação apresentada na interface.</td>
+</tr>
+<tr>
+<td><strong>HU-11 — Armazenamento das informações de navegação.</strong></td>
+<td>Protótipos do histórico e do trajeto da execução.</td>
+<td><code>historico.spec.ts</code>: consulta de sessão e pontos do trajeto. <code>integracao.spec.ts</code>: verificação dos dados persistidos no banco e recuperados pela aplicação.</td>
+</tr>
+<tr>
+<td><strong>HU-12 — Histórico de sessões, eventos e diagnósticos.</strong></td>
+<td>Protótipos do histórico de execuções e de desempenho.</td>
+<td><code>historico.spec.ts</code>: listagem de sessões e filtro de eventos por severidade. <code>integracao.spec.ts</code>: consulta de sessão, evento e percurso persistidos.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="prototipos-da-interface">Protótipos da interface<a class="headerlink" href="#prototipos-da-interface" title="Permanent link">&para;</a></h3>
+<p><strong>HU-08 e HU-09 — Painel da corrida</strong></p>
+<p><img alt="Protótipo do painel da corrida para labirinto 4×4" src="../figs/Projeto_conceitual/software/MicroMouse-PainelCorrida4x4.png" /></p>
+<p><em>Figura 1 — Protótipo do painel da corrida para labirinto 4×4.</em></p>
+<p><img alt="Protótipo do painel da corrida para labirinto 8×4" src="../figs/Projeto_conceitual/software/MicroMouse-PainelCorrida8x4.png" /></p>
+<p><em>Figura 2 — Protótipo do painel da corrida para labirinto 8×4.</em></p>
+<p><img alt="Protótipo do painel da corrida para labirinto 12×4" src="../figs/Projeto_conceitual/software/MicroMouse-PainelCorrida12x4.png" /></p>
+<p><em>Figura 3 — Protótipo do painel da corrida para labirinto 12×4.</em></p>
+<p><strong>HU-11 e HU-12 — Histórico de execuções</strong></p>
+<p><img alt="Protótipo do histórico de execuções com mapa" src="../figs/Projeto_conceitual/software/MicroMouse-HistoricoExecucoesMapa.png" /></p>
+<p><em>Figura 4 — Protótipo do histórico de execuções e do trajeto no mapa.</em></p>
+<p><img alt="Protótipo do histórico de execuções e desempenho" src="../figs/Projeto_conceitual/software/MicroMouse-HistoricoExecucoesDesempenho.png" /></p>
+<p><em>Figura 5 — Protótipo do histórico de execuções e indicadores de desempenho.</em></p>
+<h2 id="testes-unitarios-e-de-integracao-do-backend">Testes unitários e de integração do backend<a class="headerlink" href="#testes-unitarios-e-de-integracao-do-backend" title="Permanent link">&para;</a></h2>
+<p>Os testes do backend estão em <code>src/backend/src/</code> e usam <code>node:test</code>/<code>node:assert</code> por meio de TypeScript carregado com <code>tsx</code>. Os testes verificam os serviços de domínio, controladores, rotas HTTP, inicialização da aplicação e do servidor, a fábrica do Prisma e o gateway WebSocket. Em diferentes testes, as dependências de persistência ou serviços são substituídas por doubles/fakes; portanto, nem todos os testes se conectam a um PostgreSQL real.</p>
+<table>
+<thead>
+<tr>
+<th>Arquivo de teste</th>
+<th>Escopo principal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>src/__tests__/app.test.ts</code></td>
+<td>Health check, CORS, montagem de rotas e ordem dos middlewares.</td>
+</tr>
+<tr>
+<td><code>src/__tests__/server.test.ts</code></td>
+<td>Configuração da porta, inicialização HTTP/WebSocket e tratamento de falhas de criação da conexão de banco.</td>
+</tr>
+<tr>
+<td><code>lib/__tests__/prisma.test.ts</code></td>
+<td>Comportamento da fábrica/instância de Prisma.</td>
+</tr>
+<tr>
+<td><code>routes/__tests__/logs.routes.test.ts</code></td>
+<td>Encaminhamento dos endpoints para os serviços e validação de identificadores.</td>
+</tr>
+<tr>
+<td><code>controllers/__tests__/logs.controller.test.ts</code></td>
+<td>Respostas dos controladores, validação e tratamento de erros nas operações de sessões, percurso e eventos.</td>
+</tr>
+<tr>
+<td><code>services/__tests__/sessionList.service.test.ts</code></td>
+<td>Consulta e transformação da lista de sessões.</td>
+</tr>
+<tr>
+<td><code>services/__tests__/sessionNavigation.service.test.ts</code></td>
+<td>Criação e finalização de sessões, validações e persistência/consulta dos pontos do trajeto, com dependências controladas nos testes.</td>
+</tr>
+<tr>
+<td><code>services/__tests__/logEvento.service.test.ts</code></td>
+<td>Validação e registro de eventos de diagnóstico.</td>
+</tr>
+<tr>
+<td><code>services/__tests__/telemetry.service.test.ts</code></td>
+<td>Validação e processamento de mensagens de telemetria, mapa, posição e sessão.</td>
+</tr>
+<tr>
+<td><code>ws/__tests__/telemetry.gateway.test.ts</code></td>
+<td>Conexões WebSocket, identificação do papel do cliente, validação de mensagens, retransmissão, snapshots e erros do gateway.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="como-executar-os-testes-do-backend">Como executar os testes do backend<a class="headerlink" href="#como-executar-os-testes-do-backend" title="Permanent link">&para;</a></h3>
+<p>Na pasta <code>src/backend</code>:</p>
+<div class="highlight"><pre><span></span><code>npm<span class="w"> </span><span class="nb">test</span>
+</code></pre></div>
+<p>Esse comando executa a suíte definida no <code>package.json</code>. Para executar os testes de cobertura descritos na seção abaixo, utilize <code>npm run test:coverage</code>.</p>
+<h2 id="testes-unitarios-e-de-integracao-do-firmware">Testes unitários e de integração do firmware<a class="headerlink" href="#testes-unitarios-e-de-integracao-do-firmware" title="Permanent link">&para;</a></h2>
+<p>O firmware configura o ambiente <code>[env:native]</code> em <code>src/firmware/platformio.ini</code>. Esse ambiente compila os módulos selecionados para execução nativa no computador, usando testes automatizados com dependências de sensores, transporte e armazenamento simuladas quando aplicável. Ele permite validar regras de navegação e integração entre módulos, mas não substitui os testes físicos com a ESP32.</p>
+<table>
+<thead>
+<tr>
+<th>Suíte em <code>src/firmware/test/</code></th>
+<th>Escopo principal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>test_maze_map</code></td>
+<td>Inicialização do mapa, dimensões válidas e representação das células/paredes.</td>
+</tr>
+<tr>
+<td><code>test_maze_solver</code></td>
+<td>Resolução do labirinto e cálculo de caminhos para diferentes configurações.</td>
+</tr>
+<tr>
+<td><code>test_autonomous_navigator</code></td>
+<td>Integração entre mapa, solucionador e navegação autônoma.</td>
+</tr>
+<tr>
+<td><code>test_maze_mission_controller</code></td>
+<td>Coordenação da missão e interação com componentes de navegação e rastreamento.</td>
+</tr>
+<tr>
+<td><code>test_position_tracker</code></td>
+<td>Atualização da posição/orientação com leitores de odometria e orientação substituíveis por mocks.</td>
+</tr>
+<tr>
+<td><code>test_wall_perception</code></td>
+<td>Interpretação das leituras dos sensores de parede.</td>
+</tr>
+<tr>
+<td><code>test_robot_state_estimator</code></td>
+<td>Estimativa e atualização do estado do robô a partir de dados de entrada de teste.</td>
+</tr>
+<tr>
+<td><code>test_logger</code></td>
+<td>Geração e encaminhamento de registros usando transporte de log de teste.</td>
+</tr>
+<tr>
+<td><code>test_session_buffer</code></td>
+<td>Bufferização dos dados da sessão e gestão dos dados pendentes.</td>
+</tr>
+<tr>
+<td><code>test_session_recorder</code></td>
+<td>Registro dos metadados e dos pontos do percurso.</td>
+</tr>
+<tr>
+<td><code>test_session_coordinator</code></td>
+<td>Coordenação da sessão, registro e integração com logger/armazenamento substituíveis.</td>
+</tr>
+<tr>
+<td><code>test_tracking_adapter</code></td>
+<td>Adaptação das interfaces de rastreamento utilizadas pelos demais módulos.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="como-executar-os-testes-do-firmware">Como executar os testes do firmware<a class="headerlink" href="#como-executar-os-testes-do-firmware" title="Permanent link">&para;</a></h3>
+<p>Na pasta <code>src/firmware</code>:</p>
+<div class="highlight"><pre><span></span><code>pio<span class="w"> </span><span class="nb">test</span><span class="w"> </span>-e<span class="w"> </span>native
+</code></pre></div>
+<p>O filtro <code>test_filter</code> do ambiente <code>native</code> define as suítes listadas acima. Uma execução bem-sucedida indica que os testes nativos selecionados passaram; não comprova, por si só, o funcionamento elétrico dos sensores, motores ou da comunicação Wi-Fi na placa física.</p>
+<h3 id="diagnosticos-de-hardware">Diagnósticos de hardware<a class="headerlink" href="#diagnosticos-de-hardware" title="Permanent link">&para;</a></h3>
+<p>Os projetos independentes em <code>src/firmwareTest/</code> destinam-se à verificação de componentes físicos com a ESP32 para os testes de Hardware. Esses diagnósticos são executados separadamente, podem exigir ação do operador e não fazem parte da cobertura esperada para os testes de Software. Os resultados dependem das conexões, da alimentação e do hardware disponível durante a execução.</p>
+<h2 id="cobertura-de-codigo-coverage">Cobertura de código (<em>coverage</em>)<a class="headerlink" href="#cobertura-de-codigo-coverage" title="Permanent link">&para;</a></h2>
+<p>As imagens abaixo registram os relatórios de cobertura produzidos para os módulos testados. A cobertura indica a parte do código executada durante os testes e deve ser interpretada junto com os cenários e as asserções; não garante, isoladamente, a ausência de defeitos.</p>
+<h3 id="cobertura-do-backend">Cobertura do backend<a class="headerlink" href="#cobertura-do-backend" title="Permanent link">&para;</a></h3>
+<p><img alt="Relatório de cobertura de código do backend" src="../figs/Testes/Software/CoverageBackend.png" /></p>
+<p><em>Figura 6 — Captura do relatório de cobertura do backend.</em></p>
+<p>O relatório do backend é produzido pelo script <code>src/backend/scripts/test-coverage.sh</code>, executado pelo comando <code>npm run test:coverage</code>. O script utiliza o recurso de cobertura do executor nativo do Node.js (<code>--experimental-test-coverage</code>) e carrega os arquivos TypeScript por meio de <code>tsx</code>. Para cada alvo, executa os testes correspondentes, inclui o arquivo de implementação medido e exclui arquivos de teste do cálculo.</p>
+<p>Para reproduzir o relatório/validação:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>src/backend
+npm<span class="w"> </span>run<span class="w"> </span>test:coverage
+</code></pre></div>
+<h3 id="cobertura-do-firmware">Cobertura do firmware<a class="headerlink" href="#cobertura-do-firmware" title="Permanent link">&para;</a></h3>
+<p><img alt="Relatório de cobertura de código do firmware" src="../figs/Testes/Software/CoverageFirmware.png" /></p>
+<p><em>Figura 7 — Captura do relatório de cobertura do firmware.</em></p>
+<p>A cobertura do firmware é coletada no ambiente nativo do PlatformIO. Em <code>src/firmware/platformio.ini</code>, o ambiente <code>[env:native]</code> habilita a instrumentação do compilador com <code>--coverage</code> e <code>-lgcov</code>, além de símbolos de depuração (<code>-g</code>) e otimização desativada (<code>-O0</code>) para facilitar a medição. A execução dos testes gera os dados de execução usados pelo GCC/gcov; o relatório HTML versionado em <code>src/firmware/coverage.html</code> identifica o <strong>gcovr 7.2</strong> como gerador do relatório detalhado.</p>
+<p>Para reproduzir a execução dos testes que alimentam a cobertura:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>src/firmware
+pio<span class="w"> </span><span class="nb">test</span><span class="w"> </span>-e<span class="w"> </span>native
+</code></pre></div>
+<p>Após executar os testes instrumentados, o <code>gcovr</code> pode processar os dados gerados e atualizar o relatório HTML, conforme as opções do ambiente de desenvolvimento. A figura <code>CoverageFirmware.png</code> registra visualmente esse resultado. A cobertura abrange os arquivos incluídos pelo filtro de compilação do ambiente <code>native</code>; não representa a cobertura de todo o firmware embarcado nem dos diagnósticos físicos em <code>src/firmwareTest/</code>.</p>
+<h2 id="testes-funcionais-e2e-da-interface-web">Testes funcionais E2E da interface web<a class="headerlink" href="#testes-funcionais-e2e-da-interface-web" title="Permanent link">&para;</a></h2>
+<p>A suíte E2E fica em <code>src/frontend/e2e/</code> e utiliza Playwright Test com TypeScript. Os cenários padrão substituem respostas HTTP e mensagens WebSocket por dados controlados, para permitir execuções repetíveis sem um robô físico ou banco de dados preenchido previamente.</p>
+<table>
+<thead>
+<tr>
+<th>Arquivo/caso</th>
+<th>Histórias/área</th>
+<th>Verificações funcionais</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dashboard.spec.ts</code></td>
+<td>HU-08/HU-09</td>
+<td>Abertura do painel, seleção de labirintos 4×4/8×4/12×4, reinício e tratamento de indisponibilidade da API de sessões.</td>
+</tr>
+<tr>
+<td><code>simulacao.spec.ts</code></td>
+<td>HU-08/HU-09</td>
+<td>Execução simulada sem hardware, posição do robô e indicadores de bateria, rodas e PID.</td>
+</tr>
+<tr>
+<td><code>historico.spec.ts</code></td>
+<td>HU-11/HU-12</td>
+<td>Consulta da sessão, pontos do trajeto, filtro por severidade e retorno ao dashboard.</td>
+</tr>
+<tr>
+<td><code>telemetria.spec.ts</code></td>
+<td>HU-08/HU-09/HU-10</td>
+<td>Recepção de mensagens WebSocket controladas e atualização do mapa, do estado do robô e das métricas.</td>
+</tr>
+<tr>
+<td><code>integracao.spec.ts</code></td>
+<td>HU-10/HU-11/HU-12</td>
+<td>Cenário com backend e PostgreSQL reais: envio de dados de sessão/telemetria, persistência e consulta de eventos e pontos do percurso pela interface.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="como-executar-os-testes-e2e">Como executar os testes E2E<a class="headerlink" href="#como-executar-os-testes-e2e" title="Permanent link">&para;</a></h3>
+<p>Na pasta <code>src/frontend</code>:</p>
+<div class="highlight"><pre><span></span><code>npm<span class="w"> </span>install
+npx<span class="w"> </span>playwright<span class="w"> </span>install<span class="w"> </span>chromium
+npm<span class="w"> </span>run<span class="w"> </span>test:e2e
+</code></pre></div>
+<p>Para executar pela interface interativa do Playwright:</p>
+<div class="highlight"><pre><span></span><code>npm<span class="w"> </span>run<span class="w"> </span>test:e2e:ui
+</code></pre></div>
+<p>O cenário com backend real deve ser executado somente com o backend iniciado, <code>DATABASE_URL</code> apontando para um PostgreSQL exclusivo de teste, Prisma Client gerado e migrações aplicadas:</p>
+<div class="highlight"><pre><span></span><code>npm<span class="w"> </span>run<span class="w"> </span>test:e2e:backend
+</code></pre></div>
+<p>Esse cenário cria registros persistentes e não deve ser executado contra banco de produção ou compartilhado. O Playwright pode produzir relatório HTML, screenshots, vídeo e trace de falhas conforme a configuração da suíte; esses artefatos devem ser preservados quando forem utilizados como evidência da execução.</p>
+<p><strong>Estado da validação:</strong> na última execução relatada de <code>npm run test:e2e:backend</code>, o teste de integração falhou porque a sessão permaneceu com status <code>EM_ANDAMENTO</code>, enquanto o caso esperava <code>CONCLUIDO</code>. Portanto, esse cenário ainda precisa ser corrigido/reexecutado antes de ser registrado como aprovado. Não se deve considerar a suíte E2E integralmente aprovada apenas porque os arquivos de teste e a configuração estão presentes.</p>
+<h2 id="limitacoes-e-interpretacao-dos-resultados">Limitações e interpretação dos resultados<a class="headerlink" href="#limitacoes-e-interpretacao-dos-resultados" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Testes com mocks validam os componentes e seus contratos, mas não garantem que uma dependência real (como PostgreSQL, rede ou sensor físico) esteja configurada corretamente.</li>
+<li>A cobertura apresentada corresponde apenas aos módulos e arquivos instrumentados pelos respectivos scripts/configurações. Ela não equivale à cobertura total de todo o sistema.</li>
+<li>Os testes nativos do firmware não movimentam motores nem verificam as ligações elétricas reais. Para isso, devem ser utilizados os diagnósticos em <code>src/firmwareTest/</code> e o roteiro de testes físicos.</li>
+<li>O cenário E2E com backend e PostgreSQL reais só deve ser considerado aprovado após passar integralmente e ter seu relatório de execução preservado.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tabs", "navigation.top", "search.suggest", "search.highlight"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.c21346df.min.js"></script>
+      
+    
+  </body>
+</html>

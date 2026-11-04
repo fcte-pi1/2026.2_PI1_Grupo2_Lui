@@ -1,0 +1,1895 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://fcte-pi1.github.io/2026.2_PI1_Grupo2_Lui/extra/Arquitetura/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+    
+    
+      
+        <title>Arquitetura - Projeto PI1 - Grupo 2 (Lui)</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#arquitetura-de-software-solucao-micromouse" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Projeto PI1 - Grupo 2 (Lui)" class="md-header__button md-logo" aria-label="Projeto PI1 - Grupo 2 (Lui)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Projeto PI1 - Grupo 2 (Lui)
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Arquitetura
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green"  aria-label="Modo Noturno"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Modo Noturno" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="green" data-md-color-accent="green"  aria-label="Modo Claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Modo Claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    2026.2_PI1_Grupo2_Lui
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../1%20-%20TAP/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  1 - TAP
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../2%20-%20Requisitos/Requisitos/" class="md-tabs__link">
+          
+  
+  
+  2 - Requisitos
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../3%20-%20EAP/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  3 - EAP
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../4.1%20-%20Projeto%20conceitual%20de%20estruturas/" class="md-tabs__link">
+          
+  
+  
+  4 - Projetos Conceituais
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../5%20-%20Cronograma/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  5 - Cronograma
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../6%20-%20Or%C3%A7amento/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  6 - Orçamento
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../7.1%20-%20Testes%20de%20estrutura/" class="md-tabs__link">
+          
+  
+  
+  7 - Testes
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../8%20-%20Avalia%C3%A7%C3%A3o%20de%20desempenho/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  8 - Avaliação de Desempenho
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../9%20-%20Relat%C3%B3rio%20de%20encerramento%20do%20projeto/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  9 - Relatório de Encerramento
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Projeto PI1 - Grupo 2 (Lui)" class="md-nav__button md-logo" aria-label="Projeto PI1 - Grupo 2 (Lui)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Projeto PI1 - Grupo 2 (Lui)
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    2026.2_PI1_Grupo2_Lui
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../1%20-%20TAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 - TAP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 - Requisitos
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    2 - Requisitos
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../2%20-%20Requisitos/Requisitos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Declaração de Requisitos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../2%20-%20Requisitos/RF/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requisitos Funcionais
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../2%20-%20Requisitos/RNF/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requisitos Não Funcionais
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../2%20-%20Requisitos/MVP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MVP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../2%20-%20Requisitos/Matriz%20de%20Rastreabilidade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Matriz de Rastrabilidade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../3%20-%20EAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3 - EAP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4 - Projetos Conceituais
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    4 - Projetos Conceituais
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../4.1%20-%20Projeto%20conceitual%20de%20estruturas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Estruturas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../4.2%20-%20Projeto%20conceitual%20de%20energia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Energia
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../4.3%20-%20Projeto%20conceitual%20de%20hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../4.4%20-%20Projeto%20conceitual%20de%20software/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Software
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../5%20-%20Cronograma/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 - Cronograma
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../6%20-%20Or%C3%A7amento/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 - Orçamento
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7 - Testes
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    7 - Testes
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../7.1%20-%20Testes%20de%20estrutura/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Estrutura
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../7.2%20-%20Testes%20de%20energia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Energia
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../7.3%20-%20Testes%20de%20hardware/7.3%20-%20Testes%20de%20hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../7.4%20-%20Testes%20de%20software/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Software
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../7.5%20-%20Testes%20de%20integra%C3%A7%C3%A3o/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integração
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../8%20-%20Avalia%C3%A7%C3%A3o%20de%20desempenho/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8 - Avaliação de Desempenho
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../9%20-%20Relat%C3%B3rio%20de%20encerramento%20do%20projeto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 - Relatório de Encerramento
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#arquitetura-de-software-solucao-micromouse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Arquitetura de Software: Solução MicroMouse
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Arquitetura de Software: Solução MicroMouse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-visao-geral-e-proposito-do-software" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Visão Geral e Propósito do Software
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Visão Geral e Propósito do Software">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-proposito-do-software" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 Propósito do Software
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-visao-logica" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Visão Lógica
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Visão Lógica">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-padroes-arquiteturais-adotados-e-justificativa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Padrões Arquiteturais Adotados e Justificativa
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-divisao-em-modulos-do-sistema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Divisão em Módulos do Sistema
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-visao-de-processos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Visão de Processos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-visao-de-implementacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Visão de Implementação
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Visão de Implementação">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-tecnologias-adotadas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 Tecnologias Adotadas
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-visao-de-implantacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Visão de Implantação
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Visão de Implantação">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#componentes-de-hardware-utilizados-e-conexoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Componentes de Hardware Utilizados e Conexões:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-visao-de-dados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Visão de Dados
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Visão de Dados">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61-escolha-da-tecnologia-de-banco-de-dados-relacional-sqlite-postgresql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1 Escolha da Tecnologia de Banco de Dados: Relacional (SQLite / PostgreSQL)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62-modelo-entidade-relacionamento-mer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2 Modelo Entidade-Relacionamento (MER)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.2 Modelo Entidade-Relacionamento (MER)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#entidades-e-atributos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Entidades e Atributos:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#relacionamentos-e-cardinalidades" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Relacionamentos e Cardinalidades:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#63-diagrama-entidade-relacionamento-der" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.3 Diagrama Entidade-Relacionamento (DER)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+  <h1>Arquitetura</h1>
+
+<h2 id="arquitetura-de-software-solucao-micromouse">Arquitetura de Software: Solução MicroMouse<a class="headerlink" href="#arquitetura-de-software-solucao-micromouse" title="Permanent link">&para;</a></h2>
+<p>Este documento apresenta a especificação arquitetural do sistema embarcado e da central de monitoramento para o robô <strong>MicroMouse</strong>, estruturado de acordo com o modelo de <strong>Visões Arquiteturais (4+1)</strong> do Processo Unificado (UP). Em conformidade com as diretrizes do projeto, a tradicional <em>Visão de Casos de Uso</em> foi substituída pela <strong>Visão de Dados</strong>.</p>
+<hr />
+<h3 id="1-visao-geral-e-proposito-do-software">1. Visão Geral e Propósito do Software<a class="headerlink" href="#1-visao-geral-e-proposito-do-software" title="Permanent link">&para;</a></h3>
+<h4 id="11-proposito-do-software">1.1 Propósito do Software<a class="headerlink" href="#11-proposito-do-software" title="Permanent link">&para;</a></h4>
+<p>O software possui o papel de atuar como o <strong>sistema de controle autônomo e telemetria de bordo</strong> do robô MicroMouse. Ele é responsável por:</p>
+<ul>
+<li>
+<p>Processar sinais de sensores em tempo real para identificação de paredes, localização e orientação.</p>
+</li>
+<li>
+<p>Executar algoritmos de navegação e mapeamento dinâmico do labirinto.</p>
+</li>
+<li>
+<p>Controlar os atuadores (motores via controle PID e odometria) para movimentação precisa.</p>
+</li>
+<li>
+<p>Persistir e transmitir dados de telemetria, logs de execução e a topologia do labirinto para uma central de controle via Wi-Fi em tempo real.</p>
+</li>
+</ul>
+<hr />
+<h3 id="2-visao-logica">2. Visão Lógica<a class="headerlink" href="#2-visao-logica" title="Permanent link">&para;</a></h3>
+<p>A Visão Lógica descreve a organização conceitual e a estruturação das classes e módulos do sistema.</p>
+<h4 id="21-padroes-arquiteturais-adotados-e-justificativa">2.1 Padrões Arquiteturais Adotados e Justificativa<a class="headerlink" href="#21-padroes-arquiteturais-adotados-e-justificativa" title="Permanent link">&para;</a></h4>
+<ul>
+<li>
+<p>Firmware Embarcado (Robô): Arquitetura em Camadas (Layered Architecture) orientada a Eventos/Tarefas.</p>
+<ul>
+<li><strong>Justificativa:</strong> O software de bordo lida diretamente com o hardware do microcontrolador ESP32. A divisão em camadas garante o desacoplamento entre os drivers de baixo nível (I2C, PWM, GPIO), a lógica de controle PID/Navegação e a camada de comunicação de alto nível.</li>
+</ul>
+</li>
+<li>
+<p>Dashboard (Central de Controle): Padrão MVC (Model-View-Controller).</p>
+<ul>
+<li><strong>Justificativa:</strong> Permite a separação entre a interface visual que renderiza o labirinto e métricas do robô (<strong>View</strong>), os serviços que processam as mensagens WebSockets recebidas (<strong>Controller</strong>) e os modelos de dados da sessão e estado (<strong>Model</strong>).</li>
+</ul>
+</li>
+</ul>
+<h4 id="22-divisao-em-modulos-do-sistema">2.2 Divisão em Módulos do Sistema<a class="headerlink" href="#22-divisao-em-modulos-do-sistema" title="Permanent link">&para;</a></h4>
+<ul>
+<li>
+<p>1.Módulo HAL / Drivers de Hardware (Baixo Nível):</p>
+<ul>
+<li>
+<p><em>Driver IMU (MPU6500):</em> Leitura do giroscópio e acelerômetro via I2C para estimativa de orientação.</p>
+</li>
+<li>
+<p><em>Driver Ultrassônico (US-100):</em> Leitura contínua da distância de paredes via UART/GPIO.</p>
+</li>
+<li>
+<p><em>Driver Ponte H (DRV8833):</em> Controle PWM para acionamento dos motores N20.</p>
+</li>
+<li>
+<p><em>Driver de Odometria (Encoders N20):</em> Contagem de pulsos por interrupção para cálculo de deslocamento.</p>
+</li>
+<li>
+<p><em>Driver de Potência (INA226):</em> Monitoramento de tensão e corrente da bateria via I2C.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>2. Módulo de Controle e Navegação (Médio Nível):</p>
+<ul>
+<li>
+<p><em>Malha de Controle PID:</em> Mantém o robô centralizado e estabilizado durante a locomoção.</p>
+</li>
+<li>
+<p><em>Mapeador e Buscador (Floodfill):</em> Atualiza a matriz do labirinto e calcula as ações de rotação e avanço.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>3. Módulo de Comunicação e Armazenamento (Alto Nível):</p>
+<ul>
+<li>
+<p><em>Gerenciador NVS/Flash:</em> Armazena configurações e histórico de logs localmente.</p>
+</li>
+<li>
+<p><em>Servidor WebSockets/Wi-Fi:</em> Transmite a telemetria do robô e atualizações do mapa.</p>
+</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h3 id="3-visao-de-processos">3. Visão de Processos<a class="headerlink" href="#3-visao-de-processos" title="Permanent link">&para;</a></h3>
+<p>A Visão de Processos trata da concorrência, tempo real e distribuição do processamento entre as tarefas do sistema.</p>
+<p>O microcontrolador <strong>ESP32</strong> conta com dois núcleos de processamento (Core 0 e Core 1) e executa o sistema operacional de tempo real <strong>FreeRTOS</strong>. As tarefas (<em>Tasks</em>) são distribuídas entre os núcleos para garantir resposta imediata aos sensores sem bloquear as rotinas de comunicação:</p>
+<p><img alt="Tabela da Visão de Processo" src="./figs/Projeto_conceitual/VisaoDeProcessos.png" /></p>
+<ul>
+<li>
+<p><strong>Processo 1: <code>Task_Sensors</code> (Periódico - 10ms | Prioridade Alta):</strong></p>
+<ul>
+<li>Executa a amostragem do giroscópio MPU6500 e a leitura dos 4 sensores US-100 para identificação imediata de obstáculos/paredes.</li>
+</ul>
+</li>
+<li>
+<p><strong>Processo 2: <code>Task_PID_Control</code> (Periódico - 5ms | Prioridade Máxima):</strong></p>
+<ul>
+<li>Processa interrupções dos leitores de encoder dos motores N20, calcula os erros de trajetória e atualiza o ciclo de trabalho PWM da ponte H DRV8833.</li>
+</ul>
+</li>
+<li>
+<p><strong>Processo 3: <code>Task_Navigation</code> (Baseado em Eventos | Prioridade Média):</strong></p>
+<ul>
+<li>Disparada quando o robô alcança o centro de uma célula. Executa a lógica de atualização da grade de navegação e decide a próxima direção.</li>
+</ul>
+</li>
+<li>
+<p><strong>Processo 4: <code>Task_Comm</code> (Assíncrono | Prioridade Baixa):</strong></p>
+<ul>
+<li>Formata os dados no formato JSON e envia pacotes de telemetria e o estado do labirinto para a central de controle via WebSockets.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h3 id="4-visao-de-implementacao">4. Visão de Implementação<a class="headerlink" href="#4-visao-de-implementacao" title="Permanent link">&para;</a></h3>
+<p>A Visão de Implementação especifica as tecnologias, linguagens, frameworks e bibliotecas escolhidas para a solução.</p>
+<h4 id="41-tecnologias-adotadas">4.1 Tecnologias Adotadas<a class="headerlink" href="#41-tecnologias-adotadas" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Camada</th>
+<th>Tecnologia / Linguagem</th>
+<th>Frameworks e Bibliotecas</th>
+<th>Justificativa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Firmware (Embarcado)</strong></td>
+<td><strong>C++ / C</strong><br></td>
+<td>FreeRTOS, Arduino ESP32 Core, <code>Wire.h</code> (I2C), <code>ESPAsyncWebServer</code>, <code>ArduinoJson</code><br></td>
+<td>Permite controle rigoroso de baixo nível, acesso direto aos registradores e periféricos da ESP32 com altíssimo desempenho de tempo real.</td>
+</tr>
+<tr>
+<td><strong>Dashbord (Backend/Server)</strong></td>
+<td><strong>TypeScript / Node.js</strong></td>
+<td>Express.js, <code>ws</code> (WebSockets), TypeORM / Prisma</td>
+<td>Plataforma leve e eficiente em I/O assíncrono para manipulação da transmissão contínua de dados de telemetria.</td>
+</tr>
+<tr>
+<td><strong>Dashbord (Frontend/Dashboard)</strong></td>
+<td><strong>TypeScript / JavaScript</strong></td>
+<td>React.js, TailwindCSS, Chart.js, HTML5 Canvas API</td>
+<td>Permite renderização fluida da grade do labirinto em tempo real e atualização gráfica das métricas do robô.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="5-visao-de-implantacao">5. Visão de Implantação<a class="headerlink" href="#5-visao-de-implantacao" title="Permanent link">&para;</a></h3>
+<p>A Visão de Implantação descreve a arquitetura física e a topologia de hardware da solução.</p>
+<p><img alt="Diagrama de Visão de Implantação" src="./figs/Projeto_conceitual/VisaoDeImplantaçao.png" /></p>
+<h4 id="componentes-de-hardware-utilizados-e-conexoes">Componentes de Hardware Utilizados e Conexões:<a class="headerlink" href="#componentes-de-hardware-utilizados-e-conexoes" title="Permanent link">&para;</a></h4>
+<ol>
+<li>
+<p><strong>ESP32 DevKit V1 30 Pinos:</strong> Unidade Central de Processamento.</p>
+</li>
+<li>
+<p><strong>Ponte H DRV8833:</strong> Conectada às saídas PWM da ESP32 para controle bidirecional dos Motores N20-6V.</p>
+</li>
+<li>
+<p><strong>2x Motores N20 com Encoders:</strong> Conectados a pino de interrupção da ESP32 para feedback de malha fechada.</p>
+</li>
+<li>
+<p><strong>3x Sensores Ultrassônicos US-100:</strong> Dispostos nas posições frontal, esquerda e direita para mapeamento de paredes.</p>
+</li>
+<li>
+<p><strong>IMU MPU6500:</strong> Conectado via barramento I2C para estimativa de ângulo e giros precisos de 180°.</p>
+</li>
+<li>
+<p><strong>Sensor INA226:</strong> Conectado via I2C para leitura de corrente e tensão da bateria.</p>
+</li>
+<li>
+<p><strong>Regulador Buck MP1584:</strong> Regula a tensão de alimentação dos módulos lógicos.</p>
+</li>
+</ol>
+<hr />
+<h3 id="6-visao-de-dados">6. Visão de Dados<a class="headerlink" href="#6-visao-de-dados" title="Permanent link">&para;</a></h3>
+<p>A Visão de Dados descreve a modelagem e a estrutura de persistência das informações manipuladas e gravadas pelo sistema.</p>
+<h4 id="61-escolha-da-tecnologia-de-banco-de-dados-relacional-sqlite-postgresql">6.1 Escolha da Tecnologia de Banco de Dados: <strong>Relacional (SQLite / PostgreSQL)</strong><a class="headerlink" href="#61-escolha-da-tecnologia-de-banco-de-dados-relacional-sqlite-postgresql" title="Permanent link">&para;</a></h4>
+<ul>
+<li>
+<p><strong>Justificativa:</strong> Os dados manipulados pelo sistema possuem um alto grau de estruturação e esquemas rígidos (ex: coordenadas $X,Y$ fixas em uma matriz, leituras periódicas de telemetria vinculadas a uma sessão de execução e registros tabulares de erros).</p>
+</li>
+<li>
+<p>No <strong>Dashbord</strong>, adota-se um <strong>Banco de Dados Relacional</strong> (SQLite para execução local simples ou PostgreSQL para diagnósticos avançados).</p>
+</li>
+<li>
+<p>No <strong>Robô (ESP32)</strong>, utiliza-se a memória Flash interna (via biblioteca <code>Preferences</code> ou sistema de arquivos <code>LittleFS</code>) configurada estruturalmente em formato relacional/tabelar binário para armazenamento offline caso ocorra perda do link Wi-Fi.</p>
+</li>
+</ul>
+<hr />
+<h4 id="62-modelo-entidade-relacionamento-mer">6.2 Modelo Entidade-Relacionamento (MER)<a class="headerlink" href="#62-modelo-entidade-relacionamento-mer" title="Permanent link">&para;</a></h4>
+<h5 id="entidades-e-atributos">Entidades e Atributos:<a class="headerlink" href="#entidades-e-atributos" title="Permanent link">&para;</a></h5>
+<ol>
+<li>
+<p><strong>SESSAO_NAVEGACAO:</strong></p>
+<ul>
+<li>
+<p><code>id_sessao</code> (PK, Inteiro): Identificador único do percurso.</p>
+</li>
+<li>
+<p><code>data_inicio</code> (DateTime): Registro do momento do início da corrida.</p>
+</li>
+<li>
+<p><code>status_conclusao</code> (Texto): Status do percurso (Em andamento, Concluído, Interrompido por Falha).</p>
+</li>
+<li>
+<p><code>tempo_total_segundos</code> (Float): Tempo transcorrido até o reconhecimento da linha de chegada.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>CELULA_LABIRINTO:</strong></p>
+<ul>
+<li>
+<p><code>id_celula</code> (PK, Inteiro): Identificador da célula.</p>
+</li>
+<li>
+<p><code>id_sessao</code> (FK, Inteiro): Referência à sessão atual.</p>
+</li>
+<li>
+<p><code>pos_x</code> (Inteiro): Coordenada $X$ da célula na grade do labirinto.</p>
+</li>
+<li>
+<p><code>pos_y</code> (Inteiro): Coordenada $Y$ da célula na grade do labirinto.</p>
+</li>
+<li>
+<p><code>parede_norte</code> (Booleano): Presença de parede ao Norte.</p>
+</li>
+<li>
+<p><code>parede_sul</code> (Booleano): Presença de parede ao Sul.</p>
+</li>
+<li>
+<p><code>parede_leste</code> (Booleano): Presença de parede ao Leste.</p>
+</li>
+<li>
+<p><code>parede_oeste</code> (Booleano): Presença de parede ao Oeste.</p>
+</li>
+<li>
+<p><code>visitada</code> (Booleano): Flag indicando se o robô passou pela célula.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>REGISTRO_TELEMETRIA:</strong></p>
+<ul>
+<li>
+<p><code>id_telemetria</code> (PK, BigInt): Identificador único da amostra.</p>
+</li>
+<li>
+<p><code>id_sessao</code> (FK, Inteiro): Sessão associada.</p>
+</li>
+<li>
+<p><code>timestamp_ms</code> (BigInt): Milissegundos transcorridos desde o boot.</p>
+</li>
+<li>
+<p><code>tensao_bateria</code> (Float): Leitura do sensor INA226 em Volts.</p>
+</li>
+<li>
+<p><code>corrente_bateria</code> (Float): Leitura do sensor INA226 em Amperes.</p>
+</li>
+<li>
+<p><code>velocidade_esq</code> (Float): Velocidade calculada do motor esquerdo em mm/s.</p>
+</li>
+<li>
+<p><code>velocidade_dir</code> (Float): Velocidade calculada do motor direito em mm/s.</p>
+</li>
+<li>
+<p><code>angulo_orientacao</code> (Float): Leitura de orientação Yaw da IMU MPU6500.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>LOG_EVENTO:</strong></p>
+<ul>
+<li>
+<p><code>id_log</code> (PK, Inteiro): Identificador do registro.</p>
+</li>
+<li>
+<p><code>id_sessao</code> (FK, Inteiro): Sessão associada.</p>
+</li>
+<li>
+<p><code>timestamp_ms</code> (BigInt): Horário do evento.</p>
+</li>
+<li>
+<p><code>tipo_evento</code> (Texto): Categoria (INFO, WARN, ERROR, SUCCESS).</p>
+</li>
+<li>
+<p><code>descricao</code> (Texto): Detalhamento do evento (ex: "Linha de Chegada Reconhecida", "Motores Interrompidos").</p>
+</li>
+</ul>
+</li>
+</ol>
+<h5 id="relacionamentos-e-cardinalidades">Relacionamentos e Cardinalidades:<a class="headerlink" href="#relacionamentos-e-cardinalidades" title="Permanent link">&para;</a></h5>
+<ul>
+<li>
+<p>Uma <strong>SESSAO_NAVEGACAO</strong> possui $1:N$ <strong>CELULA_LABIRINTO</strong> (Uma sessão gera o mapeamento de várias células do labirinto).</p>
+</li>
+<li>
+<p>Uma <strong>SESSAO_NAVEGACAO</strong> possui $1:N$ <strong>REGISTRO_TELEMETRIA</strong> (Uma sessão coleta continuadamente múltiplos pacotes de telemetria).</p>
+</li>
+<li>
+<p>Uma <strong>SESSAO_NAVEGACAO</strong> possui $1:N$ <strong>LOG_EVENTO</strong> (Uma sessão registra diversos logs operacionais).</p>
+</li>
+</ul>
+<hr />
+<h4 id="63-diagrama-entidade-relacionamento-der">6.3 Diagrama Entidade-Relacionamento (DER)<a class="headerlink" href="#63-diagrama-entidade-relacionamento-der" title="Permanent link">&para;</a></h4>
+<pre class="mermaid"><code>erDiagram
+    SESSAO_NAVEGACAO ||--|{ CELULA_LABIRINTO : "mapeia"
+    SESSAO_NAVEGACAO ||--|{ REGISTRO_TELEMETRIA : "registra"
+    SESSAO_NAVEGACAO ||--|{ LOG_EVENTO : "gera"
+
+    SESSAO_NAVEGACAO {
+        int id_sessao PK
+        datetime data_inicio
+        string status_conclusao
+        float tempo_total_segundos
+    }
+
+    CELULA_LABIRINTO {
+        int id_celula PK
+        int id_sessao FK
+        int pos_x
+        int pos_y
+        boolean parede_norte
+        boolean parede_sul
+        boolean parede_leste
+        boolean parede_oeste
+        boolean visitada
+    }
+
+    REGISTRO_TELEMETRIA {
+        bigint id_telemetria PK
+        int id_sessao FK
+        bigint timestamp_ms
+        float tensao_bateria
+        float corrente_bateria
+        float velocidade_esq
+        float velocidade_dir
+        float angulo_orientacao
+    }
+
+    LOG_EVENTO {
+        int id_log PK
+        int id_sessao FK
+        bigint timestamp_ms
+        string tipo_evento
+        string descricao
+    }
+</code></pre>
+<hr />
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tabs", "navigation.top", "search.suggest", "search.highlight"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.c21346df.min.js"></script>
+      
+    
+  </body>
+</html>

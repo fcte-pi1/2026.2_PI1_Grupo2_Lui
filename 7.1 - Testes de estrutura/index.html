@@ -1,0 +1,3323 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://fcte-pi1.github.io/2026.2_PI1_Grupo2_Lui/7.1%20-%20Testes%20de%20estrutura/">
+      
+      
+        <link rel="prev" href="../6%20-%20Or%C3%A7amento/">
+      
+      
+        <link rel="next" href="../7.2%20-%20Testes%20de%20energia/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+    
+    
+      
+        <title>Estrutura - Projeto PI1 - Grupo 2 (Lui)</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#relatorio-consolidado-de-testes-estruturais-ap12-projeto-micromouse" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Projeto PI1 - Grupo 2 (Lui)" class="md-header__button md-logo" aria-label="Projeto PI1 - Grupo 2 (Lui)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Projeto PI1 - Grupo 2 (Lui)
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Estrutura
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green"  aria-label="Modo Noturno"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Modo Noturno" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="green" data-md-color-accent="green"  aria-label="Modo Claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Modo Claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    2026.2_PI1_Grupo2_Lui
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../1%20-%20TAP/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  1 - TAP
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../2%20-%20Requisitos/Requisitos/" class="md-tabs__link">
+          
+  
+  
+  2 - Requisitos
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../3%20-%20EAP/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  3 - EAP
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../4.1%20-%20Projeto%20conceitual%20de%20estruturas/" class="md-tabs__link">
+          
+  
+  
+  4 - Projetos Conceituais
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../5%20-%20Cronograma/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  5 - Cronograma
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../6%20-%20Or%C3%A7amento/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  6 - Orçamento
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  7 - Testes
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../8%20-%20Avalia%C3%A7%C3%A3o%20de%20desempenho/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  8 - Avaliação de Desempenho
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../9%20-%20Relat%C3%B3rio%20de%20encerramento%20do%20projeto/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  9 - Relatório de Encerramento
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Projeto PI1 - Grupo 2 (Lui)" class="md-nav__button md-logo" aria-label="Projeto PI1 - Grupo 2 (Lui)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Projeto PI1 - Grupo 2 (Lui)
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    2026.2_PI1_Grupo2_Lui
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../1%20-%20TAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 - TAP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 - Requisitos
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    2 - Requisitos
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2%20-%20Requisitos/Requisitos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Declaração de Requisitos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2%20-%20Requisitos/RF/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requisitos Funcionais
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2%20-%20Requisitos/RNF/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requisitos Não Funcionais
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2%20-%20Requisitos/MVP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MVP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2%20-%20Requisitos/Matriz%20de%20Rastreabilidade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Matriz de Rastrabilidade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3%20-%20EAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3 - EAP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4 - Projetos Conceituais
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    4 - Projetos Conceituais
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4.1%20-%20Projeto%20conceitual%20de%20estruturas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Estruturas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4.2%20-%20Projeto%20conceitual%20de%20energia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Energia
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4.3%20-%20Projeto%20conceitual%20de%20hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4.4%20-%20Projeto%20conceitual%20de%20software/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Software
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5%20-%20Cronograma/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 - Cronograma
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../6%20-%20Or%C3%A7amento/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 - Orçamento
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7 - Testes
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    7 - Testes
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Estrutura
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Estrutura
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#sumario" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sumário
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7.2%20-%20Testes%20de%20energia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Energia
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7.3%20-%20Testes%20de%20hardware/7.3%20-%20Testes%20de%20hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7.4%20-%20Testes%20de%20software/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Software
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7.5%20-%20Testes%20de%20integra%C3%A7%C3%A3o/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integração
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../8%20-%20Avalia%C3%A7%C3%A3o%20de%20desempenho/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8 - Avaliação de Desempenho
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../9%20-%20Relat%C3%B3rio%20de%20encerramento%20do%20projeto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 - Relatório de Encerramento
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#sumario" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sumário
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Descrição</th>
+<th>Data de início</th>
+<th>Data de conclusão</th>
+<th>Responsável</th>
+<th>Resultados esperados</th>
+<th>Resultados obtidos</th>
+<th>Aprovação interna (S/N)</th>
+<th>Aprovação do orientador (S/N)</th>
+<th>Observações</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DIM-01</td>
+<td>Envelope máximo</td>
+<td>25/10</td>
+<td>25/10</td>
+<td>Giovana</td>
+<td>≤ 165 mm (limite do Tema); meta interna ≤ 158 mm.</td>
+<td>Diagonal 1: 155 mm; diagonal 2: 155,7 mm (média).</td>
+<td>S</td>
+<td>-</td>
+<td>Dentro do limite e da meta interna.</td>
+</tr>
+<tr>
+<td>DIM-02</td>
+<td>Cotas do chassi</td>
+<td>25/10</td>
+<td>25/10</td>
+<td>Giovana</td>
+<td>Lado ±1 mm; espessura ±0,2 mm; furos encaixarem.</td>
+<td>Lado V: 119,75 mm (−0,25); lado H: 119,31 mm (−0,69); espessura: 3,13 mm (+0,13); furos M3 e M2 encaixaram.</td>
+<td>S</td>
+<td>-</td>
+<td>Furos verificados de forma qualitativa.</td>
+</tr>
+<tr>
+<td>DIM-03</td>
+<td>Encaixes</td>
+<td>25/10</td>
+<td>25/10</td>
+<td>Nicolai</td>
+<td>Montar sem forçar e sem ferramenta especial; sem balanço perceptível.</td>
+<td>Motor, sensor, bateria, protoboard, vão do chassi e suporte do labirinto: 2/2 montagens, sem balanço. Trava da bateria: 0/2.</td>
+<td>S</td>
+<td>-</td>
+<td>Trava da bateria reprovada (0/2); demais encaixes aprovados.</td>
+</tr>
+<tr>
+<td>DIM-04</td>
+<td>Rodas e apoio</td>
+<td>25/10</td>
+<td>25/10</td>
+<td>Nicolai</td>
+<td>Chassi nivelado (inclinação &lt; 1°); rodas dentro do contorno; cotas dentro de ±0,5 mm.</td>
+<td>Ø rodas: 33,59 e 33,65 mm; <em>ball caster</em>: 20,02 mm; vão livre: 10,80 mm; inclinação: 0,8° (média).</td>
+<td>S</td>
+<td>-</td>
+<td>Inclinação média dentro do critério; a M3 (1°) está no limite.</td>
+</tr>
+<tr>
+<td>DIM-05</td>
+<td>Folga de passagem</td>
+<td>25/10</td>
+<td>25/10</td>
+<td>Nicolai</td>
+<td>Folga mínima de 1 cm, com tolerância de ±2 mm.</td>
+<td>Retas: 21,82; 21,98 e 21,74 mm. Cantos: 23,88; 23,74 e 23,68 mm. Nenhum toque na parede.</td>
+<td>S</td>
+<td>-</td>
+<td>Folga mínima de 21,68 mm, acima do critério de 1 cm.</td>
+</tr>
+<tr>
+<td>DIM-06</td>
+<td>Altura dos sensores</td>
+<td>25/10</td>
+<td>25/10</td>
+<td>Nicolai</td>
+<td>Sensor na faixa de 20–45 mm da parede, sem feixe obstruído pelo chassi.</td>
+<td>Frontal: 36,5 mm; lateral esquerdo: 37 mm; lateral direito: 37 mm. Feixe livre nos três.</td>
+<td>S</td>
+<td>-</td>
+<td>Os três sensores dentro da faixa aceita.</td>
+</tr>
+<tr>
+<td>DIM-07</td>
+<td>Labirinto</td>
+<td>25/10</td>
+<td>25/10</td>
+<td>Nicolai</td>
+<td>Altura 50 ± 2,5 mm; distância entre furos 180 ± 5 mm; distância entre paredes 168 ± 5 mm; espessura 12 ± 0,6 mm.</td>
+<td>Altura: 50 mm (0); furos: 179,92 mm (−0,08); paredes: 167 mm (−1); espessura: 12,52 mm (+0,52).</td>
+<td>S</td>
+<td>-</td>
+<td>Todas as cotas dentro da tolerância.</td>
+</tr>
+<tr>
+<td>EST-01</td>
+<td>Massa total</td>
+<td>25/10</td>
+<td>25/10</td>
+<td>Angel</td>
+<td>&lt; 460 g</td>
+<td>339 g</td>
+<td>S</td>
+<td>-</td>
+<td>Abaixo do limite de 500 g (RNF10) e 26,3 % abaixo da massa prevista com margem (460 g). Sem a margem de 25 %, a estimativa era 368 g.</td>
+</tr>
+<tr>
+<td>EST-02</td>
+<td>Centro de gravidade</td>
+<td>25/10</td>
+<td>25/10</td>
+<td>Giovana</td>
+<td>Entre os apoios</td>
+<td>Entre os apoios</td>
+<td>S</td>
+<td>-</td>
+<td>CG em (6,33; 1,79) mm, dentro do triângulo de apoio, com margem de 1,72 mm. Ensaio apenas estático.</td>
+</tr>
+<tr>
+<td>EST-03</td>
+<td>Tombamento estático</td>
+<td>25/10</td>
+<td>25/10</td>
+<td>Angel</td>
+<td>&gt; 15°</td>
+<td>20,7° (média de 20°, 20° e 21°)</td>
+<td>S</td>
+<td>-</td>
+<td>O robô derrapou lateralmente antes de tombar. Análise dinâmica fica para a integração (AP18).</td>
+</tr>
+<tr>
+<td>EST-04</td>
+<td><em>Ball caster</em> e aderência</td>
+<td>26/10</td>
+<td>26/10</td>
+<td>Giovana</td>
+<td>Não travar</td>
+<td>Não travou</td>
+<td>S</td>
+<td>-</td>
+<td>Não travou em 3/3 repetições no degrau de ~1 mm. Avaliação qualitativa.</td>
+</tr>
+<tr>
+<td>RES-01</td>
+<td>Linha de base</td>
+<td>25/10</td>
+<td>25/10</td>
+<td>Giovana</td>
+<td>Registro completo (fotos).</td>
+<td>Registro completo</td>
+<td>S</td>
+<td>-</td>
+<td>Fotos nas vistas lateral, isométrica e superior.</td>
+</tr>
+<tr>
+<td>RES-02</td>
+<td>Fixações</td>
+<td>25/10</td>
+<td>25/10</td>
+<td>Angel</td>
+<td>Nada se solta; sem folga perceptível; bateria não sai da trava.</td>
+<td>Nada se solta; sem folga perceptível; trava não foi possível de testar</td>
+<td>S*</td>
+<td>-</td>
+<td>Problemas na impressão impossibilitaram o teste específico da trava.</td>
+</tr>
+<tr>
+<td>RES-03</td>
+<td>Rigidez da base</td>
+<td>25/10</td>
+<td>25/10</td>
+<td>Giovana</td>
+<td>Não haver deformação aparente.</td>
+<td>Sem deformação alguma</td>
+<td>S</td>
+<td>-</td>
+<td>Sem deformação nas fotos frontal, traseira e nivelada, com todos os componentes montados e a base apoiada nas bordas.</td>
+</tr>
+<tr>
+<td>RES-04</td>
+<td>Encaixe prolongado</td>
+<td>25/10</td>
+<td>25/10</td>
+<td>Giovana</td>
+<td>Sem deformação nem trinca; diferença entre as medidas menor que 5 %.</td>
+<td>Não houve danos ou mudança das cotas</td>
+<td>S</td>
+<td>-</td>
+<td>A tabela de medidas inicial × final ainda está em branco no relatório; a conclusão se apoia em "sem diferença perceptível".</td>
+</tr>
+<tr>
+<td>RES-05</td>
+<td>Manuseio</td>
+<td>25/10</td>
+<td>25/10</td>
+<td>Angel</td>
+<td>Sem dano; trava e encaixes mantêm a função.</td>
+<td>Não houve dano, encaixes tiveram sucesso, mas trava não foi testada</td>
+<td>S*</td>
+<td>-</td>
+<td>Problemas na impressão impossibilitaram o teste específico da trava.</td>
+</tr>
+</tbody>
+</table>
+<h1 id="relatorio-consolidado-de-testes-estruturais-ap12-projeto-micromouse">Relatório Consolidado de Testes Estruturais (AP12) — Projeto Micromouse<a class="headerlink" href="#relatorio-consolidado-de-testes-estruturais-ap12-projeto-micromouse" title="Permanent link">&para;</a></h1>
+<p><strong>Frente de Estruturas</strong> · Pacote Testes Estruturais (EAP · AP12)</p>
+<p>Este documento reúne os três relatórios do pacote: <strong>Verificação Dimensional</strong>, <strong>Teste de Estabilidade</strong> e <strong>Teste de Resistência</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Informação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Versão do relatório</td>
+<td>v0.1</td>
+</tr>
+<tr>
+<td>Data</td>
+<td>20/10/2026</td>
+</tr>
+<tr>
+<td>Versão do projeto sob teste</td>
+<td>RatinhoV3</td>
+</tr>
+<tr>
+<td>Commit do repositório</td>
+<td><strong>[PREENCHER: hash do commit]</strong></td>
+</tr>
+<tr>
+<td>Pasta de evidências</td>
+<td><strong>[PREENCHER: caminho/no/repositorio]</strong></td>
+</tr>
+<tr>
+<td>Responsáveis — Verificação Dimensional</td>
+<td>Giovana Rocha e Silva, Nicolai Bukvar Miketen</td>
+</tr>
+<tr>
+<td>Responsáveis — Estabilidade</td>
+<td>Giovana Rocha e Silva, Angel Daniel Grau Barreto</td>
+</tr>
+<tr>
+<td>Responsáveis — Resistência</td>
+<td>Giovana Rocha e Silva, Angel Daniel Grau Barreto</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Legenda de status:</strong> ✔ aprovado · ✘ reprovado · ◎ aprovado com ressalvas · – não executado</p>
+<hr />
+<h2 id="sumario">Sumário<a class="headerlink" href="#sumario" title="Permanent link">&para;</a></h2>
+<ol>
+<li><a href="#1-resumo-geral-dos-testes">Resumo geral dos testes</a></li>
+<li><a href="#parte-a--verificação-dimensional">Parte A — Verificação Dimensional</a></li>
+<li><a href="#parte-b--teste-de-estabilidade">Parte B — Teste de Estabilidade</a></li>
+<li><a href="#parte-c--teste-de-resistência">Parte C — Teste de Resistência</a></li>
+</ol>
+<hr />
+<h1 id="parte-a-verificacao-dimensional">Parte A — Verificação Dimensional<a class="headerlink" href="#parte-a-verificacao-dimensional" title="Permanent link">&para;</a></h1>
+<h2 id="a1-objetivo">A.1 Objetivo<a class="headerlink" href="#a1-objetivo" title="Permanent link">&para;</a></h2>
+<p>Confirmar que o robô fisicamente impresso e montado respeita as cotas do projeto e as regras do labirinto: comprimento e largura ≤ 16,5 cm, corredor livre de 16,8 cm e parede de 5 cm de altura.</p>
+<h2 id="a2-requisitos-verificados">A.2 Requisitos verificados<a class="headerlink" href="#a2-requisitos-verificados" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Descrição</th>
+<th>Ensaios</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RNF-04</td>
+<td>Operar o robô em corredores formados por células de 18 cm².</td>
+<td>DIM-02, DIM-05</td>
+</tr>
+<tr>
+<td>RNF-06</td>
+<td>Assegurar que o robô se mantenha intacto no final do trajeto.</td>
+<td>DIM-03</td>
+</tr>
+<tr>
+<td>RF-04</td>
+<td>Pontos de fixação para sensores de parede, posicionados sem obstruir o campo de detecção e sem folga/vibração que degrade a leitura.</td>
+<td>DIM-03, DIM-06</td>
+</tr>
+<tr>
+<td>RNF-03</td>
+<td>Bateria acessível sem desmontar todo o robô.</td>
+<td>DIM-04</td>
+</tr>
+<tr>
+<td>Tema</td>
+<td>Dimensão máxima de 16,5 cm; parede de 5 cm; célula de 18 cm</td>
+<td>DIM-01</td>
+</tr>
+</tbody>
+</table>
+<p><em>Requisitos cobertos por este relatório.</em></p>
+<h2 id="a3-itens-sob-teste">A.3 Itens sob teste<a class="headerlink" href="#a3-itens-sob-teste" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Peça / conjunto</th>
+<th>Versão CAD</th>
+<th>Data de impressão</th>
+<th>Material</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Chassi</td>
+<td>v1</td>
+<td>21/10</td>
+<td>ABS Premium (Brasfila)</td>
+</tr>
+<tr>
+<td>Suporte de sensor</td>
+<td>v2</td>
+<td>22/10</td>
+<td>ABS Premium (Brasfila)</td>
+</tr>
+<tr>
+<td>Trava da bateria</td>
+<td>v1</td>
+<td>22/10</td>
+<td>ABS Premium (Brasfila)</td>
+</tr>
+<tr>
+<td>Suporte de motor</td>
+<td>v1</td>
+<td>21/10</td>
+<td>ABS Premium (Brasfila)</td>
+</tr>
+<tr>
+<td>Suporte Bateria e Protoboard</td>
+<td>v2</td>
+<td>24/10</td>
+<td>ABS Premium (Brasfila)</td>
+</tr>
+<tr>
+<td>Suporte Labirinto</td>
+<td>v2</td>
+<td>24/10</td>
+<td>ABS Premium (Brasfila)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Componentes montados durante os ensaios:</strong> motores N20, bateria 18650 2S, 3 sensores ultrassônicos, rodas Ø34 mm, <em>ball caster</em>, protoboard, componentes eletrônicos, parafusos e porcas.</p>
+<p><strong>Peça piloto:</strong> Devido a novas exigências da parte de hardware, alterações no projeto conceitual foram necessárias: rebaixe da área dos motores e aumento do tamanho de encaixe da protoboard e bateria.</p>
+<p><img alt="CAD atualizado" src="../Testes%20de%20Estrutura/evidencias/CAD1.png" /></p>
+<p><em>Figura — CAD atualizado.</em></p>
+<p>A contração medida do ABS (esperado 0,4–0,8 %) e as tolerâncias aplicadas no CAD foram de 0,4 mm nos furos, 0,2 mm por lado nas regiões de encaixe removível e 0,1 mm por lado nas regiões de encaixe mais firme (motores e cavilhas do labirinto).</p>
+<h2 id="a4-materiais-e-instrumentos">A.4 Materiais e instrumentos<a class="headerlink" href="#a4-materiais-e-instrumentos" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Instrumento</th>
+<th>Resolução</th>
+<th>Uso</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Paquímetro</td>
+<td>0,02 mm</td>
+<td>Cotas do chassi, alojamentos, diâmetros</td>
+</tr>
+<tr>
+<td>Régua metálica</td>
+<td>0,5 mm</td>
+<td>Envelope, nivelamento</td>
+</tr>
+<tr>
+<td>Pista de testes 4×4</td>
+<td>–</td>
+<td>DIM-05 (célula 18 cm, parede 5×1,2 cm)</td>
+</tr>
+<tr>
+<td>Transferidor / nível</td>
+<td>1°</td>
+<td>Inclinação do chassi (DIM-04)</td>
+</tr>
+<tr>
+<td>Câmera do celular</td>
+<td>–</td>
+<td>Registro fotográfico e em vídeo</td>
+</tr>
+</tbody>
+</table>
+<h2 id="a5-procedimento">A.5 Procedimento<a class="headerlink" href="#a5-procedimento" title="Permanent link">&para;</a></h2>
+<p>Todas as cotas são medidas no mínimo 3 vezes; reportam-se média e desvio. Os ensaios devem poder ser repetidos por outra pessoa do grupo.</p>
+<h3 id="dim-01-envelope-maximo">DIM-01 — Envelope máximo<a class="headerlink" href="#dim-01-envelope-maximo" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Montar o robô com as peças estruturais completas.</li>
+<li>Medir o comprimento em 3 posições e a largura em 3 posições.</li>
+<li>Registrar o maior valor como envelope do robô.</li>
+</ol>
+<h3 id="dim-02-cotas-do-chassi">DIM-02 — Cotas do chassi<a class="headerlink" href="#dim-02-cotas-do-chassi" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Medir lado e espessura da base (2–3 mm).</li>
+<li>Fazer 3 medições por cota; calcular média e desvio contra o Desenho Técnico.</li>
+</ol>
+<h3 id="dim-03-encaixes">DIM-03 — Encaixes<a class="headerlink" href="#dim-03-encaixes" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Verificar encaixe do motor N20 (24×12×10 mm), do sensor (~4,2×2,05×1,33 cm), do vão de encaixe no chassi, da protoboard (~8,3×5,53×0,95 cm), da bateria 18650 2S (~70×35×20 mm) e da trava da bateria.</li>
+<li>Montar e desmontar 2 vezes cada encaixe.</li>
+<li>Testar furos e distância entre furos qualitativamente (parafusos encaixaram).</li>
+<li>Verificar balanço perceptível.</li>
+</ol>
+<h3 id="dim-04-rodas-e-apoio">DIM-04 — Rodas e apoio<a class="headerlink" href="#dim-04-rodas-e-apoio" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Medir Ø da roda (34 mm) e altura do <em>ball caster</em>.</li>
+<li>Apoiar o robô em piso plano; medir inclinação do chassi e vão livre ao solo.</li>
+<li>Verificar se as rodas ficam dentro do contorno do chassi.</li>
+</ol>
+<h3 id="dim-05-folga-de-passagem">DIM-05 — Folga de passagem<a class="headerlink" href="#dim-05-folga-de-passagem" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Centralizar o robô no corredor da pista 4×4.</li>
+<li>Posicionar o robô em diferentes trechos da pista.</li>
+<li>Medir a folga com trena ou paquímetro.</li>
+</ol>
+<h3 id="dim-06-altura-dos-sensores">DIM-06 — Altura dos sensores<a class="headerlink" href="#dim-06-altura-dos-sensores" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Medir a altura do centro de cada sensor ultrassônico em relação ao piso.</li>
+<li>Conferir com a parede de 5 cm e verificar se algum trecho do feixe é obstruído pelo chassi.</li>
+</ol>
+<h3 id="dim-07-labirinto">DIM-07 — Labirinto<a class="headerlink" href="#dim-07-labirinto" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Medir a altura das paredes do labirinto.</li>
+<li>Medir a distância entre os encaixes do labirinto verticalmente e horizontalmente.</li>
+<li>Medir a espessura das paredes e o espaço útil entre elas.</li>
+</ol>
+<h2 id="a6-criterios-de-aceitacao">A.6 Critérios de aceitação<a class="headerlink" href="#a6-criterios-de-aceitacao" title="Permanent link">&para;</a></h2>
+<p><em>Definidos antes dos ensaios.</em></p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Critério (proposto)</th>
+<th>Req.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DIM-01</td>
+<td>≤ 165 mm (limite do Tema). Meta interna ≤ 158 mm.</td>
+<td>Tema</td>
+</tr>
+<tr>
+<td>DIM-02</td>
+<td>Lado ±1 mm; espessura ±0,2 mm; furos encaixarem.</td>
+<td>RNF-04</td>
+</tr>
+<tr>
+<td>DIM-03</td>
+<td>Montar sem forçar e sem ferramenta especial; sem balanço perceptível.</td>
+<td>RNF-06, RF-04</td>
+</tr>
+<tr>
+<td>DIM-04</td>
+<td>Chassi nivelado (inclinação &lt; 1°); rodas dentro do contorno.</td>
+<td>RNF-02/03</td>
+</tr>
+<tr>
+<td>DIM-05</td>
+<td>Folga mínima de 1 cm com tolerância de ±2 mm.</td>
+<td>RNF-04</td>
+</tr>
+<tr>
+<td>DIM-06</td>
+<td>Sensor apontado na faixa da parede, sem feixe obstruído pelo chassi.</td>
+<td>RF-04</td>
+</tr>
+</tbody>
+</table>
+<h2 id="a7-resultados">A.7 Resultados<a class="headerlink" href="#a7-resultados" title="Permanent link">&para;</a></h2>
+<p>Valores em mm, salvo indicação.</p>
+<h3 id="dim-01-envelope-maximo_1">DIM-01 — Envelope máximo<a class="headerlink" href="#dim-01-envelope-maximo_1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Dimensão</th>
+<th>Limite</th>
+<th>Med. 1</th>
+<th>Med. 2</th>
+<th>Med. 3</th>
+<th>Média</th>
+<th>Desvio</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Diagonal 1</td>
+<td>≤ 165</td>
+<td>155</td>
+<td>155</td>
+<td>155</td>
+<td>155</td>
+<td>10</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Diagonal 2</td>
+<td>≤ 165</td>
+<td>156</td>
+<td>155</td>
+<td>156</td>
+<td>155,7</td>
+<td>9,3</td>
+<td>✔</td>
+</tr>
+</tbody>
+</table>
+<p>Evidências: <code>evidencias/DIM-01/</code></p>
+<p><img alt="Diagonal 1" src="../Testes%20de%20Estrutura/evidencias/dim1.1.jpg" /> <img alt="Diagonal 2" src="../Testes%20de%20Estrutura/evidencias/dim1.2.jpg" /> <img alt="Diagonal CAD" src="../Testes%20de%20Estrutura/evidencias/dim1.3.jpg" /></p>
+<p><em>Figuras — Diagonal 1; Diagonal 2; Diagonal CAD.</em></p>
+<h3 id="dim-02-cotas-do-chassi_1">DIM-02 — Cotas do chassi<a class="headerlink" href="#dim-02-cotas-do-chassi_1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Cota</th>
+<th>Nominal</th>
+<th>Tol.</th>
+<th>M1</th>
+<th>M2</th>
+<th>M3</th>
+<th>Média</th>
+<th>Diferença</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lado do chassi (V)</td>
+<td>120</td>
+<td>±1</td>
+<td>119,74</td>
+<td>119,68</td>
+<td>119,84</td>
+<td>119,75</td>
+<td>−0,25</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Lado do chassi (H)</td>
+<td>120</td>
+<td>±1</td>
+<td>119,36</td>
+<td>119,24</td>
+<td>119,32</td>
+<td>119,31</td>
+<td>−0,69</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Espessura da base</td>
+<td>3</td>
+<td>±0,2</td>
+<td>3,1</td>
+<td>3,12</td>
+<td>3,18</td>
+<td>3,13</td>
+<td>+0,13</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Furos M3</td>
+<td>3</td>
+<td>±0,4</td>
+<td>--</td>
+<td>--</td>
+<td>--</td>
+<td>--</td>
+<td>--</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Furos M2</td>
+<td>2</td>
+<td>±0,4</td>
+<td>--</td>
+<td>--</td>
+<td>--</td>
+<td>--</td>
+<td>--</td>
+<td>✔</td>
+</tr>
+</tbody>
+</table>
+<p>Furos verificados de forma qualitativa. Evidências: <code>evidencias/DIM-02/</code></p>
+<p><img alt="Lado 1" src="../Testes%20de%20Estrutura/evidencias/dim2.1.jpg" /> <img alt="Lado 2" src="../Testes%20de%20Estrutura/evidencias/dim2.2.jpg" /> <img alt="Espessura" src="../Testes%20de%20Estrutura/evidencias/dim2.3.jpg" /></p>
+<p><em>Figuras — Lado 1; Lado 2; Espessura.</em></p>
+<h3 id="dim-03-encaixes_1">DIM-03 — Encaixes<a class="headerlink" href="#dim-03-encaixes_1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Encaixe</th>
+<th>Nominal (mm)</th>
+<th>Med. (mm)</th>
+<th>Encaixe (mm)</th>
+<th>OK</th>
+<th>Balanço?</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Motor N20</td>
+<td>24×12×10</td>
+<td>30,3×12×10</td>
+<td>12,4×9,9</td>
+<td>2/2</td>
+<td>Não</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Sensor</td>
+<td>44×20×13</td>
+<td>45,4×20,4×13,4</td>
+<td>45,6×22,8</td>
+<td>2/2</td>
+<td>Não</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Ø Sensor</td>
+<td>16</td>
+<td>16</td>
+<td>16,2</td>
+<td>2/2</td>
+<td>Não</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Distância Ø Sensor</td>
+<td>23</td>
+<td>26</td>
+<td>25,7</td>
+<td>2/2</td>
+<td>Não</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Bateria 18650 2S</td>
+<td>70×35×20</td>
+<td>66,5×37,2×19</td>
+<td>71,5×37×21,8</td>
+<td>2/2</td>
+<td>Não</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Vão do Chassi</td>
+<td>41,8 (CAD)</td>
+<td>41</td>
+<td>41,6</td>
+<td>2/2</td>
+<td>Não</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Protoboard</td>
+<td>86×56×10</td>
+<td>83×55,3×9,5</td>
+<td>82,8×55,5</td>
+<td>2/2</td>
+<td>Não</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Trava da bateria</td>
+<td>--</td>
+<td>--</td>
+<td>--</td>
+<td>0/2</td>
+<td>--</td>
+<td>✘</td>
+</tr>
+<tr>
+<td>Suporte do Labirinto</td>
+<td>23×23×40</td>
+<td>22,8×22,84×40</td>
+<td>12,7</td>
+<td>2/2</td>
+<td>Não</td>
+<td>✔</td>
+</tr>
+</tbody>
+</table>
+<p>Evidências: <code>evidencias/DIM-03/</code></p>
+<p><img alt="Bateria altura encaixe" src="../Testes%20de%20Estrutura/evidencias/dim3.1.jpg" /> <img alt="Bateria largura encaixe" src="../Testes%20de%20Estrutura/evidencias/dim3.2.jpg" /> <img alt="Bateria profundidade encaixe" src="../Testes%20de%20Estrutura/evidencias/dim3.3.jpg" /></p>
+<p><em>Figuras — Bateria: altura, largura e profundidade do encaixe.</em></p>
+<p><img alt="Motor altura encaixe" src="../Testes%20de%20Estrutura/evidencias/dim3.4.jpg" /> <img alt="Motor direito encaixe" src="../Testes%20de%20Estrutura/evidencias/dim3.5.jpg" /> <img alt="Motor esquerdo encaixe" src="../Testes%20de%20Estrutura/evidencias/dim3.6.jpg" /></p>
+<p><em>Figuras — Motor: altura, encaixe direito e encaixe esquerdo.</em></p>
+<p><img alt="Protoboard comprimento encaixe" src="../Testes%20de%20Estrutura/evidencias/dim3.7.jpg" /> <img alt="Protoboard largura encaixe" src="../Testes%20de%20Estrutura/evidencias/dim3.8.jpg" /> <img alt="Sensor altura encaixe" src="../Testes%20de%20Estrutura/evidencias/dim3.9.jpg" /></p>
+<p><em>Figuras — Protoboard: comprimento e largura do encaixe; Sensor: altura do encaixe.</em></p>
+<p><img alt="Sensor comprimento encaixe" src="../Testes%20de%20Estrutura/evidencias/dim3.10.jpg" /> <img alt="Sensor diâmetro encaixe" src="../Testes%20de%20Estrutura/evidencias/dim3.11.jpg" /> <img alt="Sensor distância furos" src="../Testes%20de%20Estrutura/evidencias/dim3.12.jpg" /></p>
+<p><em>Figuras — Sensor: comprimento, diâmetro e distância entre furos.</em></p>
+<p><img alt="Vão do chassi encaixe" src="../Testes%20de%20Estrutura/evidencias/dim3.13.jpg" /> <img alt="Vão do chassi medida" src="../Testes%20de%20Estrutura/evidencias/dim3.14.jpg" /> <img alt="Lado 1 pilar" src="../Testes%20de%20Estrutura/evidencias/dim3.15.jpg" /></p>
+<p><em>Figuras — Vão do chassi (encaixe e medida); Lado 1 do pilar.</em></p>
+<p><img alt="Lado 2 pilar" src="../Testes%20de%20Estrutura/evidencias/dim3.16.jpg" /> <img alt="Altura pilar" src="../Testes%20de%20Estrutura/evidencias/dim3.17.jpg" /> <img alt="Encaixe pilar" src="../Testes%20de%20Estrutura/evidencias/dim3.18.jpg" /></p>
+<p><em>Figuras — Pilar: lado 2, altura e encaixe.</em></p>
+<h3 id="dim-04-rodas-e-apoio_1">DIM-04 — Rodas e apoio<a class="headerlink" href="#dim-04-rodas-e-apoio_1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Cota</th>
+<th>Nominal</th>
+<th>Tol.</th>
+<th>M1</th>
+<th>M2</th>
+<th>M3</th>
+<th>Média</th>
+<th>Diferença</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ø roda esquerda (mm)</td>
+<td>34</td>
+<td>±0,5</td>
+<td>33,54</td>
+<td>33,64</td>
+<td>33,6</td>
+<td>33,59</td>
+<td>−0,41</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Ø roda direita (mm)</td>
+<td>34</td>
+<td>±0,5</td>
+<td>33,6</td>
+<td>33,74</td>
+<td>33,6</td>
+<td>33,65</td>
+<td>−0,35</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Altura do <em>ball caster</em> (mm)</td>
+<td>20</td>
+<td>±0,5</td>
+<td>20</td>
+<td>20,06</td>
+<td>20</td>
+<td>20,02</td>
+<td>+0,02</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Vão livre ao solo (mm)</td>
+<td>11,045 (CAD)</td>
+<td>±0,5</td>
+<td>10,72</td>
+<td>10,88</td>
+<td>10,80</td>
+<td>10,80</td>
+<td>−0,25</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Inclinação do chassi (°)</td>
+<td>0</td>
+<td>&lt; 1</td>
+<td>0,6</td>
+<td>0,8</td>
+<td>1</td>
+<td>0,8</td>
+<td>+0,2</td>
+<td>✔</td>
+</tr>
+</tbody>
+</table>
+<p>Evidências: <code>./Testes%20de%20Estrutura/evidencias/DIM-04/</code></p>
+<p><img alt="Vão livre do solo" src="../Testes%20de%20Estrutura/evidencias/dim4.1.jpg" /> <img alt="Altura Ball Caster" src="../Testes%20de%20Estrutura/evidencias/dim4.2.jpg" /> <img alt="Diâmetro roda" src="../Testes%20de%20Estrutura/evidencias/dim4.3.jpg" /></p>
+<p><img alt="Medida inclinação" src="../Testes%20de%20Estrutura/evidencias/dim4.4.jpg" /> <img alt="Marcação inclinação" src="../Testes%20de%20Estrutura/evidencias/dim4.5.jpg" /></p>
+<p><em>Figuras — Vão livre do solo; altura do ball caster; diâmetro da roda; medida da inclinação; marcação da inclinação.</em></p>
+<h3 id="dim-05-folga-de-giro-e-passagem">DIM-05 — Folga de giro e passagem<a class="headerlink" href="#dim-05-folga-de-giro-e-passagem" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Posição</th>
+<th>Tocou na parede?</th>
+<th>Folga mín. (mm)</th>
+<th>Observação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Labirinto Reta #1</td>
+<td>Não</td>
+<td>21,82</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Labirinto Reta #2</td>
+<td>Não</td>
+<td>21,98</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Labirinto Reta #3</td>
+<td>Não</td>
+<td>21,74</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Labirinto Canto #1</td>
+<td>Não</td>
+<td>23,88</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Labirinto Canto #2</td>
+<td>Não</td>
+<td>23,74</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Labirinto Canto #3</td>
+<td>Não</td>
+<td>23,68</td>
+<td>✔</td>
+</tr>
+</tbody>
+</table>
+<p>Evidências: <code>./Testes%20de%20Estrutura/evidencias/DIM-05/</code></p>
+<p><img alt="Distância reta" src="../Testes%20de%20Estrutura/evidencias/dim5.1.jpg" /> <img alt="Distância canto" src="../Testes%20de%20Estrutura/evidencias/dim5.2.jpg" /></p>
+<p><em>Figuras — Distância na reta; distância no canto.</em></p>
+<h3 id="dim-06-altura-dos-sensores_1">DIM-06 — Altura dos sensores<a class="headerlink" href="#dim-06-altura-dos-sensores_1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Sensor</th>
+<th>Altura med. (mm)</th>
+<th>Faixa aceita (mm)</th>
+<th>Feixe livre?</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Frontal</td>
+<td>36,5</td>
+<td>20–45</td>
+<td>Sim</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Lateral esquerdo</td>
+<td>37</td>
+<td>20–45</td>
+<td>Sim</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Lateral direito</td>
+<td>37</td>
+<td>20–45</td>
+<td>Sim</td>
+<td>✔</td>
+</tr>
+</tbody>
+</table>
+<p>Evidências: <code>./Testes%20de%20Estrutura/evidencias/DIM-06/</code></p>
+<p><img alt="Altura sensor esquerdo" src="../Testes%20de%20Estrutura/evidencias/dim6.1.jpg" /> <img alt="Altura sensor frontal" src="../Testes%20de%20Estrutura/evidencias/dim6.2.jpg" /> <img alt="Altura sensor direito" src="../Testes%20de%20Estrutura/evidencias/dim6.3.jpg" /></p>
+<p><em>Figuras — Altura dos sensores esquerdo, frontal e direito.</em></p>
+<h3 id="dim-07-labirinto_1">DIM-07 — Labirinto<a class="headerlink" href="#dim-07-labirinto_1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Cota (mm)</th>
+<th>Nominal</th>
+<th>Tol.</th>
+<th>M1</th>
+<th>M2</th>
+<th>M3</th>
+<th>Média</th>
+<th>Diferença</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Altura</td>
+<td>50</td>
+<td>±2,5</td>
+<td>50</td>
+<td>50,02</td>
+<td>50</td>
+<td>50</td>
+<td>0</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Distância Furos</td>
+<td>180</td>
+<td>±5</td>
+<td>180,125</td>
+<td>179,875</td>
+<td>179,75</td>
+<td>179,92</td>
+<td>−0,08</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Distância Paredes</td>
+<td>168</td>
+<td>±5</td>
+<td>166</td>
+<td>168</td>
+<td>167</td>
+<td>167</td>
+<td>−1</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Espessura</td>
+<td>12</td>
+<td>±0,6</td>
+<td>12,5</td>
+<td>12,54</td>
+<td>12,52</td>
+<td>12,52</td>
+<td>+0,52</td>
+<td>✔</td>
+</tr>
+</tbody>
+</table>
+<p>Evidências: <code>./Testes%20de%20Estrutura/evidencias/DIM-06/</code></p>
+<p><img alt="Distância horizontal furos" src="../Testes%20de%20Estrutura/evidencias/dim7.1.jpg" /> <img alt="Distância vertical furos" src="../Testes%20de%20Estrutura/evidencias/dim7.2.jpg" /> <img alt="Labirinto superior" src="../Testes%20de%20Estrutura/evidencias/dim7.3.jpg" /></p>
+<p><img alt="Labirinto isométrico" src="../Testes%20de%20Estrutura/evidencias/dim7.4.jpg" /> <img alt="Distância entre paredes" src="../Testes%20de%20Estrutura/evidencias/dim7.5.jpg" /> <img alt="Espessura" src="../Testes%20de%20Estrutura/evidencias/dim7.6.jpg" /></p>
+<p><img alt="CAD labirinto" src="../Testes%20de%20Estrutura/evidencias/dim7.7.jpg" /></p>
+<p><em>Figuras — Distância horizontal e vertical entre furos; labirinto (vista superior e isométrica); distância entre paredes; espessura; CAD do labirinto.</em></p>
+<h2 id="a8-analise-e-nao-conformidades">A.8 Análise e não conformidades<a class="headerlink" href="#a8-analise-e-nao-conformidades" title="Permanent link">&para;</a></h2>
+<p><strong>[PREENCHER: descrever o que falhou, a causa provável e a ação corretiva. Se o chassi sair com 12 cm, o DIM-05 provavelmente reprova (ver tabela de vão livre).]</strong></p>
+<h3 id="registro-de-nao-conformidade-rnc">Registro de Não Conformidade (RNC)<a class="headerlink" href="#registro-de-nao-conformidade-rnc" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Ensaio</th>
+<th>Descrição</th>
+<th>Causa provável</th>
+<th>Ação corretiva</th>
+<th>Versão</th>
+<th>Reteste</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RNC-01</td>
+<td><strong>[PREENCHER]</strong></td>
+<td><strong>[PREENCHER]</strong></td>
+<td><strong>[PREENCHER]</strong></td>
+<td><strong>[PREENCHER]</strong></td>
+<td><strong>[PREENCHER]</strong></td>
+<td><strong>[PREENCHER: ID / resultado]</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="a9-conclusao">A.9 Conclusão<a class="headerlink" href="#a9-conclusao" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Ensaio</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DIM-01</td>
+<td>Envelope máximo</td>
+<td>–</td>
+</tr>
+<tr>
+<td>DIM-02</td>
+<td>Cotas do chassi</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>DIM-03</td>
+<td>Encaixes</td>
+<td>–</td>
+</tr>
+<tr>
+<td>DIM-04</td>
+<td>Rodas e apoio</td>
+<td>–</td>
+</tr>
+<tr>
+<td>DIM-05</td>
+<td>Folga de passagem</td>
+<td>–</td>
+</tr>
+<tr>
+<td>DIM-06</td>
+<td>Altura dos sensores</td>
+<td>–</td>
+</tr>
+<tr>
+<td>DIM-07</td>
+<td>Labirinto</td>
+<td>–</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parecer geral:</strong> Aprovado com ressalvas: apesar do tamanho do robô não ter demonstrado colisão provável com os testes estruturais estáticos, os testes de integração podem fazer com que haja batida. Portanto, já se enxerga possibilidades de reduzir os lados do robô.</p>
+<p><strong>Pendências para os outros grupos:</strong></p>
+<ul>
+<li>Hardware: posição dos componentes eletrônicos finais.</li>
+<li>Hardware: leitura mínima de distância do sensor.</li>
+</ul>
+<hr />
+<h1 id="parte-b-teste-de-estabilidade">Parte B — Teste de Estabilidade<a class="headerlink" href="#parte-b-teste-de-estabilidade" title="Permanent link">&para;</a></h1>
+<h2 id="b1-objetivo">B.1 Objetivo<a class="headerlink" href="#b1-objetivo" title="Permanent link">&para;</a></h2>
+<p>Mostrar que o robô não tomba de forma estática, confirmar a massa total e o centro de gravidade (CG) com o robô montado, além da aderência do <em>ball caster</em>, validando as decisões de projeto de <strong>bateria no eixo</strong>, <strong>eixo deslocado para trás</strong> e <strong>distribuição eletrônica</strong>.</p>
+<h2 id="b2-requisitos-verificados">B.2 Requisitos verificados<a class="headerlink" href="#b2-requisitos-verificados" title="Permanent link">&para;</a></h2>
+<p><em>Todos sob responsabilidade de Estruturas.</em></p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Descrição</th>
+<th>Ensaios</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RNF10</td>
+<td>Limite de massa total: massa total do robô inferior a 500 g.</td>
+<td>EST-01</td>
+</tr>
+<tr>
+<td>RNF14</td>
+<td>Estabilização dinâmica: CG e base de apoio (distância entre rodas e entre eixos) dimensionados para evitar tombamento em deslocamento, giros e repouso. <em>Cobertura parcial: este relatório verifica apenas a condição estática (repouso e inclinação).</em></td>
+<td>EST-02, EST-03</td>
+</tr>
+<tr>
+<td>RNF16</td>
+<td>Organização interna de componentes: fios, sensores e componentes sem interferências não planejadas entre si. <em>Cobertura parcial: verifica-se apenas o efeito da distribuição da eletrônica sobre a massa e o CG.</em></td>
+<td>EST-02</td>
+</tr>
+<tr>
+<td>RNF17</td>
+<td>Tracionar a roda: rodas com material/perfil que maximizem a aderência, minimizando derrapagem e erro odométrico.</td>
+<td>EST-04</td>
+</tr>
+</tbody>
+</table>
+<h2 id="b3-itens-sob-teste">B.3 Itens sob teste<a class="headerlink" href="#b3-itens-sob-teste" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Peça / conjunto</th>
+<th>Versão CAD</th>
+<th>Data de montagem</th>
+<th>Componentes montados</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Robô completo</td>
+<td>RatinhoV3</td>
+<td>25/10</td>
+<td>Motores N20, rodas Ø34 mm, <em>ball caster</em>, 3 sensores ultrassônicos, eletrônica, bateria 18650 2S e componentes estruturais completos</td>
+</tr>
+</tbody>
+</table>
+<p>Material: ABS Premium (Brasfila).</p>
+<h2 id="b4-materiais-e-instrumentos">B.4 Materiais e instrumentos<a class="headerlink" href="#b4-materiais-e-instrumentos" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Instrumento</th>
+<th>Resolução</th>
+<th>Uso</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Balança digital</td>
+<td>0,1 g</td>
+<td>EST-01, EST-02</td>
+</tr>
+<tr>
+<td>Régua metálica</td>
+<td>0,5 mm</td>
+<td>EST-02</td>
+</tr>
+<tr>
+<td>Plataforma inclinável com transferidor</td>
+<td>1°</td>
+<td>EST-03</td>
+</tr>
+<tr>
+<td>Trena</td>
+<td>1 mm</td>
+<td>EST-02, EST-04</td>
+</tr>
+<tr>
+<td>Câmera do celular (vídeo/foto)</td>
+<td>-</td>
+<td>EST-01, EST-02, EST-03, EST-04</td>
+</tr>
+<tr>
+<td>Pista de testes 4×4 (célula 18 cm, parede 5×1,2 cm)</td>
+<td>-</td>
+<td>EST-04</td>
+</tr>
+</tbody>
+</table>
+<h2 id="b5-procedimento">B.5 Procedimento<a class="headerlink" href="#b5-procedimento" title="Permanent link">&para;</a></h2>
+<p><strong>Condições gerais.</strong> Todos os ensaios são realizados com o robô completo e montado (chassi, motores, rodas, <em>ball caster</em>, sensores, eletrônica e bateria carregada), na versão do projeto indicada no cabeçalho deste relatório. Cada grandeza é medida no mínimo 3 vezes, nas mesmas condições, e o valor adotado é a média das medições, com a dispersão registrada. As medições são feitas sobre superfície plana, limpa e nivelada, com instrumentos de resolução compatível com o critério avaliado. Fotos e vídeos de cada ensaio são armazenados na pasta de evidências.</p>
+<h3 id="est-01-massa-total">EST-01 — Massa total<a class="headerlink" href="#est-01-massa-total" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Pesar o robô completo (com bateria) 3 vezes.</li>
+<li>Comparar a média com a massa prevista, pelo desvio relativo:</li>
+</ol>
+<p>$$\Delta m = \frac{|m_{\text{medida}} - m_{\text{teórica}}|}{m_{\text{teórica}}}\times 100\%$$</p>
+<p><strong>Lista de componentes e massa estimada do robô</strong></p>
+<table>
+<thead>
+<tr>
+<th>Grupo</th>
+<th>Componente</th>
+<th>Qtd</th>
+<th>Massa unit.</th>
+<th>Subtotal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Eletrônica</td>
+<td>ESP32-WROOM-32 DevKit 30 pinos</td>
+<td>1</td>
+<td>9,5 g</td>
+<td>9,5 g</td>
+</tr>
+<tr>
+<td>Eletrônica</td>
+<td>Ponte H DRV8833</td>
+<td>1</td>
+<td>1,7 g</td>
+<td>1,7 g</td>
+</tr>
+<tr>
+<td>Eletrônica</td>
+<td>Motor N20 6V c/ encoder</td>
+<td>2</td>
+<td>15 g</td>
+<td>30 g</td>
+</tr>
+<tr>
+<td>Eletrônica</td>
+<td>Sensor ultrassônico US-100</td>
+<td>3</td>
+<td>8 g</td>
+<td>24 g</td>
+</tr>
+<tr>
+<td>Eletrônica</td>
+<td>Giroscópio/IMU MPU6500</td>
+<td>1</td>
+<td>2,6 g</td>
+<td>2,6 g</td>
+</tr>
+<tr>
+<td>Eletrônica</td>
+<td>Medidor INA226</td>
+<td>1</td>
+<td>3 g (estim.)</td>
+<td>3 g</td>
+</tr>
+<tr>
+<td>Eletrônica</td>
+<td>Regulador Buck MP1584</td>
+<td>1</td>
+<td>3 g</td>
+<td>3 g</td>
+</tr>
+<tr>
+<td>Eletrônica</td>
+<td>Protoboard 400 furos</td>
+<td>1</td>
+<td>44 g</td>
+<td>44 g</td>
+</tr>
+<tr>
+<td>Eletrônica</td>
+<td>Jumpers (kit)</td>
+<td>1</td>
+<td>40 g (estim.)</td>
+<td>40 g</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Subtotal eletrônica</strong></td>
+<td></td>
+<td></td>
+<td><strong>158 g</strong></td>
+</tr>
+<tr>
+<td>Bateria</td>
+<td>7,4V 3300mAh (2x18650)</td>
+<td>1</td>
+<td>150 g (estim.)</td>
+<td>150 g</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Subtotal bateria</strong></td>
+<td></td>
+<td></td>
+<td><strong>150 g</strong></td>
+</tr>
+<tr>
+<td>Rodas/Apoio</td>
+<td>Roda motriz 34x6,5mm</td>
+<td>2</td>
+<td>4 g</td>
+<td>8 g</td>
+</tr>
+<tr>
+<td>Rodas/Apoio</td>
+<td><em>Ball caster</em></td>
+<td>1</td>
+<td>5 g</td>
+<td>5 g</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Subtotal rodas/apoio</strong></td>
+<td></td>
+<td></td>
+<td><strong>13 g</strong></td>
+</tr>
+<tr>
+<td>Estrutura (ABS)</td>
+<td>Chassi + 2º andar (infill 25%, parede 3 mm)</td>
+<td>1</td>
+<td>40 g</td>
+<td>40 g</td>
+</tr>
+<tr>
+<td>Estrutura (ABS)</td>
+<td>Pilares/parafusos de fixação</td>
+<td></td>
+<td></td>
+<td>7 g</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Subtotal estrutura</strong></td>
+<td></td>
+<td></td>
+<td><strong>47 g</strong></td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Total geral</strong></td>
+<td></td>
+<td></td>
+<td><strong>368 g</strong></td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Margem de 25%</strong></td>
+<td></td>
+<td></td>
+<td><strong>460 g</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="est-02-centro-de-gravidade">EST-02 — Centro de gravidade<a class="headerlink" href="#est-02-centro-de-gravidade" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Com uma balança em cada ponto de apoio, podemos descobrir o CG da seguinte forma:</li>
+</ol>
+<p>$$x_{CG} = \frac{P_B\cdot X_B + P_C\cdot X_C}{P_A+P_B+P_C} \qquad \text{e} \qquad y_{CG} = \frac{P_C\cdot Y_B}{P_A+P_B+P_C}$$</p>
+<p>em que $X$ e $Y$ são coordenadas no chassi. $P$ são as leituras da balança. $A$, $B$ e $C$ são os pontos de apoio: roda esquerda, roda direita e <em>ball caster</em>, respectivamente. $A$ (roda esquerda) é a origem.
+2. Verificar se a projeção do CG fica dentro do triângulo de apoio (rodas e <em>ball caster</em>) e comparar com a posição do eixo das rodas.</p>
+<h3 id="est-03-tombamento-estatico">EST-03 — Tombamento estático<a class="headerlink" href="#est-03-tombamento-estatico" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Inclinar a plataforma até o robô tombar ou escorregar.</li>
+<li>Registrar o ângulo e se ocorreu tombamento ou escorregamento primeiro.</li>
+</ol>
+<h3 id="est-04-ball-caster-e-aderencia">EST-04 — <em>Ball caster</em> e aderência<a class="headerlink" href="#est-04-ball-caster-e-aderencia" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Passar o <em>ball caster</em> em um degrau de ~1 mm (emenda de painel da pista).</li>
+<li>Comparar qualitativamente com a superfície lisa.</li>
+</ol>
+<h2 id="b6-criterios-de-aceitacao">B.6 Critérios de aceitação<a class="headerlink" href="#b6-criterios-de-aceitacao" title="Permanent link">&para;</a></h2>
+<p><em>Definidos antes dos ensaios.</em></p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Critério</th>
+<th>Req.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>EST-01</td>
+<td>Massa total &lt; 500 g.</td>
+<td>RNF10</td>
+</tr>
+<tr>
+<td>EST-02</td>
+<td>Projeção do CG dentro do triângulo de apoio, com margem.</td>
+<td>RNF14, RNF16</td>
+</tr>
+<tr>
+<td>EST-03</td>
+<td>Sem tombar até 15°; o piso real é plano, então o critério é conservador.</td>
+<td>RNF14</td>
+</tr>
+<tr>
+<td>EST-04</td>
+<td><em>Ball caster</em> não trava.</td>
+<td>RNF17</td>
+</tr>
+</tbody>
+</table>
+<h2 id="b7-resultados">B.7 Resultados<a class="headerlink" href="#b7-resultados" title="Permanent link">&para;</a></h2>
+<h3 id="est-01-massa-total_1">EST-01 — Massa total<a class="headerlink" href="#est-01-massa-total_1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Med. 1</th>
+<th>Med. 2</th>
+<th>Med. 3</th>
+<th>Média</th>
+<th>Teórico</th>
+<th>Δm (%)</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Massa (g)</td>
+<td>339</td>
+<td>339</td>
+<td>339</td>
+<td>339</td>
+<td>460</td>
+<td>26,3%</td>
+<td>✔</td>
+</tr>
+</tbody>
+</table>
+<p>Massa total inferior a 500 g (RNF10): Sim. Evidências: <code>./Testes%20de%20Estrutura/evidencias/EST-01/</code></p>
+<p><img alt="Pesagem do carrinho" src="../Testes%20de%20Estrutura/evidencias/est1.jpg" /></p>
+<p><em>Figura — Pesagem do carrinho.</em></p>
+<h3 id="est-02-centro-de-gravidade_1">EST-02 — Centro de gravidade<a class="headerlink" href="#est-02-centro-de-gravidade_1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Eixo</th>
+<th>Med. 1</th>
+<th>Med. 2</th>
+<th>Med. 3</th>
+<th>Média</th>
+<th>Dentro?</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Longitudinal $x_{CG}$ (mm)</td>
+<td>6,3</td>
+<td>6,17</td>
+<td>6,51</td>
+<td>6,33</td>
+<td>Sim</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Transversal $y_{CG}$ (mm)</td>
+<td>1,83</td>
+<td>1,6</td>
+<td>1,95</td>
+<td>1,79</td>
+<td>Sim</td>
+<td>✔</td>
+</tr>
+</tbody>
+</table>
+<p>Um ponto $P=(x,y)$ está dentro do triângulo de vértices $(0;0)$, $(12{,}2;0)$ e $(6{,}2;6)$ se, e somente se, $y \ge 0$, $30x - 31y \ge 0$ e $x + y \le 12{,}2$. Projeção do CG dentro do triângulo de apoio: Sim, margem de 1,72 mm. Evidências: <code>./Testes%20de%20Estrutura/evidencias/EST-02/</code></p>
+<p><img alt="Distância entre rodas" src="../Testes%20de%20Estrutura/evidencias/est2.1.jpg" /></p>
+<p><em>Figura — Distância entre rodas.</em></p>
+<p><img alt="Massa apoio Ball Caster" src="../Testes%20de%20Estrutura/evidencias/est2.2.jpg" /></p>
+<p><em>Figura — Massa no apoio do ball caster.</em></p>
+<p><img alt="Massa apoio Rodas" src="../Testes%20de%20Estrutura/evidencias/est2.3.jpg" /></p>
+<p><em>Figura — Massa no apoio das rodas.</em></p>
+<h3 id="est-03-tombamento-estatico_1">EST-03 — Tombamento estático<a class="headerlink" href="#est-03-tombamento-estatico_1" title="Permanent link">&para;</a></h3>
+<p>Ângulo de tombamento ou escorregamento (indicar qual ocorreu primeiro).</p>
+<table>
+<thead>
+<tr>
+<th>Direção</th>
+<th>Falha</th>
+<th>Med. 1</th>
+<th>Med. 2</th>
+<th>Med. 3</th>
+<th>Média</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lateral</td>
+<td>Derrapou</td>
+<td>20</td>
+<td>20</td>
+<td>21</td>
+<td>20,7</td>
+<td>✔</td>
+</tr>
+</tbody>
+</table>
+<p>Evidências: <code>./Testes%20de%20Estrutura/evidencias/EST-03/</code></p>
+<p><img alt="Tombamento estático" src="../Testes%20de%20Estrutura/evidencias/est.3.jpg" /></p>
+<p><em>Figura — Tombamento estático.</em></p>
+<h3 id="est-04-ball-caster-e-aderencia_1">EST-04 — <em>Ball caster</em> e aderência<a class="headerlink" href="#est-04-ball-caster-e-aderencia_1" title="Permanent link">&para;</a></h3>
+<p>Degrau de ~1 mm.</p>
+<table>
+<thead>
+<tr>
+<th>Rep.</th>
+<th><em>Caster</em> travou?</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Não</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Não</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Não</td>
+<td>✔</td>
+</tr>
+</tbody>
+</table>
+<p>Evidências: <code>./Testes%20de%20Estrutura/evidencias/EST-04/</code></p>
+<h2 id="b8-analise-e-nao-conformidades">B.8 Análise e não conformidades<a class="headerlink" href="#b8-analise-e-nao-conformidades" title="Permanent link">&para;</a></h2>
+<h3 id="resumo-dos-ensaios">Resumo dos ensaios<a class="headerlink" href="#resumo-dos-ensaios" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Critério</th>
+<th>Valor obtido</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>EST-01</td>
+<td>Massa &lt; 500 g</td>
+<td>339</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>EST-02</td>
+<td>CG dentro do triângulo de apoio</td>
+<td>(6,33; 1,79)</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>EST-03</td>
+<td>Sem tombar até 15°</td>
+<td>20,7</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>EST-04</td>
+<td>Caster não trava</td>
+<td>-</td>
+<td>✔</td>
+</tr>
+</tbody>
+</table>
+<p>Contagem: 4 aprovados, 0 reprovados, 0 com ressalvas.</p>
+<p><strong>Pontos de atenção do grupo.</strong></p>
+<ul>
+<li>Todos os testes foram realizados de forma estática, espera-se realizar uma análise dinâmica nos testes de integração.</li>
+<li>Se o EST-02 mostrar CG fora do previsto, abrir RNC; a correção (reposicionar bateria ou eixo) obriga a repetir o EST-02 e o EST-03.</li>
+</ul>
+<h2 id="b9-conclusao">B.9 Conclusão<a class="headerlink" href="#b9-conclusao" title="Permanent link">&para;</a></h2>
+<p><strong>Parecer geral:</strong> aprovado.</p>
+<p><strong>Riscos para o teste de integração (AP18):</strong> Foi realizado apenas de forma estática.</p>
+<h3 id="apendice-ba-pendencias-com-outros-grupos">Apêndice B.A — Pendências com outros grupos<a class="headerlink" href="#apendice-ba-pendencias-com-outros-grupos" title="Permanent link">&para;</a></h3>
+<p><em>Informações necessárias de outros grupos.</em></p>
+<table>
+<thead>
+<tr>
+<th>Grupo</th>
+<th>O que precisamos</th>
+<th>Recebido?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Energia</td>
+<td>Massa e dimensões finais da bateria (impacta CG e alojamento)</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Hardware</td>
+<td>Massa da eletrônica e posição final dos sensores</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Hardware</td>
+<td>Disposição dos componentes eletrônicos</td>
+<td>✔</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="parte-c-teste-de-resistencia">Parte C — Teste de Resistência<a class="headerlink" href="#parte-c-teste-de-resistencia" title="Permanent link">&para;</a></h1>
+<h2 id="c1-objetivo">C.1 Objetivo<a class="headerlink" href="#c1-objetivo" title="Permanent link">&para;</a></h2>
+<p>Provar que a estrutura do robô suporta a montagem e o manuseio pela equipe sem deformar, quebrar ou soltar peças.</p>
+<h2 id="c2-requisitos-verificados">C.2 Requisitos verificados<a class="headerlink" href="#c2-requisitos-verificados" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RNF-06</td>
+<td>Assegurar que o robô se mantenha intacto no final do trajeto.</td>
+</tr>
+<tr>
+<td>RF-04</td>
+<td>Fixação firme dos sensores para a devida coleta de dados.</td>
+</tr>
+<tr>
+<td>RNF-03</td>
+<td>Bateria acessível para troca.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="c3-itens-sob-teste">C.3 Itens sob teste<a class="headerlink" href="#c3-itens-sob-teste" title="Permanent link">&para;</a></h2>
+<p><em>Cada ensaio deve registrar a versão da peça usada.</em></p>
+<table>
+<thead>
+<tr>
+<th>Peça / conjunto</th>
+<th>Versão CAD</th>
+<th>Data de impressão</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Chassi (base)</td>
+<td>v1</td>
+<td>21/10</td>
+</tr>
+<tr>
+<td>Suporte dos motores N20</td>
+<td>v1</td>
+<td>21/10</td>
+</tr>
+<tr>
+<td>Suportes dos 3 sensores ultrassônicos</td>
+<td>v2</td>
+<td>22/10</td>
+</tr>
+<tr>
+<td>Compartimento e trava da bateria (18650 2S)</td>
+<td>v2</td>
+<td>24/10</td>
+</tr>
+</tbody>
+</table>
+<p>Material: ABS Premium (Brasfila).</p>
+<h2 id="c4-materiais-e-instrumentos">C.4 Materiais e instrumentos<a class="headerlink" href="#c4-materiais-e-instrumentos" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Instrumento</th>
+<th>Resolução</th>
+<th>Uso</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Parede de teste (1,2 cm × 5 cm, fiel ao Tema)</td>
+<td>---</td>
+<td>RES-02</td>
+</tr>
+<tr>
+<td>Paquímetro</td>
+<td>0,02 mm</td>
+<td>RES-01, RES-02, RES-05</td>
+</tr>
+<tr>
+<td>Câmera do celular</td>
+<td>---</td>
+<td>todos</td>
+</tr>
+<tr>
+<td>Transferidor</td>
+<td>1°</td>
+<td>RES-02 (desvio angular do sensor)</td>
+</tr>
+<tr>
+<td>Pista de testes 4×4</td>
+<td>---</td>
+<td>RES-02, RES-05, RES-06</td>
+</tr>
+</tbody>
+</table>
+<h2 id="c5-procedimento">C.5 Procedimento<a class="headerlink" href="#c5-procedimento" title="Permanent link">&para;</a></h2>
+<p>O micromouse foi montado de acordo com recomedações da equipe de energia e hardware, em seguida os testes foram realizados com documentação em vídeo e foto.</p>
+<h3 id="res-01-linha-de-base">RES-01 — Linha de base<a class="headerlink" href="#res-01-linha-de-base" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Fotografar o robô montado (vistas frontal, traseira, laterais, superior e inferior).</li>
+<li>Marcar com fotos o estado de fixações, parafusos e fios.</li>
+<li>Salvar tudo em <code>./Testes%20de%20Estrutura/evidencias/RES-01/</code>.</li>
+</ol>
+<h3 id="res-02-fixacoes">RES-02 — Fixações<a class="headerlink" href="#res-02-fixacoes" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Aplicar esforço manual leve na trava da bateria, nos suportes de motor e nos de sensor.</li>
+<li>Virar o robô de cabeça para baixo, com cuidado, e verificar se algo se solta.</li>
+</ol>
+<h3 id="res-03-rigidez-da-base">RES-03 — Rigidez da base<a class="headerlink" href="#res-03-rigidez-da-base" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Montar todos os componentes e apoiar a base nas bordas.</li>
+<li>Observar deformação.</li>
+</ol>
+<h3 id="res-04-encaixe-prolongado">RES-04 — Encaixe prolongado<a class="headerlink" href="#res-04-encaixe-prolongado" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Antes: montar o robô e realizar as medidas (lados do chassi e distância dos suportes).</li>
+<li>Depois: após um tempo, realizar novas medidas.</li>
+</ol>
+<h3 id="res-05-manuseio">RES-05 — Manuseio<a class="headerlink" href="#res-05-manuseio" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Executar <strong>2 ciclos</strong> de toda a montagem eletrônica.</li>
+<li>Verificar após cada ciclo a função da trava e dos encaixes.</li>
+</ol>
+<h2 id="c6-criterios-de-aceitacao">C.6 Critérios de aceitação<a class="headerlink" href="#c6-criterios-de-aceitacao" title="Permanent link">&para;</a></h2>
+<p><em>Definidos antes dos ensaios.</em></p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Critério</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RES-01</td>
+<td>Registro completo (fotos).</td>
+</tr>
+<tr>
+<td>RES-02</td>
+<td>Nada se solta; sem folga perceptível; bateria não sai da trava.</td>
+</tr>
+<tr>
+<td>RES-03</td>
+<td>Não haver deformação aparente.</td>
+</tr>
+<tr>
+<td>RES-04</td>
+<td>Sem deformação nem trinca.</td>
+</tr>
+<tr>
+<td>RES-05</td>
+<td>Sem dano; trava e encaixes mantêm a função.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="c7-resultados">C.7 Resultados<a class="headerlink" href="#c7-resultados" title="Permanent link">&para;</a></h2>
+<h3 id="res-01-linha-de-base_1">RES-01 — Linha de base<a class="headerlink" href="#res-01-linha-de-base_1" title="Permanent link">&para;</a></h3>
+<p>Resultado: ✔ · Evidências: <code>./Testes%20de%20Estrutura/evidencias/RES-01/</code></p>
+<p><img alt="Visão lateral" src="../Testes%20de%20Estrutura/evidencias/res1.jpg" /> <img alt="Visão isométrica" src="../Testes%20de%20Estrutura/evidencias/res1.2.jpg" /> <img alt="Visão superior" src="../Testes%20de%20Estrutura/evidencias/res1.3.jpg" /></p>
+<p><em>Figuras — Visão lateral; visão isométrica; visão superior.</em></p>
+<h3 id="res-02-fixacoes_1">RES-02 — Fixações<a class="headerlink" href="#res-02-fixacoes_1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Fixação</th>
+<th>Esforço manual</th>
+<th>Robô invertido</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Trava da bateria</td>
+<td>-</td>
+<td>-</td>
+<td>✘</td>
+</tr>
+<tr>
+<td>Suporte de motor (E / D)</td>
+<td>Resistiu</td>
+<td>Resistiu</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Suporte de sensor (3)</td>
+<td>Resistiu</td>
+<td>Resistiu</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Ball Caster</td>
+<td>Resistiu</td>
+<td>Resistiu</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Bateria</td>
+<td>Resistiu</td>
+<td>Resistiu</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Protoboard</td>
+<td>Resistiu</td>
+<td>Resistiu</td>
+<td>✔</td>
+</tr>
+</tbody>
+</table>
+<p>Evidências: vídeo no YouTube; <code>./Testes%20de%20Estrutura/evidencias/RES-02/</code></p>
+<h3 id="res-03-rigidez-da-base_1">RES-03 — Rigidez da base<a class="headerlink" href="#res-03-rigidez-da-base_1" title="Permanent link">&para;</a></h3>
+<p>Fotos da deformação.</p>
+<table>
+<thead>
+<tr>
+<th>Foto</th>
+<th>Deformou?</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Frontal</td>
+<td>Não</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Traseira</td>
+<td>Não</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Nivelada</td>
+<td>Não</td>
+<td>✔</td>
+</tr>
+</tbody>
+</table>
+<p>Evidências: <code>./Testes%20de%20Estrutura/evidencias/RES-03/</code></p>
+<p><img alt="Com apoio" src="../Testes%20de%20Estrutura/evidencias/res3.1.jpg" /> <img alt="Frontal" src="../Testes%20de%20Estrutura/evidencias/res3.2.jpg" /> <img alt="Traseira" src="../Testes%20de%20Estrutura/evidencias/res3.3.jpg" /></p>
+<p><em>Figuras — Com apoio; frontal; traseira.</em></p>
+<h3 id="res-04-encaixe-prolongado_1">RES-04 — Encaixe prolongado<a class="headerlink" href="#res-04-encaixe-prolongado_1" title="Permanent link">&para;</a></h3>
+<p>Medida original vs. final.</p>
+<table>
+<thead>
+<tr>
+<th>Medida</th>
+<th>Falha?</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lados do chassi</td>
+<td>Não</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Distância dos sensores</td>
+<td>Não</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Encaixe da bateria</td>
+<td>Não</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Encaixe da protoboard</td>
+<td>Não</td>
+<td>✔</td>
+</tr>
+</tbody>
+</table>
+<p>Evidências: <code>./Testes%20de%20Estrutura/evidencias/RES-04/</code></p>
+<p><img alt="Pós-encaixe frontal" src="../Testes%20de%20Estrutura/evidencias/res4.1.jpg" /></p>
+<p><em>Figura — Pós-encaixe frontal.</em></p>
+<p><img alt="Pós-encaixe superior" src="../Testes%20de%20Estrutura/evidencias/res4.2.jpg" /></p>
+<p><em>Figura — Pós-encaixe superior.</em></p>
+<h3 id="res-05-manuseio_1">RES-05 — Manuseio<a class="headerlink" href="#res-05-manuseio_1" title="Permanent link">&para;</a></h3>
+<p>Ciclos de manuseio.</p>
+<table>
+<thead>
+<tr>
+<th>Ciclo</th>
+<th>Dano?</th>
+<th>Trava funciona?</th>
+<th>Encaixes mantidos?</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Não</td>
+<td>-</td>
+<td>Sim</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Não</td>
+<td>-</td>
+<td>Sim</td>
+<td>◎</td>
+</tr>
+</tbody>
+</table>
+<p>Evidências: <code>evidencias/RES-05/</code></p>
+<h2 id="c8-analise-e-nao-conformidades">C.8 Análise e não conformidades<a class="headerlink" href="#c8-analise-e-nao-conformidades" title="Permanent link">&para;</a></h2>
+<h3 id="resumo-dos-ensaios_1">Resumo dos ensaios<a class="headerlink" href="#resumo-dos-ensaios_1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Critério</th>
+<th>Resultado</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RES-01</td>
+<td>Registro completo</td>
+<td>Registrado</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>RES-02</td>
+<td>Nada se solta</td>
+<td>Nada se solta</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>RES-03</td>
+<td>Flecha não aparente</td>
+<td>Sem flecha</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>RES-04</td>
+<td>Diferença &lt; 5 %</td>
+<td>Sem diferença perceptível</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>RES-05</td>
+<td>Sem alterações; trava funciona</td>
+<td>Sem danos ou complicações</td>
+<td>◎</td>
+</tr>
+</tbody>
+</table>
+<p>Contagem: 3 aprovados, 0 reprovados, 2 com ressalvas.</p>
+<h3 id="registro-de-nao-conformidade-rnc_1">Registro de Não Conformidade (RNC)<a class="headerlink" href="#registro-de-nao-conformidade-rnc_1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>RNC</th>
+<th>Ensaio</th>
+<th>Descrição</th>
+<th>Causa provável</th>
+<th>Ação corretiva</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RNC-01</td>
+<td>RES-2</td>
+<td>Trava não pôde ser testada</td>
+<td>Erro na impressão</td>
+<td>Melhorar o CAD do suporte da trava da bateria</td>
+</tr>
+<tr>
+<td>RNC-02</td>
+<td>RES-5</td>
+<td>Trava não pôde ser testada</td>
+<td>Erro na impressão</td>
+<td>Melhorar o CAD do suporte da trava da bateria</td>
+</tr>
+</tbody>
+</table>
+<h2 id="c9-conclusao">C.9 Conclusão<a class="headerlink" href="#c9-conclusao" title="Permanent link">&para;</a></h2>
+<p><strong>Parecer geral:</strong> aprovado com ressalvas. A impressão 3D falhou na região do suporte da trava da bateria, portanto não foi possível testá-la. Entretanto, isso não é suficiente para reprovar o teste, uma vez que é simples de resolver.</p>
+<p><strong>Riscos para o teste de integração (AP18):</strong> Bateria sem sua trava pode estar sujeita a riscos, apesar da trava por encaixe.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tabs", "navigation.top", "search.suggest", "search.highlight"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.c21346df.min.js"></script>
+      
+    
+  </body>
+</html>

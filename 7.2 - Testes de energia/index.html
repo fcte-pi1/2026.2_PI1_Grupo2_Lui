@@ -1,0 +1,1794 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://fcte-pi1.github.io/2026.2_PI1_Grupo2_Lui/7.2%20-%20Testes%20de%20energia/">
+      
+      
+        <link rel="prev" href="../7.1%20-%20Testes%20de%20estrutura/">
+      
+      
+        <link rel="next" href="../7.3%20-%20Testes%20de%20hardware/7.3%20-%20Testes%20de%20hardware/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+    
+    
+      
+        <title>Energia - Projeto PI1 - Grupo 2 (Lui)</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#testes-de-energia" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Projeto PI1 - Grupo 2 (Lui)" class="md-header__button md-logo" aria-label="Projeto PI1 - Grupo 2 (Lui)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Projeto PI1 - Grupo 2 (Lui)
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Energia
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green"  aria-label="Modo Noturno"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Modo Noturno" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="green" data-md-color-accent="green"  aria-label="Modo Claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Modo Claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    2026.2_PI1_Grupo2_Lui
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../1%20-%20TAP/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  1 - TAP
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../2%20-%20Requisitos/Requisitos/" class="md-tabs__link">
+          
+  
+  
+  2 - Requisitos
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../3%20-%20EAP/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  3 - EAP
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../4.1%20-%20Projeto%20conceitual%20de%20estruturas/" class="md-tabs__link">
+          
+  
+  
+  4 - Projetos Conceituais
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../5%20-%20Cronograma/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  5 - Cronograma
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../6%20-%20Or%C3%A7amento/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  6 - Orçamento
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../7.1%20-%20Testes%20de%20estrutura/" class="md-tabs__link">
+          
+  
+  
+  7 - Testes
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../8%20-%20Avalia%C3%A7%C3%A3o%20de%20desempenho/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  8 - Avaliação de Desempenho
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../9%20-%20Relat%C3%B3rio%20de%20encerramento%20do%20projeto/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  9 - Relatório de Encerramento
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Projeto PI1 - Grupo 2 (Lui)" class="md-nav__button md-logo" aria-label="Projeto PI1 - Grupo 2 (Lui)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Projeto PI1 - Grupo 2 (Lui)
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    2026.2_PI1_Grupo2_Lui
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../1%20-%20TAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 - TAP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 - Requisitos
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    2 - Requisitos
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2%20-%20Requisitos/Requisitos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Declaração de Requisitos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2%20-%20Requisitos/RF/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requisitos Funcionais
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2%20-%20Requisitos/RNF/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requisitos Não Funcionais
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2%20-%20Requisitos/MVP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MVP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2%20-%20Requisitos/Matriz%20de%20Rastreabilidade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Matriz de Rastrabilidade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3%20-%20EAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3 - EAP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4 - Projetos Conceituais
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    4 - Projetos Conceituais
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4.1%20-%20Projeto%20conceitual%20de%20estruturas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Estruturas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4.2%20-%20Projeto%20conceitual%20de%20energia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Energia
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4.3%20-%20Projeto%20conceitual%20de%20hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4.4%20-%20Projeto%20conceitual%20de%20software/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Software
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5%20-%20Cronograma/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 - Cronograma
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../6%20-%20Or%C3%A7amento/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 - Orçamento
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7 - Testes
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    7 - Testes
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7.1%20-%20Testes%20de%20estrutura/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Estrutura
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Energia
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7.3%20-%20Testes%20de%20hardware/7.3%20-%20Testes%20de%20hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7.4%20-%20Testes%20de%20software/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Software
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7.5%20-%20Testes%20de%20integra%C3%A7%C3%A3o/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integração
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../8%20-%20Avalia%C3%A7%C3%A3o%20de%20desempenho/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8 - Avaliação de Desempenho
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../9%20-%20Relat%C3%B3rio%20de%20encerramento%20do%20projeto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 - Relatório de Encerramento
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="testes-de-energia">Testes de Energia<a class="headerlink" href="#testes-de-energia" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>Apresentar com detalhes os testes feitos para conferir se as demandas energéticas do projeto foram atendidas.</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;"><strong>ID</strong></th>
+<th><strong>Descrição</strong></th>
+<th><strong>Data de Início</strong></th>
+<th><strong>Data de Conclusão</strong></th>
+<th><strong>Responsável</strong></th>
+<th><strong>Resultados Esperados</strong></th>
+<th><strong>Resultados Obtidos</strong></th>
+<th style="text-align: center;"><strong>Aprovação Interna (S/N)</strong></th>
+<th style="text-align: center;"><strong>Aprovação do Orientador (S/N)</strong></th>
+<th><strong>Observações</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">2.1</td>
+<td>Conferência das especificações nominais do pack de baterias Li-ion</td>
+<td>21/10/2026</td>
+<td>21/10/2026</td>
+<td>Subgrupo de Energia</td>
+<td>Pack 2S de 7,4 V, 3300 mAh, com tensão entre 6,0 V (corte) e 8,4 V (carga máxima)</td>
+<td>Confirmado: 2S (células 18650), 7,4 V nominal, 3300 mAh (≈ 24,4 Wh), corte de 6,0 V e carga máxima de 8,4 V</td>
+<td style="text-align: center;">S</td>
+<td style="text-align: center;">-</td>
+<td>Fabricante, modelo, datasheet e presença de BMS/PCM não disponíveis</td>
+</tr>
+<tr>
+<td style="text-align: center;">2.2</td>
+<td>Verificação do dimensionamento da capacidade da bateria frente ao projeto conceitual</td>
+<td>21/10/2026</td>
+<td>21/10/2026</td>
+<td>Subgrupo de Energia</td>
+<td>Capacidade ≥ 3,16 Ah (4,5 W por 4 h = 18 Wh ≈ 2,43 Ah a 7,4 V, mais 30% de margem)</td>
+<td>Pack de 3300 mAh atende ao mínimo calculado de 3159 mAh</td>
+<td style="text-align: center;">S</td>
+<td style="text-align: center;">-</td>
+<td>O ensaio serve para conferir essa escolha com medições reais</td>
+</tr>
+<tr>
+<td style="text-align: center;">2.3</td>
+<td>Montagem da bancada: bateria → regulador buck MP1584 → 2 motores N20, com multímetros DT9205A</td>
+<td>21/10/2026</td>
+<td>21/10/2026</td>
+<td>Subgrupo de Energia</td>
+<td>Bancada capaz de medir a tensão na bateria, a tensão na saída do regulador e a corrente</td>
+<td>Bancada montada em protoboard, com um multímetro na bateria, um na saída do buck e um para a corrente</td>
+<td style="text-align: center;">S</td>
+<td style="text-align: center;">-</td>
+<td>Ensaio feito sem a ESP, que ainda não estava pronta</td>
+</tr>
+<tr>
+<td style="text-align: center;">2.4</td>
+<td>Ensaio de operação contínua dos 2 motores por 15 min: queda de tensão da bateria</td>
+<td>21/10/2026</td>
+<td>21/10/2026</td>
+<td>Subgrupo de Energia</td>
+<td>Tensão estável e bem acima do corte de 6,0 V durante todo o ensaio</td>
+<td>7,80 V (0 min), 7,74 V (≈ 8 min), 7,66 V (15 min): queda de 0,14 V (≈ 1,8%)</td>
+<td style="text-align: center;">S</td>
+<td style="text-align: center;">-</td>
+<td>Bateria não estava com carga total (7,80 V inicial). Só 3 pontos de medição</td>
+</tr>
+<tr>
+<td style="text-align: center;">2.5</td>
+<td>Projeção linear da tensão para 1 h de operação</td>
+<td>21/10/2026</td>
+<td>21/10/2026</td>
+<td>Subgrupo de Energia</td>
+<td>Tensão projetada acima de 6,0 V</td>
+<td>Sem ESP: ≈ 7,24 V em 1 h (0,56 V/h). Com ESP (0,264 W, ≈ +18%): ≈ 7,14 V (0,66 V/h). Ambos acima do corte</td>
+<td style="text-align: center;">S</td>
+<td style="text-align: center;">-</td>
+<td>Projeção linear; a curva real de descarga Li-ion não é linear</td>
+</tr>
+<tr>
+<td style="text-align: center;">2.6</td>
+<td>Medição da tensão na saída do regulador buck durante a operação dos motores</td>
+<td>21/10/2026</td>
+<td>21/10/2026</td>
+<td>Subgrupo de Energia</td>
+<td>Saída regulada estável em ≈ 6 V</td>
+<td>5,93 V estáveis (buck ajustado em 6 V)</td>
+<td style="text-align: center;">S</td>
+<td style="text-align: center;">-</td>
+<td>Entrada do MP1584: 4,5 a 28 V</td>
+</tr>
+<tr>
+<td style="text-align: center;">2.7</td>
+<td>Medição da corrente média e da capacidade consumida no ensaio de 15 min</td>
+<td>21/10/2026</td>
+<td>21/10/2026</td>
+<td>Subgrupo de Energia</td>
+<td>Consumo coerente com a potência média estimada de 4,5 W (≈ 0,6 A a 7,4 V)</td>
+<td>Relatório registra I_médio ≈ 6 A e ΔC ≈ 1,5 Ah em 15 min</td>
+<td style="text-align: center;">S</td>
+<td style="text-align: center;">-</td>
+<td><strong>Revisar este valor</strong> (ver nota abaixo da tabela)</td>
+</tr>
+<tr>
+<td style="text-align: center;">2.8</td>
+<td>Monitoramento de temperatura durante o ensaio de 15 min</td>
+<td>21/10/2026</td>
+<td>21/10/2026</td>
+<td>Subgrupo de Energia</td>
+<td>Sem aquecimento anormal</td>
+<td>Nenhuma alteração de temperatura observada</td>
+<td style="text-align: center;">S</td>
+<td style="text-align: center;">-</td>
+<td>Observação qualitativa, sem medição por instrumento</td>
+</tr>
+<tr>
+<td style="text-align: center;">2.9</td>
+<td>Ensaio de travamento dos eixos dos motores por 6 s: queda instantânea de tensão</td>
+<td>21/10/2026</td>
+<td>21/10/2026</td>
+<td>Subgrupo de Energia</td>
+<td>Tensão mínima acima de 6,0 V, sem desligamento do regulador</td>
+<td>Partiu de 7,66 V e caiu para 7,33 V (−0,33 V). Saída do regulador se manteve em 5,93 V</td>
+<td style="text-align: center;">S</td>
+<td style="text-align: center;">-</td>
+<td>Eixos travados com alicate. Tempo curto para evitar superaquecimento</td>
+</tr>
+<tr>
+<td style="text-align: center;">2.10</td>
+<td>Medição da corrente de pico com os motores travados</td>
+<td>21/10/2026</td>
+<td>21/10/2026</td>
+<td>Subgrupo de Energia</td>
+<td>Corrente de pico dentro da capacidade do regulador (3 A)</td>
+<td>Pico de 0,74 A (740 mA)</td>
+<td style="text-align: center;">S</td>
+<td style="text-align: center;">-</td>
+<td>Medido no borne de 20 A do multímetro (respeitado o ciclo de 10 s a cada 15 min). Só o máximo foi anotado. Multímetro lento pode não capturar o pico real</td>
+</tr>
+<tr>
+<td style="text-align: center;">2.12</td>
+<td>Cálculo da resistência interna equivalente do pack</td>
+<td>21/10/2026</td>
+<td>21/10/2026</td>
+<td>Subgrupo de Energia</td>
+<td>Queda de tensão em carga pequena em relação à tensão nominal</td>
+<td>R_int = (7,66 − 7,33) / 0,74 ≈ 0,45 Ω</td>
+<td style="text-align: center;">S</td>
+<td style="text-align: center;">-</td>
+<td>Estimativa limitada pela leitura de corrente com multímetro</td>
+</tr>
+<tr>
+<td style="text-align: center;">2.13</td>
+<td>Avaliação do risco de brownout / reinício do microcontrolador por travamento</td>
+<td>21/10/2026</td>
+<td>21/10/2026</td>
+<td>Subgrupo de Energia</td>
+<td>Tensão sempre acima de 6 V (regulador) e 5 V (motores)</td>
+<td>Mínimo de 7,33 V. Sem desligamento e sem reinício. Risco de brownout descartado</td>
+<td style="text-align: center;">S</td>
+<td style="text-align: center;">-</td>
+<td>Condição simulada: colisão ou travamento em parede do labirinto</td>
+</tr>
+<tr>
+<td style="text-align: center;">2.15</td>
+<td>Cálculo da autonomia útil: T_útil = (3,3 Ah × 0,8) / I_médio</td>
+<td>21/10/2026</td>
+<td>21/10/2026</td>
+<td>Subgrupo de Energia</td>
+<td>Autonomia ≥ 4 h (tempo estimado das provas, com margem)</td>
+<td>Fórmula definida (corte de 6,0 V e fator operacional de 80%). O relatório não apresenta o valor numérico final</td>
+<td style="text-align: center;">S</td>
+<td style="text-align: center;">-</td>
+<td>Com I_médio = 6 A, o resultado seria ≈ 0,44 h (≈ 26 min); com 0,6 A, ≈ 4,4 h. Confirmar a corrente</td>
+</tr>
+<tr>
+<td style="text-align: center;">2.16</td>
+<td>Validação não destrutiva (sem descarga total) e recomendação de proteção</td>
+<td>21/10/2026</td>
+<td>21/10/2026</td>
+<td>Subgrupo de Energia</td>
+<td>Validar a bateria sem expô-la a descarga profunda</td>
+<td>Menor tensão registrada: 7,33 V, bem acima de 6,0 V. Descarga total não realizada, por risco de dissolução de cobre, curto interno e fuga térmica. Recomendado circuito UVLO em 6,0 V</td>
+<td style="text-align: center;">S</td>
+<td style="text-align: center;">-</td>
+<td>Um professor recomendou o teste, mas o grupo decidiu não executá-lo após pesquisa (ver Seção 2 do relatório)</td>
+</tr>
+</tbody>
+</table>
+<h1 id="relatorio-de-testes-da-bateria-micromouse-resolvedor-de-labirintos">Relatório de Testes da Bateria – Micromouse Resolvedor de Labirintos<a class="headerlink" href="#relatorio-de-testes-da-bateria-micromouse-resolvedor-de-labirintos" title="Permanent link">&para;</a></h1>
+<p><strong>Projeto Integrador de Engenharia – Micromouse Resolvedor de Labirintos</strong>
+<strong>Subgrupo de Energia</strong></p>
+<hr />
+<h2 id="1-objetivo-e-especificacoes-nominais-da-bateria">1. Objetivo e Especificações Nominais da Bateria<a class="headerlink" href="#1-objetivo-e-especificacoes-nominais-da-bateria" title="Permanent link">&para;</a></h2>
+<h3 id="11-objetivo">1.1 Objetivo<a class="headerlink" href="#11-objetivo" title="Permanent link">&para;</a></h3>
+<p>Este relatório documenta o ensaio do pack de baterias Li-ion que alimentará o Micromouse. O objetivo é verificar se a bateria funciona de forma adequada durante o tempo estabelecido para a resolução dos três labirintos, observando como a tensão se comporta com os motores em operação contínua e sob esforço extremo (motores travados).</p>
+<p>Para isso foram realizados dois ensaios curtos e controlados: (1) operação contínua dos dois motores por 15 minutos, para acompanhar a queda de tensão e a duração da bateria; e (2) travamento dos motores por 6 segundos, para medir a corrente de pico e a queda instantânea de tensão. A autonomia total será estimada por cálculo, sem descarregar a bateria até o fim (justificativa na Seção 2).</p>
+<h3 id="12-contexto-no-projeto">1.2 Contexto no projeto<a class="headerlink" href="#12-contexto-no-projeto" title="Permanent link">&para;</a></h3>
+<p>No projeto conceitual de energia [13], a potência média do sistema foi estimada em cerca de 4,5 W. Para 4 h de operação, isso resulta em aproximadamente 18 Wh, ou cerca de 2,43 Ah a 7,4 V. Aplicando uma margem de segurança de 30%, chega-se a cerca de 3,16 Ah (3.159 mAh), e por isso foi escolhido um pack de 3300 mAh. Este ensaio serve para conferir essa escolha com medições reais.</p>
+<h3 id="13-especificacoes-nominais-da-bateria">1.3 Especificações nominais da bateria<a class="headerlink" href="#13-especificacoes-nominais-da-bateria" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Parâmetro técnico</th>
+<th>Valor nominal</th>
+<th>Condição / detalhe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Química</td>
+<td>Íon de lítio (Li-ion), recarregável</td>
+<td>Conforme etiqueta do pack</td>
+</tr>
+<tr>
+<td>Configuração</td>
+<td>2S (duas células em série)</td>
+<td>Células tipo 18650 (lista de compras [14]); 7,4 V indica 2 células em série</td>
+</tr>
+<tr>
+<td>Tensão nominal</td>
+<td>7,4 V</td>
+<td>3,7 V por célula</td>
+</tr>
+<tr>
+<td>Tensão máxima de carga (100%)</td>
+<td>8,4 V</td>
+<td>4,2 V por célula</td>
+</tr>
+<tr>
+<td>Tensão mínima de corte (cut-off)</td>
+<td>6,0 V</td>
+<td>3,0 V por célula</td>
+</tr>
+<tr>
+<td>Capacidade nominal</td>
+<td>3300 mAh</td>
+<td>3,3 Ah</td>
+</tr>
+<tr>
+<td>Energia nominal (calculada)</td>
+<td>≈ 24,4 Wh</td>
+<td>7,4 V × 3,3 Ah</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Observação:</strong> os valores de tensão máxima e de corte são os usuais para células Li-ion de 3,7 V. Fabricante, modelo e datasheet do pack não estão disponíveis, e não há informação sobre placa de proteção (BMS/PCM) interna.</p>
+</blockquote>
+<hr />
+<h2 id="2-justificativa-tecnica-por-que-nao-foi-realizada-a-descarga-total">2. Justificativa Técnica – Por que não foi realizada a descarga total<a class="headerlink" href="#2-justificativa-tecnica-por-que-nao-foi-realizada-a-descarga-total" title="Permanent link">&para;</a></h2>
+<p>O ensaio de descarga completa (até a tensão de corte de 6,0 V ou abaixo dela) não foi realizado. Apesar de um dos professores terem recomendado o teste, após discussões e pesquisas o grupo decidiu não executá-lo. Descarregar uma bateria Li-ion além do seu limite causa danos que não se revertem e cria riscos de segurança. Os motivos estão detalhados a seguir.</p>
+<h3 id="21-tensao-de-corte-e-margem-de-seguranca">2.1 Tensão de corte e margem de segurança<a class="headerlink" href="#21-tensao-de-corte-e-margem-de-seguranca" title="Permanent link">&para;</a></h3>
+<p>Para células Li-ion de 3,7 V, o limite usual de descarga é de cerca de 3,0 V por célula: a maioria dos equipamentos portáteis desliga nesse ponto, o que reduz o desgaste da bateria e deixa uma pequena reserva de energia [1]. Em um pack 2S, isso equivale a 6,0 V. A resistência interna da célula também aumenta à medida que ela se esgota [1], de modo que o fim da descarga é a fase mais estressante.</p>
+<p>Em packs em série, diferenças de capacidade entre as duas células podem fazer uma delas ficar abaixo de 3,0 V mesmo quando a tensão total marca 6,0 V [11]. Ou seja, levar o pack até o corte, sem proteção individual por célula, já traz risco.</p>
+<h3 id="22-degradacao-quimica-irreversivel-dissolucao-do-cobre">2.2 Degradação química irreversível: dissolução do cobre<a class="headerlink" href="#22-degradacao-quimica-irreversivel-dissolucao-do-cobre" title="Permanent link">&para;</a></h3>
+<p>Na descarga profunda, o potencial do anodo (grafite) sobe. Ao passar de cerca de 3,3 a 3,6 V em relação ao lítio, o coletor de corrente de cobre do anodo começa a oxidar e a se dissolver no eletrólito líquido [3][4]. Esse processo danifica o coletor de forma irreversível [12] e provoca perda severa de capacidade [5]. Estudos conduzidos por laboratórios da Universidade de Maryland (CALCE) e da Marinha dos EUA analisaram esse fenômeno em células sobredescarregadas [2].</p>
+<h3 id="23-risco-de-curto-circuito-interno">2.3 Risco de curto-circuito interno<a class="headerlink" href="#23-risco-de-curto-circuito-interno" title="Permanent link">&para;</a></h3>
+<p>O cobre dissolvido migra pelo eletrólito, atravessa o separador (a membrana porosa que isola o anodo do catodo) e se deposita no lado oposto, podendo formar uma ponte condutora entre os dois eletrodos [3][6][7]. A literatura descreve esses depósitos como dendritos de cobre capazes de perfurar o separador [10]. O curto-circuito interno se agrava conforme a descarga profunda continua [7]. Na recarga seguinte, a célula é carregada já com o defeito instalado, e os pontos de cobre depositados podem se tornar locais de deposição de lítio metálico [8].</p>
+<h3 id="24-perigo-de-fuga-termica-thermal-runaway">2.4 Perigo de fuga térmica (<em>thermal runaway</em>)<a class="headerlink" href="#24-perigo-de-fuga-termica-thermal-runaway" title="Permanent link">&para;</a></h3>
+<p>Fuga térmica é uma reação em cadeia exotérmica e autossustentada: ela ocorre quando a geração de calor dentro da célula supera a capacidade de dissipá-lo [9]. Um curto-circuito interno gera aquecimento localizado, que pode danificar ainda mais o separador e acelerar as reações, levando a superaquecimento, fogo ou explosão [10]. A descarga profunda é apontada como um dos tipos de abuso que podem desencadear esse cenário [3]. Em um pack, o calor ainda pode se propagar para as células vizinhas [9].</p>
+<h3 id="25-validacao-nao-destrutiva-adotada">2.5 Validação não destrutiva adotada<a class="headerlink" href="#25-validacao-nao-destrutiva-adotada" title="Permanent link">&para;</a></h3>
+<p>Por esses motivos, o ensaio foi planejado para manter a bateria longe do limite de corte. A menor tensão registrada foi de 7,33 V (durante o travamento dos motores), bem acima dos 6,0 V. A autonomia total será estimada por cálculo, a partir da corrente média medida no ensaio de 15 minutos, conforme a Seção 5, o que preserva a integridade e a vida útil da bateria que será usada no robô. Como proteção adicional, a Seção 6 recomenda um circuito de proteção contra subtensão (UVLO) ajustado em 6,0 V.</p>
+<hr />
+<h2 id="3-metodologia-e-bancada-de-testes">3. Metodologia e Bancada de Testes<a class="headerlink" href="#3-metodologia-e-bancada-de-testes" title="Permanent link">&para;</a></h2>
+<h3 id="31-condicoes-iniciais">3.1 Condições iniciais<a class="headerlink" href="#31-condicoes-iniciais" title="Permanent link">&para;</a></h3>
+<p>O ensaio de 15 minutos começou com a bateria em 7,80 V (cerca de 3,90 V por célula). A bateria não estava totalmente carregada (100% corresponde a 8,4 V), pois o mesmo pack já havia sido usado em testes anteriores. O ensaio de travamento começou logo em seguida, com a tensão que a bateria tinha ao final do ensaio anterior (7,66 V), sem recarga entre os dois. Por isso, os resultados devem ser lidos considerando que o pack partiu de uma carga abaixo da máxima.</p>
+<h3 id="32-materiais-e-instrumentos">3.2 Materiais e instrumentos<a class="headerlink" href="#32-materiais-e-instrumentos" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Instrumentos utilizados:</strong> 2 multímetros digitais DT9205A: o primeiro mediu a tensão na saída da bateria e o segundo, a tensão já regulada na saída do regulador buck. A corrente foi medida com um multímetro ligado ao regulador buck.</li>
+<li><strong>Bateria:</strong> pack Li-ion 2S, 7,4 V, 3300 mAh (Seção 1.3).</li>
+<li><strong>Regulador de tensão:</strong> módulo buck MP1584 [13]: entrada de 4,5 a 28 V, saída ajustável de 0,8 a 20 V, até 3 A [15]. Saída medida em ≈ 5,93 V (Figura 3).</li>
+<li><strong>Motores:</strong> 2 motores (N20-6V com encoder, conforme o projeto [13] e a lista de compras [14]).</li>
+<li><strong>Montagem:</strong> protoboard, jumpers, regulador buck, motores e conector da bateria.</li>
+<li><strong>Ferramenta:</strong> alicate, usado para travar o eixo dos motores.</li>
+</ul>
+<h3 id="33-montagem-da-bancada">3.3 Montagem da bancada<a class="headerlink" href="#33-montagem-da-bancada" title="Permanent link">&para;</a></h3>
+<p>A bateria foi ligada ao regulador buck, montado na protoboard, e a saída do regulador alimentou os dois motores. A tensão da bateria foi lida na saída da bateria (entrada do regulador) por um multímetro, e a tensão já regulada foi lida na saída do regulador buck pelo outro, ambos ligados em paralelo. A corrente foi medida por um multímetro ligado ao regulador buck.</p>
+<p><img alt="Figura 1 – Bancada de testes do ensaio de 15 min: bateria, regulador buck na protoboard e ligação aos motores" src="../figs/figura1-testes-15m.jpg" /></p>
+<p><em>Figura 1 – Bancada de testes do ensaio de 15 min: bateria, regulador buck na protoboard e ligação aos motores</em></p>
+<h3 id="34-procedimento-1-operacao-continua-15-minutos">3.4 Procedimento 1 – Operação contínua (15 minutos)<a class="headerlink" href="#34-procedimento-1-operacao-continua-15-minutos" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Com a bateria em 7,80 V, o circuito foi ligado: bateria → regulador buck → 2 motores.</li>
+<li>Os motores ficaram em operação contínua por 15 minutos, para obter a curva de descarga e estimar a duração da bateria.</li>
+<li>A tensão da bateria (entrada do regulador) foi registrada no início (7,80 V, 0 min), no meio do ensaio (7,74 V, ≈ 8 min) e no final (7,66 V, 15 min). A tensão na saída do regulador, já regulada, foi de ≈ 5,93 V.</li>
+<li>A corrente média de operação (I médio) ficou próxima de 6 A, e será usada nos cálculos de autonomia da Seção 5.</li>
+</ol>
+<p><img alt="Figura 2 – Tensão na entrada do regulador aos ≈ 8 min (7,74 V)" src="../figs/figura2-tensao-bateria.jpg" /></p>
+<p><em>Figura 2 – Tensão na entrada do regulador aos ≈ 8 min (7,74 V)</em></p>
+<p><img alt="Figura 3 – Tensão na saída do regulador (5,93 V)" src="../figs/figura3-tensao-saida-regulador.jpg" /></p>
+<p><em>Figura 3 – Tensão na saída do regulador (5,93 V)</em></p>
+<p><img alt="Figura 4 – Tensão da bateria ao final dos 15 min (7,66 V)" src="../figs/figura4-tensao-bateria-final-15m.jpg" /></p>
+<p><em>Figura 4 – Tensão da bateria ao final dos 15 min (7,66 V)</em></p>
+<h3 id="35-procedimento-2-travamento-dos-motores-6-segundos">3.5 Procedimento 2 – Travamento dos motores (6 segundos)<a class="headerlink" href="#35-procedimento-2-travamento-dos-motores-6-segundos" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Com a bateria em 7,66 V, o eixo de saída dos motores (<em>shaft</em>), que é a parte que gira e transmite o movimento à roda, foram travados com um alicate, impedindo-os de girar.</li>
+<li>Os motores foram mantidos travados por 6 segundos, tempo curto para evitar superaquecimento dos motores e da fiação.</li>
+<li>Foram medidos o pico de corrente e a queda instantânea de tensão da bateria.</li>
+</ol>
+<p><img alt="Figura 5 – Ilustração do procedimento de travamento do eixo com alicate" src="../figs/figura5-travamento-eixo.jpg" /></p>
+<p><em>Figura 5 – Ilustração do procedimento de travamento do eixo com alicate</em></p>
+<blockquote>
+<p><strong>Observação sobre o multímetro:</strong> Diante do pico de corrente de 0,74 A, superior à capacidade da entrada de miliampères (limitada a 500 mA por fusível), o multímetro foi conectado ao borne dedicado de 20 A. O tempo de execução do ensaio (6 s) respeitou o ciclo de trabalho estipulado pelo fabricante para essa entrada (máximo de 10 s de condução a cada 15 min).</p>
+</blockquote>
+<h3 id="36-dados-brutos-registrados">3.6 Dados brutos registrados<a class="headerlink" href="#36-dados-brutos-registrados" title="Permanent link">&para;</a></h3>
+<p>Leituras de tensão da bateria (entrada do regulador) ao longo do ensaio de 15 minutos:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">Tempo (min)</th>
+<th style="text-align: center;">Tensão (V)</th>
+<th>Observação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">7,80</td>
+<td>Início do ensaio</td>
+</tr>
+<tr>
+<td style="text-align: center;">≈ 8</td>
+<td style="text-align: center;">7,74</td>
+<td>Leitura intermediária (Figura 2)</td>
+</tr>
+<tr>
+<td style="text-align: center;">15</td>
+<td style="text-align: center;">7,66</td>
+<td>Fim do ensaio (Figura 4)</td>
+</tr>
+</tbody>
+</table>
+<p>Resumo dos dois ensaios:</p>
+<table>
+<thead>
+<tr>
+<th>Ensaio</th>
+<th>Condição</th>
+<th style="text-align: center;">Tensão inicial</th>
+<th style="text-align: center;">Tensão final / mínima</th>
+<th style="text-align: center;">Variação</th>
+<th>Corrente</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Operação contínua (15 min)</td>
+<td>2 motores via buck</td>
+<td style="text-align: center;">7,80 V</td>
+<td style="text-align: center;">7,66 V</td>
+<td style="text-align: center;">−0,14 V</td>
+<td>I médio: próximo de 6 A</td>
+</tr>
+<tr>
+<td>Travamento (6 s)</td>
+<td>Eixos travados</td>
+<td style="text-align: center;">7,66 V</td>
+<td style="text-align: center;">7,33 V (queda instantânea)</td>
+<td style="text-align: center;">−0,33 V</td>
+<td>0,74 A (740 mA)</td>
+</tr>
+</tbody>
+</table>
+<p>Tensão medida na saída do regulador buck durante o ensaio: ≈ 5,93 V (Figura 3). A análise desses dados (consumo, risco de brownout) está na Seção 4.</p>
+<h3 id="37-limitacoes-do-ensaio">3.7 Limitações do ensaio<a class="headerlink" href="#37-limitacoes-do-ensaio" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Sem osciloscópio, não há registro da forma do transiente de tensão; o multímetro digital atualiza a leitura devagar e pode não capturar o pico real de corrente.</li>
+<li>A tensão da bateria foi registrada em apenas três instantes (0, ≈ 8 e 15 min), e a bateria não estava totalmente carregada.</li>
+</ul>
+<hr />
+<h2 id="passo-4-analise-dos-resultados-do-ensaio">Passo 4: Análise dos Resultados do Ensaio<a class="headerlink" href="#passo-4-analise-dos-resultados-do-ensaio" title="Permanent link">&para;</a></h2>
+<h3 id="ensaio-de-15-minutos-regime-continuo">Ensaio de 15 minutos (regime contínuo)<a class="headerlink" href="#ensaio-de-15-minutos-regime-continuo" title="Permanent link">&para;</a></h3>
+<p>O ensaio foi feito só com os dois motores, sem a ESP (ainda não estava pronta). A tensão da bateria caiu de 7,80 V para 7,66 V em 15 min (queda de 0,14 V, cerca de 1,8%).</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">Tempo (min)</th>
+<th style="text-align: center;">Tensão (V)</th>
+<th>Ponto de medição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">7,80</td>
+<td>Bateria</td>
+</tr>
+<tr>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">7,74</td>
+<td>Entrada do regulador</td>
+</tr>
+<tr>
+<td style="text-align: center;">15</td>
+<td style="text-align: center;">7,66</td>
+<td>Bateria</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Gráfico – Queda de 0,14 V em 15 min; projeção de 7,24 V em 1 h, acima do corte de 6,0 V. Medições do ensaio de 15 min (7,80 / 7,74 / 7,66 V); projeção linear até 60 min" src="../figs/figura6-grafico.png" /></p>
+<p><em>Gráfico – Queda de 0,14 V em 15 min; projeção de 7,24 V em 1 h, acima do corte de 6,0 V. Medições do ensaio de 15 min (7,80 / 7,74 / 7,66 V); projeção linear até 60 min</em></p>
+<ul>
+<li><strong>Projeção para 1 hora:</strong> mantida a taxa de queda (cerca de 0,56 V por hora), a tensão chegaria a cerca de 7,24 V, bem acima do corte de 6,0 V. Como a ESP não estava ligada (componente não estava pronto no momento dos testes) e é um componente que apresenta um consumo real da bateria (0,264 W) podemos estimar que a queda da tensão seria um pouco maior, um aumento em cerca de 18%. Nessa análise, a taxa de queda seria de 0,66 V por hora, o que ainda apresenta uma margem segura de operação, mesmo com a bateria não operando em carga total (tensão da bateria chegaria em 7,14 V, ainda acima do corte de 6,0 V).</li>
+<li><strong>Temperatura:</strong> sem alteração observada durante o ensaio.</li>
+<li><strong>Saída do regulador</strong> com os motores em funcionamento: 5,93 V (buck ajustado em 6 V).</li>
+<li><strong>Corrente média e capacidade consumida:</strong> I_médio ≈ 6 A e ΔC ≈ 1,5 Ah em 15 min (ver Seção 5).</li>
+</ul>
+<h3 id="ensaio-de-6-segundos-motores-travados">Ensaio de 6 segundos (motores travados)<a class="headerlink" href="#ensaio-de-6-segundos-motores-travados" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Grandeza</th>
+<th>Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tensão em vazio (V_vazio)</td>
+<td>7,66 V</td>
+</tr>
+<tr>
+<td>Tensão mínima transiente (V_stall)</td>
+<td>7,33 V</td>
+</tr>
+<tr>
+<td>Corrente de pico (I_stall)</td>
+<td>0,74 A (só a máxima foi anotada)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Risco de brownout:</strong> mesmo com os motores travados, a bateria entregou no mínimo 7,33 V, uma queda instantânea de 0,33 V, um valor consideravelmente baixo comparado a operação da bateria. Esse valor está acima dos 6 V do regulador buck e dos 5 V necessários aos motores. A saída do regulador se manteve em 5,93 V e não houve desligamento. Portanto, não há risco de brownout nem de reinício do microcontrolador por travamento nas paredes do labirinto.</p>
+<hr />
+<h2 id="passo-5-calculos-de-engenharia">Passo 5: Cálculos de Engenharia<a class="headerlink" href="#passo-5-calculos-de-engenharia" title="Permanent link">&para;</a></h2>
+<h3 id="resistencia-interna-equivalente">Resistência interna equivalente<a class="headerlink" href="#resistencia-interna-equivalente" title="Permanent link">&para;</a></h3>
+<p><code>R_int = (V_vazio − V_stall) / I_stall = (7,66 − 7,33) / 0,74 ≈ 0,45 Ω</code></p>
+<p>V_vazio é a tensão da bateria logo antes do travamento (7,66 V, Seção 3.5). R_int é uma estimativa, limitada pela leitura de corrente com multímetro (Seção 3.7).</p>
+<h3 id="autonomia-util">Autonomia útil<a class="headerlink" href="#autonomia-util" title="Permanent link">&para;</a></h3>
+<p>A corrente média (I_médio) foi registrada no ensaio de 15 min, com os dois motores e sem a ESP. Com ela, a capacidade consumida (<code>ΔC = I_médio × 0,25 h</code>) e a autonomia são calculadas pela fórmula abaixo.</p>
+<p><code>T_útil = (3,3 Ah × 0,8) / I_médio</code></p>
+<p>Considera o corte de segurança de 6,0 V e o fator operacional de 80%.</p>
+<hr />
+<h2 id="passo-6-conclusoes-e-recomendacoes">Passo 6: Conclusões e Recomendações<a class="headerlink" href="#passo-6-conclusoes-e-recomendacoes" title="Permanent link">&para;</a></h2>
+<p>Os ensaios práticos realizados pelo subgrupo de Energia permitiram validar a escolha e a viabilidade do pack de baterias Li-ion de 7,4 V e 3300 mAh para a alimentação do Micromouse, sem a necessidade de expor o componente a testes de descarga profunda até o limite de corte (6,0 V).</p>
+<p>A análise conjunta dos dois testes experimentais permitiu extrair as seguintes conclusões de engenharia:</p>
+<ul>
+<li><strong>Estabilidade em Regime Contínuo (Ensaio de 15 min):</strong> Durante o teste de operação contínua dos dois motores, a bateria apresentou uma queda de tensão extremamente sutil (de 7,80 V para 7,66 V, ou apenas 1,8%), mantendo a saída do regulador buck estável em ≈ 5,93 V e sem registrar qualquer alteração de temperatura. Os dados coletados permitiram projetar a curva de descarga ao longo do tempo, comprovando que, mesmo considerando o acréscimo de consumo dos demais subsistemas (como a ESP32), a bateria opera com uma ampla margem de segurança acima do limiar crítico de 6,0 V durante o tempo estimado para a execução das provas.</li>
+<li><strong>Imunidade a Brownout e Resposta a Transientes (Ensaio de 6 s):</strong> O teste de travamento dos eixos demonstrou que, sob condição extrema de sobredemanda (corrente de pico de 0,74 A por 6 s), o afundamento instantâneo de tensão da bateria foi de apenas 0,33 V, atingindo o patamar mínimo de 7,33 V. Como essa tensão permanece significativamente superior ao limite operacional do regulador buck (≈ 6,0 V) e à tensão de alimentação do microcontrolador (5 V / 3,3 V), fica comprovado que o sistema elétrico é imune a redefinições indesejadas (brownouts) em caso de colisões ou travamentos mecânicos nas paredes do labirinto.</li>
+<li><strong>Validação Não Destrutiva e Projeção Prolongada:</strong> A estratégia de utilizar ensaios curtos e controlados para extrapolar matematicamente o consumo e a autonomia útil do robô mostrou-se plenamente eficaz. Essa abordagem permitiu extrair parâmetros reais do sistema em bancada, como a taxa de queda de tensão por hora (<code>ΔV/Δt</code>) e a resistência interna equivalente (<code>R_int</code>), preservando as células contra fenômenos degradantes irreversíveis (como a dissolução do coletor de cobre, formação de dendritos e risco de fuga térmica).</li>
+</ul>
+<hr />
+<h2 id="referencias-secoes-1-a-3">Referências (Seções 1 a 3)<a class="headerlink" href="#referencias-secoes-1-a-3" title="Permanent link">&para;</a></h2>
+<p>[1] Battery University. BU-802c: How Low Can a Battery Be Discharged? https://batteryuniversity.com/article/bu-802c-how-low-can-a-battery-be-discharged</p>
+<p>[2] Hendricks, C. E. et al. Copper Dissolution in Overdischarged Lithium-ion Cells: X-ray Photoelectron Spectroscopy and X-ray Absorption Fine Structure Analysis. Journal of The Electrochemical Society, v. 167, 2020. DOI 10.1149/1945-7111/ab697a. https://web.calce.umd.edu/articles/abstracts/2020/20_Copper_dissolution_in.html</p>
+<p>[3] US Patent 10,797,320. Cell design to prevent over-discharge in li-ion batteries. https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/10797320</p>
+<p>[4] US Patent 10,305,104. Li-ion battery cathode materials with over-discharge protection. https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/10305104</p>
+<p>[5] UL Research Institutes. Elucidating Copper Dissolution Phenomenon in Li-Ion Cells under Overdischarge Extremes. https://ul.org/library/elucidating-copper-dissolution-phenomenon-li-ion-cells-under-overdischarge-extremes</p>
+<p>[6] NASA Tech Briefs, NPO-19950 e NPO-19966 (proteção de células Li-ion contra curto interno na sobredescarga). https://www.techbriefs.com/component/content/article/32058-npo19950 e https://www.techbriefs.com/component/content/article/32303-npo19966</p>
+<p>[7] Scientific Reports (Nature), artigo srep30248, sobre os mecanismos de sobredescarga forçada em baterias Li-ion. https://www.nature.com/articles/srep30248</p>
+<p>[8] Vora, F. T. Internal Short Circuit in Lithium-Ion Batteries. Dissertação (M.Sc.), Purdue University. https://hammer.purdue.edu/articles/thesis/INTERNAL_SHORT_CIRCUIT_IN_LITHIUM-ION_BATTERIES/20069648</p>
+<p>[9] Shahid, S.; Agelin-Chaab, M. A review of thermal runaway prevention and mitigation strategies for lithium-ion batteries. Energy Conversion and Management: X, v. 16, 2022, 100310. https://doaj.org/article/effc518aab7740669ae5f8d7bd481b33 e MDPI Processes, v. 13, n. 8, 2025, art. 2499. https://www.mdpi.com/2227-9717/13/8/2499</p>
+<p>[10] US Patent 9,905,836. Rechargeable battery with internal current limiter and interrupter. https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/9905836</p>
+<p>[11] All About Circuits (fórum). LiPo Battery Deep Discharge Protection cut-off circuit. https://forum.allaboutcircuits.com/threads/lipo-battery-deep-discharge-protection-cut-off-circuit.118686/ (discussão técnica, fonte de apoio)</p>
+<p>[12] COMSOL Multiphysics. Copper Current-Collector Dissolution (documentação de modelo). https://doc.comsol.com/6.4/doc/com.comsol.help.models.battery.cu_current_collector_dissolution/models.battery.cu_current_collector_dissolution.pdf</p>
+<p>[13] Projeto Integrador – Micromouse. 4.2 Projeto conceitual de Energia (documento interno do grupo).</p>
+<p>[14] Projeto Integrador – Micromouse. 6 – Orçamento (documento interno do grupo, atualizado em 30/09/2026).</p>
+<p>[15] Especificações do módulo regulador MP1584. https://www.embeddedrelated.com/parts/p/MP1584EN e https://45-in-1-sensor-kit.readthedocs.io/en/latest/41.mp1854en.html</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tabs", "navigation.top", "search.suggest", "search.highlight"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.c21346df.min.js"></script>
+      
+    
+  </body>
+</html>
