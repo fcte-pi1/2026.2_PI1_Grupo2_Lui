@@ -7,7 +7,7 @@ namespace mm {
 /**
  * Interface para transporte de logs de eventos (HU-12).
  *
- * Implementada concretamente pelo módulo de comunicação (WebSocket/WiFi)
+ * Implementada concretamente pelo módulo de comunicação (Bluetooth Classic SPP)
  * ou por um mock de testes. Não deve bloquear tarefas críticas de controle.
  */
 class ILogTransport {

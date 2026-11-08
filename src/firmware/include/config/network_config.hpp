@@ -2,31 +2,17 @@
 
 #include <cstdint>
 
-// Overrides locais ficam fora do controle de versão. Copie
-// network_config.local.example.hpp para network_config.local.hpp e configure
-// Wi-Fi, endereço do backend e parâmetros físicos do INA226.
+// Configurações locais ficam fora do controle de versão. Copie
+// network_config.local.example.hpp para network_config.local.hpp e personalize
+// o nome Bluetooth e os parâmetros físicos do INA226.
 #if defined(__has_include)
 #  if __has_include("network_config.local.hpp")
 #    include "network_config.local.hpp"
 #  endif
 #endif
 
-// O host deve ser o IP LAN do computador que executa o backend; "localhost"
-// apontaria para o próprio ESP32 e não funcionaria.
-#ifndef MM_WIFI_SSID
-#define MM_WIFI_SSID ""
-#endif
-#ifndef MM_WIFI_PASSWORD
-#define MM_WIFI_PASSWORD ""
-#endif
-#ifndef MM_TELEMETRY_HOST
-#define MM_TELEMETRY_HOST "192.168.1.100"
-#endif
-#ifndef MM_TELEMETRY_PORT
-#define MM_TELEMETRY_PORT 3000
-#endif
-#ifndef MM_TELEMETRY_PATH
-#define MM_TELEMETRY_PATH "/ws?role=device"
+#ifndef MM_BT_DEVICE_NAME
+#define MM_BT_DEVICE_NAME "MicroMouse"
 #endif
 #ifndef MM_MAZE_WIDTH
 #define MM_MAZE_WIDTH 4

@@ -1,7 +1,16 @@
-import { describe, it } from "node:test";
+import { after, describe, it } from "node:test";
 import assert from "node:assert/strict";
 import net from "node:net";
 import { resolvePort, startServer } from "../server";
+
+// Os testes de inicialização não devem depender de pareamento ou porta Bluetooth
+// configurados no .env da máquina que os executa.
+const configuredBluetoothPath = process.env.MM_BLUETOOTH_SERIAL_PORT;
+delete process.env.MM_BLUETOOTH_SERIAL_PORT;
+after(() => {
+  if (configuredBluetoothPath === undefined) delete process.env.MM_BLUETOOTH_SERIAL_PORT;
+  else process.env.MM_BLUETOOTH_SERIAL_PORT = configuredBluetoothPath;
+});
 
 
 async function getFreePort() {
@@ -34,7 +43,8 @@ describe("server startup", () => {
     try {
       assert.equal(backend.server.listening, true);
       assert.equal(backend.gateway.clients.size, 0);
-      assert.equal(logged.length, 1);
+      assert.equal(logged.length, 2);
+      assert.ok(logged.some((message) => message.includes("Ponte Bluetooth SPP desabilitada")));
       const address = backend.server.address();
       assert.ok(address && typeof address !== "string");
       const response = await fetch(`http://127.0.0.1:${address.port}/health`);

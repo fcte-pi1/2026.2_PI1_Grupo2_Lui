@@ -10,13 +10,20 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
 #include <freertos/task.h>
-#include <WebSocketsClient.h>
+
+#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
+#error "Bluetooth Classic deve estar habilitado no ESP32 Arduino Core."
+#endif
+#if !defined(CONFIG_BT_SPP_ENABLED)
+#error "Bluetooth SPP não está disponível nesta variante de ESP32."
+#endif
+#include <BluetoothSerial.h>
 
 namespace mm {
 
 /**
- * HU-10: transporte assíncrono entre ESP32 e gateway /ws.
- * Os produtores publicam em uma fila sem esperar pelo socket. Telemetria antiga
+ * HU-10: transporte assíncrono Bluetooth Classic SPP entre ESP32 e a ponte serial do backend.
+ * Os produtores publicam em uma fila sem esperar pelo enlace. Telemetria antiga
  * é descartada; configuração e células conhecidas ficam em cache e são
  * retransmitidas na reconexão. O início da sessão precede logs/telemetria.
  */
@@ -50,22 +57,20 @@ private:
     };
 
     static void taskEntry(void* context);
-    static void socketEvent(WStype_t type, uint8_t* payload, size_t length);
     void run();
     bool enqueue(ItemKind kind, const char* json, size_t length);
+    bool sendFrame(const char* payload, size_t length);
     bool sendSession(const SessionBuffer& session);
     bool replaySnapshot();
 
     QueueHandle_t queue_ = nullptr;
     TaskHandle_t task_ = nullptr;
-    WebSocketsClient webSocket_;
+    BluetoothSerial bluetooth_;
     volatile bool connected_ = false;
     volatile uint32_t droppedMessages_ = 0;
-    bool socketConfigured_ = false;
-    uint32_t lastWifiRetryMs_ = 0;
     uint32_t lastQueueCheckMs_ = 0;
 
-    // Protege cache/session-start compartilhados entre loop de missão e task WS.
+    // Protege cache/session-start compartilhados entre loop de missão e task Bluetooth.
     portMUX_TYPE stateMux_ = portMUX_INITIALIZER_UNLOCKED;
     char mazePayload_[kPayloadSize] = {0};
     size_t mazeLength_ = 0;
@@ -76,7 +81,7 @@ private:
     bool cellValid_[kMaxMapCells] = {false};
     char latestCellPayload_[kPayloadSize] = {0};
     size_t latestCellLength_ = 0;
-    bool snapshotReplayPending_ = false; // escrita/leitura principal na task WS
+    bool snapshotReplayPending_ = false; // escrita/leitura principal na task Bluetooth
 
     char sessionStartPayload_[kPayloadSize] = {0};
     size_t sessionStartLength_ = 0;

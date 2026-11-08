@@ -2,7 +2,7 @@ import { afterEach, describe, it } from "node:test";
 import assert from "node:assert/strict";
 import http, { type IncomingMessage } from "node:http";
 import WebSocket, { WebSocketServer } from "ws";
-import { connectionRole, createTelemetryGateway, sendIfOpen } from "../telemetry.gateway";
+import { connectionRole, createTelemetryGateway, ingestBluetoothMessage, sendIfOpen } from "../telemetry.gateway";
 import { LogInvalidoError } from "../../services/logEvento.service";
 import { SessionNavigationError } from "../../services/sessionNavigation.service";
 import { TelemetryInvalidaError } from "../../services/telemetry.service";
@@ -179,6 +179,34 @@ describe("telemetry.gateway WebSocket", () => {
     assert.equal(telemetry.type, "telemetry");
     assert.deepEqual(telemetry.wheels_speed, { left: 0.2, right: 0.21 });
     assert.deepEqual(ctx.calls.map((call) => call.method), ["start", "log", "end", "telemetry"]);
+  });
+
+  it("ingere linhas Bluetooth SPP pelo mesmo pipeline e atualiza o dashboard em tempo real", async () => {
+    const ctx = await setup();
+    const dashboard = await ctx.connect("dashboard");
+
+    ingestBluetoothMessage(ctx.gateway, JSON.stringify({
+      type: "session_start", device_session_id: 88, tipo_labirinto: "4x4", tentativa: 1,
+    }));
+    assert.deepEqual(await dashboard.receive(), {
+      type: "session_started", device_session_id: 88, id_sessao: 31,
+    });
+
+    const maze = { type: "maze", width: 4, height: 4 };
+    ingestBluetoothMessage(ctx.gateway, JSON.stringify(maze));
+    assert.deepEqual(await dashboard.receive(), maze);
+
+    const cell = { type: "cell", cell: { x: 1, y: 2 }, robot: { x: 1, y: 2, heading: "EAST" } };
+    ingestBluetoothMessage(ctx.gateway, JSON.stringify(cell));
+    assert.deepEqual(await dashboard.receive(), cell);
+
+    ingestBluetoothMessage(ctx.gateway, JSON.stringify({
+      type: "telemetry", session_id: 88, t_ms: 250,
+    }));
+    const telemetry = await dashboard.receive();
+    assert.equal(telemetry.type, "telemetry");
+    assert.equal(telemetry.battery_voltage, 7.4);
+    assert.deepEqual(ctx.calls.map((call) => call.method), ["start", "telemetry"]);
   });
 
   it("devolve gateway_error para erros de domínio das três categorias", async () => {

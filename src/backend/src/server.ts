@@ -2,7 +2,8 @@ import http, { type Server } from "node:http";
 import type { Express } from "express";
 import { createApp } from "./app";
 import { createLogsRouter } from "./routes/logs.routes";
-import { createTelemetryGateway } from "./ws/telemetry.gateway";
+import { createTelemetryGateway, ingestBluetoothMessage } from "./ws/telemetry.gateway";
+import { startBluetoothSerialBridge, type BluetoothSerialBridge } from "./communication/bluetoothSerial";
 import { createLogEventoService, type LogEventoDb } from "./services/logEvento.service";
 import { createSessionListService, type SessionListDb } from "./services/sessionList.service";
 import { createSessionNavigationService, type SessionNavigationDb } from "./services/sessionNavigation.service";
@@ -19,6 +20,7 @@ export interface BackendServices {
 export interface BackendServer {
   server: Server;
   gateway: WebSocketServer;
+  bluetoothBridge?: BluetoothSerialBridge;
 }
 
 export interface StartServerOptions {
@@ -61,6 +63,23 @@ export async function startServer(options: StartServerOptions = {}): Promise<Bac
       resolveListen();
     });
   });
+
+  // A porta serial virtual é criada pelo sistema operacional após o pareamento
+  // Bluetooth SPP. Sem a variável, o backend continua operando sem hardware.
+  const bluetoothPath = process.env.MM_BLUETOOTH_SERIAL_PORT?.trim();
+  if (bluetoothPath) {
+    const baudRate = Number(process.env.MM_BLUETOOTH_SERIAL_BAUD_RATE) || 115200;
+    backend.bluetoothBridge = startBluetoothSerialBridge({
+      path: bluetoothPath,
+      baudRate,
+      onLine: (line) => ingestBluetoothMessage(backend.gateway, line),
+      log,
+    });
+    log(`Ponte Bluetooth SPP habilitada em ${bluetoothPath} (baud=${baudRate}).`);
+  } else {
+    log("Ponte Bluetooth SPP desabilitada; defina MM_BLUETOOTH_SERIAL_PORT após parear a ESP32.");
+  }
+
   return backend;
 }
 

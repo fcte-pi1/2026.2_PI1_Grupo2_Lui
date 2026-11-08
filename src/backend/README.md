@@ -17,3 +17,14 @@ Evite incluir:
 - Arquivos temporários/específicos do sistema operacional: arquivos gerados automaticamente pelo sistema ou pelo gerenciador de arquivos (ex.: `*~`, `.DS_Store`, `Thumbs.db`).
 > [!WARNING]
 > **Não acrescente arquivos referentes ao _frontend_ nesta pasta.** Eles deverão ser armazenados na pasta [frontend](https://github.com/fcte-pi1/template/tree/main/src/frontend) deste repositório.
+
+## Telemetria Bluetooth SPP
+
+O backend pode receber dados da ESP32 por uma porta serial virtual criada pelo pareamento Bluetooth Classic (SPP). Copie `.env.example` para `.env` e configure:
+
+```env
+MM_BLUETOOTH_SERIAL_PORT=/dev/rfcomm0
+MM_BLUETOOTH_SERIAL_BAUD_RATE=115200
+```
+
+No Windows, use a porta `COM` de saída do serviço SPP; no macOS, use o dispositivo serial Bluetooth disponibilizado pelo sistema (geralmente `/dev/cu.*`). A variável `MM_BLUETOOTH_SERIAL_PORT` é obrigatória para habilitar a ponte. O backend reconecta a porta automaticamente em caso de falha. O firmware transmite objetos JSON terminados por `\n`; a ponte encaminha cada linha ao mesmo gateway que atende os dispositivos WebSocket. O dashboard continua conectado a `ws://localhost:3000/ws?role=dashboard`.

@@ -3,7 +3,6 @@
 #include "communication/TelemetryClient.h"
 
 #include <Arduino.h>
-#include <WiFi.h>
 #include <cstring>
 
 #include "config/network_config.hpp"
@@ -11,8 +10,7 @@
 namespace mm {
 namespace {
 constexpr UBaseType_t QUEUE_LENGTH = 16;
-constexpr uint32_t WIFI_RETRY_MS = 5000;
-constexpr uint32_t SOCKET_HEARTBEAT_MS = 10000;
+constexpr uint32_t SEND_TIMEOUT_MS = 2000;
 
 struct StringWriterContext {
     String* output;
@@ -29,22 +27,27 @@ int appendSessionChunk(const char* chunk, size_t length, void* context) {
 
 bool TelemetryClient::begin() {
     if (queue_ != nullptr) return true;
+
     queue_ = xQueueCreate(QUEUE_LENGTH, sizeof(QueueItem));
     if (queue_ == nullptr) return false;
 
-    WiFi.mode(WIFI_STA);
-    if (MM_WIFI_SSID[0] != '\0') {
-        WiFi.begin(MM_WIFI_SSID, MM_WIFI_PASSWORD);
-    } else {
-        Serial.println("HU-10: configure MM_WIFI_SSID/MM_WIFI_PASSWORD para habilitar telemetria.");
+    if (!bluetooth_.begin(MM_BT_DEVICE_NAME)) {
+        Serial.println("HU-10: falha ao inicializar o servidor Bluetooth Classic SPP.");
+        vQueueDelete(queue_);
+        queue_ = nullptr;
+        return false;
     }
 
-    if (xTaskCreatePinnedToCore(taskEntry, "telemetry-ws", 8192, this, 1, &task_, 0) != pdPASS) {
+    if (xTaskCreatePinnedToCore(taskEntry, "telemetry-bt", 8192, this, 1, &task_, 0) != pdPASS) {
+        bluetooth_.end();
         vQueueDelete(queue_);
         queue_ = nullptr;
         task_ = nullptr;
         return false;
     }
+
+    Serial.printf("HU-10: Bluetooth Classic SPP anunciado como '%s'; aguardando pareamento.\n",
+                  MM_BT_DEVICE_NAME);
     return true;
 }
 
@@ -66,7 +69,7 @@ bool TelemetryClient::publishMazeConfig(const char* json, size_t length,
     mazeWidth_ = width;
     mazeHeight_ = height;
     portEXIT_CRITICAL(&stateMux_);
-    // Tenta envio imediato; em caso de perda, o cache será replayado na reconexão.
+    // Enfileira imediatamente; em caso de perda, o cache será replayado na reconexão.
     return enqueue(ItemKind::Json, json, length);
 }
 
@@ -153,45 +156,42 @@ void TelemetryClient::taskEntry(void* context) {
     vTaskDelete(nullptr);
 }
 
-void TelemetryClient::socketEvent(WStype_t type, uint8_t* payload, size_t length) {
-    (void)payload;
-    (void)length;
-    if (type == WStype_CONNECTED) Serial.println("HU-10: WebSocket conectado ao backend.");
-    else if (type == WStype_DISCONNECTED) Serial.println("HU-10: WebSocket desconectado; reconectando.");
+bool TelemetryClient::sendFrame(const char* payload, size_t length) {
+    if (payload == nullptr || length == 0 || !bluetooth_.hasClient()) return false;
+
+    // BluetoothSerial enfileira um frame inteiro ou retorna zero quando a fila
+    // SPP está congestionada. Aguarda somente nesta task de baixa prioridade.
+    const uint32_t startedAt = millis();
+    size_t written = 0;
+    while (written < length) {
+        if (!bluetooth_.hasClient() ||
+            static_cast<uint32_t>(millis() - startedAt) >= SEND_TIMEOUT_MS) {
+            return false;
+        }
+
+        const size_t accepted = bluetooth_.write(
+            reinterpret_cast<const uint8_t*>(payload) + written,
+            length - written);
+        if (accepted > 0) written += accepted;
+        else vTaskDelay(pdMS_TO_TICKS(1));
+    }
+
+    const uint8_t newline = '\n';
+    while (bluetooth_.hasClient() &&
+           static_cast<uint32_t>(millis() - startedAt) < SEND_TIMEOUT_MS) {
+        if (bluetooth_.write(&newline, 1) == 1) return true;
+        vTaskDelay(pdMS_TO_TICKS(1));
+    }
+    return false;
 }
 
 void TelemetryClient::run() {
     QueueItem item{};
     while (true) {
         const uint32_t now = millis();
-        if (WiFi.status() != WL_CONNECTED) {
-            connected_ = false;
-            portENTER_CRITICAL(&stateMux_);
-            if (sessionActive_ && !sessionClosedLocally_) sessionStartPending_ = true;
-            portEXIT_CRITICAL(&stateMux_);
-            if (MM_WIFI_SSID[0] != '\0' && static_cast<uint32_t>(now - lastWifiRetryMs_) >= WIFI_RETRY_MS) {
-                lastWifiRetryMs_ = now;
-                WiFi.reconnect();
-            }
-            // Drena pacotes transitórios offline: configuração/células são mantidas
-            // no cache, o início será refeito e a sessão fechada permanece pendente.
-            if (queue_ != nullptr && xQueueReceive(queue_, &item, 0) == pdTRUE) {
-                ++droppedMessages_;
-            }
-            vTaskDelay(pdMS_TO_TICKS(50));
-            continue;
-        }
-
-        if (!socketConfigured_) {
-            webSocket_.begin(MM_TELEMETRY_HOST, MM_TELEMETRY_PORT, MM_TELEMETRY_PATH);
-            webSocket_.onEvent(socketEvent);
-            webSocket_.setReconnectInterval(2000);
-            webSocket_.enableHeartbeat(SOCKET_HEARTBEAT_MS, 3000, 2);
-            socketConfigured_ = true;
-        }
         const bool wasConnected = connected_;
-        webSocket_.loop();
-        connected_ = webSocket_.isConnected();
+        connected_ = bluetooth_.hasClient();
+
         if (wasConnected && !connected_) {
             portENTER_CRITICAL(&stateMux_);
             if (sessionActive_ && !sessionClosedLocally_) sessionStartPending_ = true;
@@ -199,46 +199,68 @@ void TelemetryClient::run() {
         }
         if (!wasConnected && connected_) snapshotReplayPending_ = true;
 
+        if (!connected_) {
+            // Drena amostras transitórias offline: mapa/configuração são mantidos
+            // no cache, início e encerramento de sessão permanecem pendentes.
+            portENTER_CRITICAL(&stateMux_);
+            if (sessionActive_ && !sessionClosedLocally_) sessionStartPending_ = true;
+            portEXIT_CRITICAL(&stateMux_);
+            if (queue_ != nullptr && xQueueReceive(queue_, &item, 0) == pdTRUE) {
+                ++droppedMessages_;
+            }
+            vTaskDelay(pdMS_TO_TICKS(50));
+            continue;
+        }
+
         // O backend deve conhecer a sessão antes de receber logs ou telemetria.
-        if (connected_) {
-            bool startPending;
-            char startPayload[kPayloadSize];
-            size_t startLength;
-            portENTER_CRITICAL(&stateMux_);
-            startPending = sessionStartPending_;
-            startLength = sessionStartLength_;
-            if (startPending && startLength > 0) memcpy(startPayload, sessionStartPayload_, startLength + 1);
-            portEXIT_CRITICAL(&stateMux_);
-            if (startPending) {
-                if (startLength > 0 && webSocket_.sendTXT(reinterpret_cast<uint8_t*>(startPayload), startLength)) {
-                    portENTER_CRITICAL(&stateMux_);
-                    sessionStartPending_ = false;
-                    portEXIT_CRITICAL(&stateMux_);
-                }
-                vTaskDelay(pdMS_TO_TICKS(10));
-                continue;
+        bool startPending;
+        char startPayload[kPayloadSize];
+        size_t startLength;
+        portENTER_CRITICAL(&stateMux_);
+        startPending = sessionStartPending_;
+        startLength = sessionStartLength_;
+        if (startPending && startLength > 0) memcpy(startPayload, sessionStartPayload_, startLength + 1);
+        portEXIT_CRITICAL(&stateMux_);
+        if (startPending) {
+            if (startLength > 0 && sendFrame(startPayload, startLength)) {
+                portENTER_CRITICAL(&stateMux_);
+                sessionStartPending_ = false;
+                portEXIT_CRITICAL(&stateMux_);
+            } else {
+                connected_ = false;
             }
+            vTaskDelay(pdMS_TO_TICKS(10));
+            continue;
+        }
 
-            // Primeiro esvazia a fila corrente; só depois o snapshot corrige células
-            // que não puderam ser transmitidas durante a desconexão.
-            if (snapshotReplayPending_ && uxQueueMessagesWaiting(queue_) == 0) {
-                if (replaySnapshot()) snapshotReplayPending_ = false;
-                vTaskDelay(pdMS_TO_TICKS(10));
-                continue;
-            }
+        // Primeiro esvazia a fila corrente; só depois o snapshot corrige células
+        // que não puderam ser transmitidas durante a desconexão.
+        if (snapshotReplayPending_ && uxQueueMessagesWaiting(queue_) == 0) {
+            if (replaySnapshot()) snapshotReplayPending_ = false;
+            else connected_ = false;
+            vTaskDelay(pdMS_TO_TICKS(10));
+            continue;
+        }
 
-            // O fim respeita a ordem dos logs/telemetria já enfileirados antes dele.
-            const SessionBuffer* endSession = nullptr;
-            portENTER_CRITICAL(&stateMux_);
-            if (pendingSessionEnd_ != nullptr && uxQueueMessagesWaiting(queue_) == 0 && !snapshotReplayPending_) {
-                endSession = pendingSessionEnd_;
-            }
-            portEXIT_CRITICAL(&stateMux_);
-            if (endSession != nullptr && sendSession(*endSession)) {
+        // O fim respeita a ordem dos logs/telemetria já enfileirados antes dele.
+        const SessionBuffer* endSession = nullptr;
+        portENTER_CRITICAL(&stateMux_);
+        if (pendingSessionEnd_ != nullptr && uxQueueMessagesWaiting(queue_) == 0 && !snapshotReplayPending_) {
+            endSession = pendingSessionEnd_;
+        }
+        portEXIT_CRITICAL(&stateMux_);
+        if (endSession != nullptr) {
+            if (sendSession(*endSession)) {
                 portENTER_CRITICAL(&stateMux_);
                 if (pendingSessionEnd_ == endSession) pendingSessionEnd_ = nullptr;
                 portEXIT_CRITICAL(&stateMux_);
+            } else {
+                connected_ = false;
             }
+        }
+        if (!connected_) {
+            vTaskDelay(pdMS_TO_TICKS(10));
+            continue;
         }
 
         if (static_cast<uint32_t>(now - lastQueueCheckMs_) >= 2 &&
@@ -247,10 +269,9 @@ void TelemetryClient::run() {
             if (item.kind == ItemKind::Telemetry &&
                 static_cast<uint32_t>(now - item.queuedAtMs) > network::TELEMETRY_QUEUE_STALE_MS) {
                 ++droppedMessages_;
-            } else if (connected_) {
-                webSocket_.sendTXT(reinterpret_cast<uint8_t*>(item.payload), strlen(item.payload));
-            } else {
+            } else if (!sendFrame(item.payload, strlen(item.payload))) {
                 ++droppedMessages_;
+                connected_ = false;
             }
         }
         vTaskDelay(pdMS_TO_TICKS(10));
@@ -268,7 +289,7 @@ bool TelemetryClient::replaySnapshot() {
     width = mazeWidth_;
     height = mazeHeight_;
     portEXIT_CRITICAL(&stateMux_);
-    if (length > 0 && !webSocket_.sendTXT(reinterpret_cast<uint8_t*>(payload), length)) return false;
+    if (length > 0 && !sendFrame(payload, length)) return false;
 
     for (uint8_t y = 0; y < height; ++y) {
         for (uint8_t x = 0; x < width; ++x) {
@@ -277,7 +298,7 @@ bool TelemetryClient::replaySnapshot() {
             length = cellValid_[index] ? cellLengths_[index] : 0;
             if (length > 0) memcpy(payload, cellPayloads_[index], length + 1);
             portEXIT_CRITICAL(&stateMux_);
-            if (length > 0 && !webSocket_.sendTXT(reinterpret_cast<uint8_t*>(payload), length)) return false;
+            if (length > 0 && !sendFrame(payload, length)) return false;
         }
     }
 
@@ -286,7 +307,7 @@ bool TelemetryClient::replaySnapshot() {
     length = latestCellLength_;
     if (length > 0) memcpy(payload, latestCellPayload_, length + 1);
     portEXIT_CRITICAL(&stateMux_);
-    return length == 0 || webSocket_.sendTXT(reinterpret_cast<uint8_t*>(payload), length);
+    return length == 0 || sendFrame(payload, length);
 }
 
 bool TelemetryClient::sendSession(const SessionBuffer& session) {
@@ -294,14 +315,14 @@ bool TelemetryClient::sendSession(const SessionBuffer& session) {
     body.reserve(256 + session.count() * 48);
     StringWriterContext writer{&body, true};
     if (!session.writeJson(appendSessionChunk, &writer) || !writer.ok || body.length() < 2 || body[0] != '{') {
-        Serial.println("HU-11: falha ao serializar a sessão para o WebSocket.");
+        Serial.println("HU-11: falha ao serializar a sessão para Bluetooth SPP.");
         return false;
     }
     String envelope;
     envelope.reserve(body.length() + 24);
     envelope = "{\"type\":\"session_end\",";
     envelope.concat(body.c_str() + 1);
-    return webSocket_.sendTXT(reinterpret_cast<uint8_t*>(const_cast<char*>(envelope.c_str())), envelope.length());
+    return sendFrame(envelope.c_str(), envelope.length());
 }
 
 }  // namespace mm

@@ -19,6 +19,7 @@
     "dotenv": "^18.0.5",
     "express": "^5.2.1",
     "pg": "^8.23.1",
+    "serialport": "^13.0.0",
     "ws": "^8.22.0"
   },
   "devDependencies": {
@@ -33,6 +34,7 @@
   "allowScripts": {
     "prisma@7.10.0": true,
     "@prisma/engines@7.10.0": true,
-    "esbuild@0.28.2": true
+    "esbuild@0.28.2": true,
+    "@serialport/bindings-cpp@13.0.1": true
   }
 }

@@ -436,8 +436,8 @@ void publishTelemetryIfDue(uint32_t nowMs) {
 }
 
 void initializeTelemetry() {
-    if (MM_WIFI_SSID[0] == '\0') {
-        Serial.println("HU-10: telemetria desativada; configure MM_WIFI_SSID/MM_WIFI_PASSWORD em network_config.local.hpp.");
+    if (MM_BT_DEVICE_NAME[0] == '\0') {
+        Serial.println("HU-10: configure MM_BT_DEVICE_NAME em network_config.local.hpp.");
         return;
     }
 
@@ -462,7 +462,7 @@ void initializeTelemetry() {
     }
 
     telemetryClientReady = true;
-    Serial.printf("HU-10: cliente iniciado; sessão do dispositivo=%lu; envio nominal a cada %lu ms.\n",
+    Serial.printf("HU-10: cliente Bluetooth iniciado; sessão do dispositivo=%lu; envio nominal a cada %lu ms.\n",
                   static_cast<unsigned long>(telemetrySessionId),
                   static_cast<unsigned long>(mm::network::TELEMETRY_PERIOD_MS));
 }

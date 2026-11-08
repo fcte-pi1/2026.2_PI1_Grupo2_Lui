@@ -19,6 +19,88 @@ export function sendIfOpen(socket: WebSocket, serialized: string): void {
 function isPacket(value: unknown): value is Packet {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
+
+const BLUETOOTH_MESSAGE_EVENT = "bluetooth_device_message";
+
+/** Encaminha uma linha JSON recebida pela porta Bluetooth para o mesmo pipeline do WebSocket. */
+export function ingestBluetoothMessage(gateway: WebSocketServer, line: string): void {
+  gateway.emit(BLUETOOTH_MESSAGE_EVENT, line);
+}
+
+async function processDevicePacket(
+  raw: string,
+  services: GatewayServices,
+  broadcast: (packet: Packet) => void,
+  onDomainError: (message: string) => void,
+): Promise<void> {
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (!isPacket(parsed)) throw new Error("Mensagem deve ser um objeto JSON");
+    const packet = parsed;
+
+    if (packet.type === "session_start") {
+      const deviceSessionId = Number(packet.device_session_id);
+      const created = await services.sessions.iniciarSessao({
+        device_session_id: deviceSessionId,
+        tipo_labirinto: typeof packet.tipo_labirinto === "string" ? packet.tipo_labirinto : undefined,
+        tentativa: packet.tentativa === undefined ? undefined : Number(packet.tentativa),
+      });
+      broadcast({ type: "session_started", device_session_id: deviceSessionId, id_sessao: created.id_sessao });
+      return;
+    }
+
+    if (packet.type === "log") {
+      const event = await services.logs.registrarLog({
+        idSessaoDispositivo: Number(packet.session_id),
+        nivel: typeof packet.nivel === "string" ? packet.nivel : "",
+        descricao: typeof packet.mensagem === "string" ? packet.mensagem : "",
+        timestampMs: Number(packet.t_ms),
+      });
+      broadcast({ type: "event_recorded", session_id: Number(packet.session_id), ...event });
+      return;
+    }
+
+    if (packet.type === "session_end") {
+      const result = await services.sessions.finalizarSessao(packet);
+      broadcast({
+        type: "session_finished",
+        device_session_id: Number(packet.session_id),
+        ...result,
+      });
+      return;
+    }
+
+    if (packet.type === "telemetry") {
+      const telemetry = await services.telemetry.registrarTelemetria(packet);
+      broadcast({
+        type: "telemetry",
+        battery_voltage: telemetry.battery_voltage,
+        battery_current_a: telemetry.battery_current_a,
+        pid_error: telemetry.pid_error,
+        wheels_speed: telemetry.wheels_speed,
+        heading_deg: telemetry.heading_deg,
+        sensor_distances_mm: telemetry.sensor_distances_mm,
+        robot_state: telemetry.robot_state,
+        error_reason: telemetry.error_reason,
+        timestamp: telemetry.timestamp_ms,
+      });
+      return;
+    }
+
+    // Pacote de mapa do MazeMap (sem `type`) e mensagens tipadas maze,
+    // cell ou position são encaminhados sem criar uma segunda tradução.
+    if (!packet.type || ["maze", "cell", "position"].includes(String(packet.type))) {
+      broadcast(packet);
+    }
+  } catch (error) {
+    if (error instanceof LogInvalidoError || error instanceof SessionNavigationError || error instanceof TelemetryInvalidaError) {
+      console.error("Pacote de telemetria rejeitado:", error.message);
+      onDomainError(error.message);
+      return;
+    }
+    console.error("Mensagem inválida ou erro ao processar pacote do dispositivo", error);
+  }
+}
 export function connectionRole(request: Pick<IncomingMessage, "url">): "device" | "dashboard" {
   try {
     const url = new URL(request.url ?? "/ws", "http://localhost");
@@ -60,6 +142,18 @@ export function createTelemetryGateway(server: Server, services: GatewayServices
     for (const client of dashboards) sendIfOpen(client, serialized!);
   };
 
+  // Uma única fila preserva a ordem de session_start, logs, mapa e telemetria
+  // que chegam pelo fluxo serial Bluetooth.
+  let bluetoothProcessing = Promise.resolve();
+  wss.on(BLUETOOTH_MESSAGE_EVENT, (line: string) => {
+    bluetoothProcessing = bluetoothProcessing.then(() => processDevicePacket(
+      line,
+      services,
+      broadcast,
+      (message) => console.error("Bluetooth SPP rejeitou pacote:", message),
+    )).catch((error) => console.error("Falha no processamento serial Bluetooth", error));
+  });
+
   wss.on("connection", (socket: WebSocket, request: IncomingMessage) => {
     const role = connectionRole(request);
     if (role === "dashboard") {
@@ -80,78 +174,15 @@ export function createTelemetryGateway(server: Server, services: GatewayServices
     }
 
     // Serializa o processamento por conexão: session_start deve ser persistido
-    // antes dos logs/telemetria e session_end, mesmo com consultas assíncronas.
+    // antes dos logs/telemetria e session_end, inclusive no transporte WebSocket.
     let processing = Promise.resolve();
     socket.on("message", (data) => {
-      processing = processing.then(async () => {
-        if (role !== "device") return; // navegador não grava no banco pelo WS.
-        try {
-          const parsed: unknown = JSON.parse(data.toString());
-          if (!isPacket(parsed)) throw new Error("Mensagem WebSocket deve ser um objeto JSON");
-          const packet = parsed;
-
-          if (packet.type === "session_start") {
-            const created = await services.sessions.iniciarSessao({
-              device_session_id: Number(packet.device_session_id),
-              tipo_labirinto: typeof packet.tipo_labirinto === "string" ? packet.tipo_labirinto : undefined,
-              tentativa: packet.tentativa === undefined ? undefined : Number(packet.tentativa),
-            });
-            broadcast({ type: "session_started", device_session_id: Number(packet.device_session_id), id_sessao: created.id_sessao });
-            return;
-          }
-
-          if (packet.type === "log") {
-            const event = await services.logs.registrarLog({
-              idSessaoDispositivo: Number(packet.session_id),
-              nivel: typeof packet.nivel === "string" ? packet.nivel : "",
-              descricao: typeof packet.mensagem === "string" ? packet.mensagem : "",
-              timestampMs: Number(packet.t_ms),
-            });
-            broadcast({ type: "event_recorded", session_id: Number(packet.session_id), ...event });
-            return;
-          }
-
-          if (packet.type === "session_end") {
-            const result = await services.sessions.finalizarSessao(packet);
-            broadcast({
-              type: "session_finished",
-              device_session_id: Number(packet.session_id),
-              ...result,
-            });
-            return;
-          }
-
-          if (packet.type === "telemetry") {
-            const telemetry = await services.telemetry.registrarTelemetria(packet);
-            broadcast({
-              type: "telemetry",
-              battery_voltage: telemetry.battery_voltage,
-              battery_current_a: telemetry.battery_current_a,
-              pid_error: telemetry.pid_error,
-              wheels_speed: telemetry.wheels_speed,
-              heading_deg: telemetry.heading_deg,
-              sensor_distances_mm: telemetry.sensor_distances_mm,
-              robot_state: telemetry.robot_state,
-              error_reason: telemetry.error_reason,
-              timestamp: telemetry.timestamp_ms,
-            });
-            return;
-          }
-
-          // Pacote de mapa do MazeMap (sem `type`) e mensagens tipadas maze,
-          // cell ou position são encaminhados sem criar uma segunda tradução.
-          if (!packet.type || ["maze", "cell", "position"].includes(String(packet.type))) {
-            broadcast(packet);
-          }
-        } catch (error) {
-          if (error instanceof LogInvalidoError || error instanceof SessionNavigationError || error instanceof TelemetryInvalidaError) {
-            console.error("Pacote de telemetria rejeitado:", error.message);
-            sendIfOpen(socket, JSON.stringify({ type: "gateway_error", message: error.message })!);
-            return;
-          }
-          console.error("Mensagem WebSocket inválida ou erro de persistência", error);
-        }
-      }).catch((error) => console.error("Falha no processamento serial do WebSocket", error));
+      processing = processing.then(() => processDevicePacket(
+        data.toString(),
+        services,
+        broadcast,
+        (message) => sendIfOpen(socket, JSON.stringify({ type: "gateway_error", message })),
+      )).catch((error) => console.error("Falha no processamento serial do WebSocket", error));
     });
 
     socket.on("close", () => {
