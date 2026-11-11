@@ -9,3 +9,4 @@ compile_commands.json
 
 # Credenciais e calibração locais do firmware (não versionar)
 include/config/network_config.local.hpp
+src/config/network_config.local.hpp

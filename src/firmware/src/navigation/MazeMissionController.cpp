@@ -1,4 +1,4 @@
-#include "navigation/MazeMissionController.h"
+#include "MazeMissionController.h"
 
 namespace nav {
 

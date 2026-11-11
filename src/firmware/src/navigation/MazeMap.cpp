@@ -1,4 +1,4 @@
-#include "navigation/MazeMap.h"
+#include "MazeMap.h"
 
 #include <cstdio>
 #include <cstring>

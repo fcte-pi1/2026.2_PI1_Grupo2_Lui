@@ -1,4 +1,4 @@
-#include "navigation/MazeSolver.h"
+#include "MazeSolver.h"
 
 namespace nav {
 

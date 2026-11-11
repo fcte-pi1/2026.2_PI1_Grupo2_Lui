@@ -1,4 +1,4 @@
-#include "navigation/AutonomousNavigator.h"
+#include "AutonomousNavigator.h"
 
 namespace nav {
 

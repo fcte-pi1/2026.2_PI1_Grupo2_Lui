@@ -1,11 +1,11 @@
 #ifdef ARDUINO
 
-#include "communication/TelemetryClient.h"
+#include "TelemetryClient.h"
 
 #include <Arduino.h>
 #include <cstring>
 
-#include "config/network_config.hpp"
+#include "../config/network_config.hpp"
 
 namespace mm {
 namespace {
