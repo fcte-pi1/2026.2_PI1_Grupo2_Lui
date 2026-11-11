@@ -1,111 +1,204 @@
-# Firmware MicroMouse — Arduino IDE
+# Como gravar o firmware na placa (ESP32)
 
-O firmware está organizado como um sketch da **Arduino IDE** para a placa **ESP32
-DevKit V1 (ESP32 clássico / ESP32-WROOM-32)**. O projeto também mantém o
-`platformio.ini` para compilação e execução dos testes nativos pelo PlatformIO.
+Este guia mostra, passo a passo, como passar o código do MicroMouse do computador
+para a placa **ESP32 DevKit V1** usando a **Arduino IDE**. Não é preciso ter
+experiência com Arduino.
 
-## 1. Preparar a Arduino IDE
+**Você vai precisar de:**
 
-1. Instale a Arduino IDE 2.x.
-2. Em **Arquivo → Preferências**, adicione o índice de placas ESP32 no campo
-   **URLs adicionais para Gerenciadores de Placas**:
+- um computador com o repositório baixado;
+- a placa ESP32 DevKit V1;
+- um cabo USB **de dados** 
+
+> **Antes de começar:** quando a gravação termina, o robô liga e **começa a
+> andar sozinho** em poucos segundos. Deixe o robô **parado e com as rodas sem
+> tocar a mesa** ou já colocado no labirinto.
+
+---
+
+## Parte 1 — Preparar o computador (só na primeira vez)
+
+Se você já fez esta parte antes, pule para a [Parte 2](#parte-2--gravar-o-código-na-placa).
+
+### Passo 1: Instalar a Arduino IDE
+
+1. Acesse <https://www.arduino.cc/en/software>.
+2. Baixe a **Arduino IDE 2.x** para o seu sistema e instale normalmente
+   (Avançar → Avançar → Concluir).
+3. Abra a Arduino IDE.
+
+### Passo 2: Ensinar a Arduino IDE a reconhecer a ESP32
+
+1. No menu de cima, clique em **Arquivo → Preferências**.
+2. Procure o campo **URLs adicionais para Gerenciadores de Placas**.
+3. Cole este endereço nele:
 
    ```text
    https://espressif.github.io/arduino-esp32/package_esp32_index.json
    ```
 
-3. Abra **Ferramentas → Placa → Gerenciador de Placas**, pesquise por
-   **esp32 by Espressif Systems** e instale a versão **3.3.11**, alinhada à
-   versão de referência do projeto em `.github/SETUP.md`.
-4. Não é necessária biblioteca externa adicional no Library Manager.
-   `BluetoothSerial`, `Wire`, `LittleFS` e as APIs NVS são fornecidas pelo core
-   ESP32 instalado no passo anterior.
+   Se já houver outro endereço no campo, coloque uma vírgula depois dele e cole
+   este em seguida.
+4. Clique em **OK**.
 
-## 2. Abrir o sketch
+### Passo 3: Instalar o pacote da ESP32
 
-Abra o arquivo `src/firmware/firmware.ino` pela Arduino IDE. A pasta do sketch
-precisa continuar se chamando `firmware`, assim como o arquivo principal
-`firmware.ino`.
+1. No menu de cima, clique em **Ferramentas → Placa → Gerenciador de Placas**.
+   Um painel vai abrir na lateral esquerda.
+2. Na caixa de busca, digite `esp32`.
+3. Encontre o item **esp32 by Espressif Systems**.
+4. Na lista de versões desse item, escolha **3.3.11**. Use exatamente essa
+   versão, porque com outras o código pode não compilar.
+5. Clique em **Instalar** e espere terminar. Pode demorar alguns minutos.
 
-A implementação está dividida em módulos C++ sob `src/` (`hal`, `control`,
-`navigation`, `communication`, `config` e `common`). A Arduino IDE compila
-recursivamente os arquivos C/C++ dessa pasta. As funções `setup()` e `loop()`
-continuam implementadas em `src/main.cpp`.
+Você **não precisa** instalar nenhuma biblioteca extra. Tudo o que o código usa
+já vem nesse pacote.
 
-## 3. Selecionar placa e parâmetros
+### Passo 4: Instalar o driver USB (só se a placa não aparecer no Passo 7)
 
-Em **Ferramentas**, selecione:
+A maioria dos computadores reconhece a placa sozinha. Se no Passo 7 nenhuma
+porta nova aparecer, instale o driver do chip USB da sua placa. Ele vem escrito
+no chip pequeno perto da entrada USB.
 
-| Opção | Configuração |
-|---|---|
-| Placa | **ESP32 Dev Module** |
-| Upload Speed | `115200` |
-| CPU Frequency | `240MHz (WiFi/BT)` ou a opção equivalente disponível |
-| Flash Size | `4MB (32Mb)` |
-| Partition Scheme | `Default 4MB with spiffs` ou a opção padrão equivalente |
-| Core Debug Level | `None` |
+- Chip **CP2102** ou **CP210x**: instale o driver da Silicon Labs
+  (<https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers>).
+- Chip **CH340**: instale o driver da WCH
+  (<https://www.wch-ic.com/downloads/CH341SER_EXE.html>).
 
-Conecte a ESP32 por USB, selecione a porta em **Ferramentas → Porta** e confirme
-que a placa escolhida é a ESP32 clássica DevKit V1, não uma variante ESP32-S2,
-ESP32-S3 ou ESP32-C3. O transporte do firmware utiliza Bluetooth Classic SPP.
+Depois de instalar, desconecte e conecte a placa de novo.
 
-## 4. Configuração local (opcional)
+---
 
-Os valores padrão permitem iniciar o firmware sem criar arquivo adicional. Para
-personalizar o nome Bluetooth ou a calibração do INA226:
+## Parte 2 — Gravar o código na placa
 
-1. Copie `src/config/network_config.local.example.hpp`.
-2. Salve a cópia como `src/config/network_config.local.hpp`.
-3. Edite os valores necessários. Esse arquivo é ignorado pelo Git.
+### Passo 5: Abrir o projeto
 
-O nome Bluetooth padrão anunciado pela ESP32 é `MicroMouse`. A comunicação é
-Bluetooth Classic SPP (porta serial), não BLE.
+1. Na Arduino IDE, clique em **Arquivo → Abrir…**.
+2. Navegue até a pasta do repositório e abra o arquivo:
 
-## 5. Compilar e gravar
+   ```text
+   src/firmware/firmware.ino
+   ```
 
-1. Clique em **Verificar** para compilar.
-2. Com a ESP32 conectada, clique em **Carregar**.
-3. Se a placa não entrar automaticamente no modo de gravação, mantenha o botão
-   **BOOT** pressionado quando a IDE iniciar o envio e solte-o quando a gravação
-   começar.
-4. Abra o **Monitor Serial** em `115200` baud para acompanhar a inicialização,
-   sensores, motores e estado da conexão Bluetooth.
+3. O arquivo aberto é quase vazio. **Isso é normal.** O código de verdade fica
+   na pasta `src/firmware/src/`, e a Arduino IDE o encontra sozinha.
 
-## 6. Organização dos arquivos
+> Não renomeie a pasta `firmware` nem o arquivo `firmware.ino`. A Arduino IDE só
+> funciona se os dois tiverem o mesmo nome.
+
+### Passo 6: Escolher a placa
+
+1. Clique em **Ferramentas → Placa → esp32 → ESP32 Dev Module**.
+2. Ainda em **Ferramentas**, confira se as opções abaixo estão assim. Se alguma
+   estiver diferente, clique nela e troque.
+
+   | Opção em Ferramentas | Deve estar em |
+   |---|---|
+   | Upload Speed | `115200` |
+   | CPU Frequency | `240MHz (WiFi/BT)` |
+   | Flash Size | `4MB (32Mb)` |
+   | Partition Scheme | `Default 4MB with spiffs` |
+   | Core Debug Level | `None` |
+
+### Passo 7: Conectar a placa e escolher a porta
+
+1. Com a placa **desconectada**, abra **Ferramentas → Porta** e veja quais portas
+   aparecem na lista (pode até estar vazia).
+2. Conecte a ESP32 no computador pelo cabo USB. Um LED da placa deve acender.
+3. Abra **Ferramentas → Porta** de novo. A porta **que apareceu agora** é a da
+   placa. Clique nela para selecionar.
+   - No Windows, o nome é parecido com `COM3` ou `COM5`.
+   - No Linux, é parecido com `/dev/ttyUSB0`.
+   - No macOS, é parecido com `/dev/cu.usbserial-...`.
+
+Se nenhuma porta nova aparecer, troque o cabo USB ou instale o driver (Passo 4).
+
+### Passo 8: Gravar
+
+1. Clique no botão **Carregar**: a **seta para a direita (→)** no canto superior
+   esquerdo.
+2. A Arduino IDE primeiro compila o código e depois grava na placa. A
+   **primeira vez demora alguns minutos**, e as próximas são mais rápidas.
+3. Acompanhe a parte de baixo da janela:
+   - Se aparecer `Connecting....____....` e ficar parado, **aperte e segure o
+     botão BOOT** da placa. Solte quando começar a aparecer a porcentagem
+     (`Writing at ... (10 %)`).
+   - Quando aparecer **`Hard resetting via RTS pin...`**, a gravação terminou com
+     sucesso.
+
+### Passo 9: Conferir se deu certo
+
+1. Clique em **Ferramentas → Monitor Serial**.
+2. No canto direito do monitor, selecione **115200 baud**.
+3. Aperte o botão **EN** (ou **RST**) da placa para reiniciá-la e ver as
+   mensagens desde o começo. Mantenha o robô **parado** enquanto aparecer
+   `Calibrando IMU`.
+4. Se tudo estiver certo, as mensagens vão ser parecidas com estas:
+
+   ```text
+   [OK] MPU6500 respondeu no barramento I2C.
+   Calibrando IMU. Mantenha o robô parado.
+   HU-10: cliente Bluetooth iniciado; ...
+   Labirinto 4x4; início=(...); objetivo=(...).
+   Navegação autônoma iniciada; sem intervenção manual durante a tentativa.
+   ```
+
+- `HU-09: INA226 ausente/não calibrado` é só um aviso. O robô funciona
+  normalmente, só não mostra o nível da bateria.
+- Qualquer mensagem começando com **`Falha`** indica um problema. Veja a tabela
+  [Deu erro?](#deu-erro).
+
+Pronto, o código está na placa. 🎉 Para gravar uma nova versão depois, basta
+repetir a **Parte 2**.
+
+---
+
+## Organização dos arquivos
 
 ```text
 firmware/
 ├── firmware.ino             # Sketch principal exigido pela Arduino IDE
-├── src/                     # Código C/C++ compilado recursivamente
-│   ├── common/
-│   ├── communication/
-│   ├── config/
-│   ├── control/
-│   ├── hal/
-│   ├── navigation/
-│   └── main.cpp              # setup() e loop()
-├── include/                 # Headers de compatibilidade para projetos legados
+├── src/                     # Todo o código C/C++ (compilado automaticamente)
+│   ├── common/              # Tipos compartilhados entre os módulos
+│   ├── communication/       # Logger e telemetria via Bluetooth
+│   ├── config/              # Pinos da placa, labirinto e configuração local
+│   ├── control/             # PID, odometria e controle de movimento
+│   ├── hal/                 # Drivers de motores, encoders, IMU, INA226 e armazenamento
+│   ├── navigation/          # Mapa, solver, percepção de paredes e navegação autônoma
+│   └── main.cpp             # setup() e loop()
+├── include/                 # Headers de compatibilidade usados por src/firmwareTest/
 ├── test/                    # Testes unitários do PlatformIO
-└── platformio.ini            # Configuração alternativa do PlatformIO
+└── platformio.ini           # Configuração alternativa do PlatformIO
 ```
 
-Os arquivos de `include/` são apenas encaminhadores para os headers mantidos em
-`src/`. Essa compatibilidade preserva os caminhos utilizados pelos projetos
-independentes em `src/firmwareTest/`, sem exigir alterações neles.
+O código do robô fica todo em `src/`. A Arduino IDE compila essa pasta inteira
+sozinha, então o `firmware.ino` existe só porque a IDE exige um arquivo com o
+mesmo nome da pasta.
 
-## 7. PlatformIO e testes nativos
+Os arquivos de `include/` não têm código próprio: cada um apenas aponta para o
+arquivo correspondente em `src/`. Eles existem para que os projetos de teste de
+hardware em `src/firmwareTest/` continuem compilando sem alterações. **Ao alterar
+o código, edite sempre os arquivos em `src/`.**
 
-A estrutura continua incluindo `platformio.ini`. Para os testes nativos de
-regras de navegação e lógica sem hardware, abra `src/firmware/` no PlatformIO e
-execute:
+---
 
-```bash
-pio test -e native
-```
+## PlatformIO e testes
 
-Para gravar pelo PlatformIO, o ambiente `esp32dev` continua disponível:
+O projeto também pode ser compilado com o PlatformIO, pelo `platformio.ini`.
+Para rodar os testes automáticos no computador, sem a placa:
 
-```bash
-pio run -e esp32dev
-pio run -e esp32dev --target upload
-```
+1. Instale o PlatformIO com `python -m pip install -U platformio`, ou instale a
+   extensão **PlatformIO IDE** no VS Code.
+2. Instale um compilador C/C++. No Windows, rode
+   `winget install -e --id BrechtSanders.WinLibs.POSIX.UCRT` e depois
+   **feche todas as janelas do VS Code/terminal** e abra de novo. No Linux, use
+   `build-essential`. No macOS, use `xcode-select --install`.
+3. Na pasta `src/firmware/`, rode:
+
+   ```bash
+   pio test -e native                     # testes
+   pio run -e esp32dev --target upload    # gravar na placa pelo PlatformIO
+   ```
+
+   Se o comando `pio` não for reconhecido, use `python -m platformio` no lugar
+   dele.
