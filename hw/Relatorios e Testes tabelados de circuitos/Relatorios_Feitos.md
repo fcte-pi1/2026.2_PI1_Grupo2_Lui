@@ -18,3 +18,7 @@
 - []
 - []
 - []
+
+# Ploblemas de integraçao incontrados
+
+1. O motor esquer nao fira apos o segundo comando de codego, ele fica duro, achamos que pode ser um problema no redutor do motor entao trocamos ele

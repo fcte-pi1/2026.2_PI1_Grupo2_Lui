@@ -29,7 +29,7 @@ A explicação detalhada de cada termo presente na conta:
 - $\frac{M}{4095}$	A proporção da leitura. Transforma o número bruto em uma porcentagem (de 0% a 100%) da escala do chip.
 - \(3,3\)	A tensão máxima de referência que o pino do ESP32 aceita receber (3,3 Volts).
 
-|![simulaçao da bateria](./Simulações_de_circuitos_eletrônicos/export.png)|
+|![simulaçao da bateria](/hw/Simulações%20de%20circuitos%20eletrônicos/export.png)|
 
 Onde o medidor2.V corresponde a nossa tensão lida pela esp32 como valor bruto.
 
