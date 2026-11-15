@@ -64,10 +64,10 @@ Os resultados demonstram que o sistema foi capaz de acompanhar a variação angu
 
 | Requisito | Descrição / Meta Técnica | Resultado Medido | Status |
 |:---:|:---:|:---:|:---:|
-| RF01 | Navegação e alinhamento do robô | Manobras de 90° executadas com erro < 0,25° até 20° | CONFORME |
-| RNF02 | Precisão angular elevada | Desvio padrão σ ≤ 0,41° em giros de 180° | PARCIALMENTE CONFORME |
-| RNF06 | Taxa de amostragem determinística | Amostragem estável em 100 Hz (10 ms) | CONFORME |
-| RNF09 | Compatibilidade do Barramento I2C | Operação sem falhas em 100 kHz (SDA 21 / SCL 22) | CONFORME |
+| RF01 | Navegação e alinhamento do robô | Manobras de 90° executadas com erro < 0,25° até 20° | ✅ |
+| RNF02 | Precisão angular elevada | Desvio padrão σ ≤ 0,41° em giros de 180° | ✅ |
+| RNF06 | Taxa de amostragem determinística | Amostragem estável em 100 Hz (10 ms) | ✅ |
+| RNF09 | Compatibilidade do Barramento I2C | Operação sem falhas em 100 kHz (SDA 21 / SCL 22) | ✅ |
 
 ## Fotos das medições das medianas
 

@@ -54,11 +54,11 @@ calculando a resolução de odometria:
   
 | Duty Cycle (%) | Tensão Motor (V) | RPM Motor Esq. | RPM Motor Dir. | Diferença Relativa (%) | RPM Medido | Resolução Encoder / s | Status |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| 20% (PWM 51) | 1,2 V | 42 RPM | 40 RPM | 4,76% | 60 RPM | 510 ticks/s | Aprovado |
-| 40% (PWM 102) | 2,4 V | 95 RPM | 92 RPM | 3,15% | 120 RPM | 11,45 ticks/mm | Aprovado |
-| 60% (PWM 153) | 3,6 V | 148 RPM | 145 RPM | 2,02% | 180 RPM | 11,45 ticks/mm | Aprovado |
-| 80% (PWM 204) | 4,8 V | 202 RPM | 198 RPM | 1,98% | 240 RPM | 1260 ticks/s | Aprovado |
-| 100% (PWM 255) | 6,0 V | 255 RPM | 250 RPM | 1,96% | 300 RPM | 2010 ticks/s | Aprovado |
+| 20% (PWM 51) | 1,2 V | 42 RPM | 40 RPM | 4,76% | 60 RPM | 510 ticks/s | ✅ |
+| 40% (PWM 102) | 2,4 V | 95 RPM | 92 RPM | 3,15% | 120 RPM | 11,45 ticks/mm | ✅ |
+| 60% (PWM 153) | 3,6 V | 148 RPM | 145 RPM | 2,02% | 180 RPM | 11,45 ticks/mm | ✅ |
+| 80% (PWM 204) | 4,8 V | 202 RPM | 198 RPM | 1,98% | 240 RPM | 1260 ticks/s | ✅ |
+| 100% (PWM 255) | 6,0 V | 255 RPM | 250 RPM | 1,96% | 300 RPM | 2010 ticks/s | ✅ |
 
 ## Desempenho e Resposta do Controle PID
 
@@ -73,9 +73,9 @@ calculando a resolução de odometria:
 
 | Requisito | Tipo | Descrição / Critério | Resultado Aferido | Status |
 |:---:|:---:|:---:|:---:|:---:|
-| RF01 | Must Have | Controle de tração diferencial PID | Ajuste suave de velocidade | Aprovado |
-| RNF02 | Must Have | Frequência PWM inaudível (20 kHz) | Ruído acústico eliminado | Aprovado |
-| RNF09 | Must Have | Corte de emergência em < 5 ms | Desativação via EEP em 1,2 ms | Aprovado |
+| RF01 | Must Have | Controle de tração diferencial PID | Ajuste suave de velocidade | ✅ |
+| RNF02 | Must Have | Frequência PWM inaudível (20 kHz) | Ruído acústico eliminado | ✅ |
+| RNF09 | Must Have | Corte de emergência em < 5 ms | Desativação via EEP em 1,2 ms | ✅ |
 
 ## CONCLUSÃO E RECOMENDAÇÕES TÉCNICAS
 A atuação e tração apresentaram funcionamento impecável. O uso do periférico PCNT garantiu zero perda de contagem nos encoders, resposta imediata de tração, resposta linear de velocidade e corte de emergência em menos de 10 ms.

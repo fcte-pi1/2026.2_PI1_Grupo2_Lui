@@ -22,12 +22,12 @@ ANÁLISE DE PROCESSAMENTO
 
 | Periférico / Módulo | Pinos ESP32 | Tipo de Periférico | Função no MicroMouse | Status de Validação |
 |:---:|:---:|:---:|:---:|:---:|
-| Barramento I2C | GPIO 21 (SDA) / 22 (SCL) | I2C Master (400 kHz) | Comunicação IMU MPU6500 e INA226 | APROVADO |
-| Ultrassom Frontal | GPIO 4 (TRIG) / 35 (ECHO) | Output / GPIO (ADC1) | Medição de Distância Frontal | APROVADO |
-| Ultrassom Esquerdo | GPIO 14 (TRIG) / 36 (ECHO) | Output / GPIO (ADC1) | Medição de Distância Esquerda | APROVADO |
-| Ultrassom Direito | GPIO 27 (TRIG) / 39 (ECHO) | Output / GPIO (ADC1) | Medição de Distância Direita | APROVADO |
-| Motores E/D (PWM) | GPIO 16, 17, 18, 19 | LEDC PWM (20 kHz) | Controle de Velocidade e Sentido | APROVADO |
-| Encoders E/D | GPIO 32, 33, 25, 26 | PCNT (Pulse Counter) | Odometria de Quadratura por Hardware | APROVADO |
+| Barramento I2C | GPIO 21 (SDA) / 22 (SCL) | I2C Master (400 kHz) | Comunicação IMU MPU6500 e INA226 | ✅ |
+| Ultrassom Frontal | GPIO 4 (TRIG) / 35 (ECHO) | Output / GPIO (ADC1) | Medição de Distância Frontal | ✅ |
+| Ultrassom Esquerdo | GPIO 14 (TRIG) / 36 (ECHO) | Output / GPIO (ADC1) | Medição de Distância Esquerda | ✅ |
+| Ultrassom Direito | GPIO 27 (TRIG) / 39 (ECHO) | Output / GPIO (ADC1) | Medição de Distância Direita | ✅ |
+| Motores E/D (PWM) | GPIO 16, 17, 18, 19 | LEDC PWM (20 kHz) | Controle de Velocidade e Sentido | ✅ |
+| Encoders E/D | GPIO 32, 33, 25, 26 | PCNT (Pulse Counter) | Odometria de Quadratura por Hardware | ✅ |
 
 ## CONFIGURAÇÃO DA BANCADA E MAPEAMENTO DE HARDWARE
 A placa ESP32 DevKit V1 de 30 pinos operou a 240 MHz. Os pinos GPI (D34, D35, D36, D39) foram reservados para entradas digitais/analógicas do bloco ADC1, e o barramento I2C operou nos GPIOs 21/22.
@@ -50,19 +50,19 @@ dados JSON via Wi-Fi TCP/IP atingiu latência média de 12 ms a 5 Hz.
 
 | Métrica / Periférico | Parâmetro Alvo | Valor Aferido | Desvio / Erro | Status |
 |:---:|:---:|:---:|:---:|:---:|
-| Clock da CPU | 240 MHz | 240,0 MHz | 0,0% | Aprovado |
-| Tempo de Loop | < 10,0 ms | 5,7 ms | Abaixo do limite | Aprovado |
-| Taxa Wi-Fi (JSON) | 5 Hz (200 ms) | 5,0 Hz | 0,0% | Aprovado |
-| Latência Wi-Fi | < 50,0 ms | 12,5 ms | Abaixo do limite | Aprovado |
-| Prevenção Boot Loop | GPIO 12 Livre | Sem conexões no D12 | Boot 100% seguro | Aprovado |
+| Clock da CPU | 240 MHz | 240,0 MHz | 0,0% | ✅ |
+| Tempo de Loop | < 10,0 ms | 5,7 ms | Abaixo do limite | ✅ |
+| Taxa Wi-Fi (JSON) | 5 Hz (200 ms) | 5,0 Hz | 0,0% | ✅ |
+| Latência Wi-Fi | < 50,0 ms | 12,5 ms | Abaixo do limite | ✅ |
+| Prevenção Boot Loop | GPIO 12 Livre | Sem conexões no D12 | Boot 100% seguro | ✅ |
 
 ## MATRIZ DE RASTREABILIDADE DE REQUISITOS (MoSCoW)
 
 | Requisito | Tipo | Descrição / Critério | Resultado Aferido | Status MoSCoW |
 |:---:|:---:|:---:|:---:|:---:|
-| RF01 | Must Have | Processamento e telemetria Wi-Fi | Envio JSON contínuo a 5 Hz | Aprovado |
-| RNF02 | Must Have | Tempo de resposta do loop < 10 ms | Loop executado em 5,7 ms | Aprovado |
-| RNF09 | Must Have | Segurança de boot e alocação | GPIO 12 livre e ADC1 isolado | Aprovado |
+| RF01 | Must Have | Processamento e telemetria Wi-Fi | Envio JSON contínuo a 5 Hz | ✅ |
+| RNF02 | Must Have | Tempo de resposta do loop < 10 ms | Loop executado em 5,7 ms | ✅ |
+| RNF09 | Must Have | Segurança de boot e alocação | GPIO 12 livre e ADC1 isolado | ✅ |
 
 ## CONCLUSÃO
 O microcontrolador ESP32 DevKit V1 operou com desempenho e estabilidade excelentes. A transmissão de dados de telemetria TCP/IP ocorreu em pacotes JSON a 5 Hz (200 ms) sem travar a leitura do ADC1 ou I2C.
