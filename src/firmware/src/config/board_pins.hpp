@@ -35,6 +35,11 @@ constexpr uint8_t ENCODER_LEFT_B  = 33;
 constexpr uint8_t ENCODER_RIGHT_A = 25;
 constexpr uint8_t ENCODER_RIGHT_B = 26;
 
+// Verificado em bancada: comandos positivos movem ambas as rodas para frente.
+// O PCNT direito bruto tem sinal oposto ao esquerdo nessa montagem.
+constexpr bool ENCODER_LEFT_INVERT_DIRECTION = false;
+constexpr bool ENCODER_RIGHT_INVERT_DIRECTION = true;
+
 // Barramento I2C compartilhado pelo MPU6500 e INA226.
 constexpr uint8_t I2C_SDA = 21;
 constexpr uint8_t I2C_SCL = 22;

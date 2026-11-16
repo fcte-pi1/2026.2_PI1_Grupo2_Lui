@@ -34,7 +34,9 @@ enum class MotionFailureReason : uint8_t {
     LeftWheelStalled,
     RightWheelStalled,
     Cancelled,
-    InvalidDistance
+    InvalidDistance,
+    SafetyLimit,
+    BrakeNotSettled
 };
 
 struct MotionControllerConfig {
@@ -57,10 +59,10 @@ struct MotionControllerConfig {
     float settledSpeedMmS;
     float settledGyroDegS;
 
-    // Corrige a diferença entre distâncias das rodas durante avanço.
-    // Unidade aproximada: (mm/s de correção) / mm de diferença.
+    // Ganho de correção de rumo por yaw da IMU; fatores de encoder são provisórios.
+    // Unidade: (mm/s de correcao diferencial) / grau de yaw.
     float straightCorrectionKp;
-    // Correção diferencial a partir da diferença de distância dos sensores laterais.
+    // Reservado: alinhamento lateral desativado ate calibracao fisica (ganho zero).
     float wallAlignmentKp;
 
     // Feed-forward aproximado do motor: PWM por mm/s + compensação de atrito
@@ -109,7 +111,7 @@ public:
                                   bool valid);
     bool startTurnLeft90();
     bool startTurnRight90();
-    bool startTurnAround180(); // por convenção, gira para a esquerda (+180 graus)
+    bool startTurnAround180(); // meia-volta à direita, como na bancada
 
     // Chamar periodicamente pela Task_PID_Control (por exemplo, a cada 5 ms).
     void update(float dtSeconds);
@@ -117,6 +119,7 @@ public:
     // Interrompe o movimento. Status passa a Failed com motivo Cancelled.
     void stop();
 
+    bool isMovingForward() const { return motionType_ == MotionType::ForwardCell && targetDistanceMm_ > 0; }
     MotionStatus getStatus() const;
     MotionType getMotionType() const;
     MotionFailureReason getFailureReason() const;
@@ -139,7 +142,8 @@ private:
                                 float rightTargetMmS,
                                 float leftMeasuredMmS,
                                 float rightMeasuredMmS,
-                                float dtSeconds);
+                                float dtSeconds, bool brakeLeft = false, bool brakeRight = false);
+    void beginBrake(uint32_t now, MotionFailureReason reason = MotionFailureReason::None);
     void fail(MotionFailureReason reason);
     void succeed();
     void updateStallTimers(int32_t leftDeltaCount,
@@ -162,6 +166,12 @@ private:
     MotionType motionType_ = MotionType::None;
     MotionFailureReason failureReason_ = MotionFailureReason::None;
     bool initialized_ = false;
+    bool braking_ = false;
+    uint32_t brakeStartedMs_ = 0, quietSinceMs_ = 0;
+    uint32_t lastAngularProgressMs_ = 0;
+    float lastAngularProgress_ = 0, currentGyroDps_ = 0;
+    float leftIntegralPwm_ = 0, rightIntegralPwm_ = 0;
+    MotionFailureReason brakeFailure_ = MotionFailureReason::None;
 
     int32_t startLeftCount_ = 0;
     int32_t startRightCount_ = 0;

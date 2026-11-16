@@ -32,7 +32,7 @@ struct MazeConfig {
 namespace MazeSettings {
 
     constexpr uint32_t ATTEMPT_TIMEOUT_MS =
-        10UL * 60UL * 1000UL;
+        3UL * 60UL * 1000UL;
 
     constexpr uint8_t MAX_ATTEMPTS = 3;
 

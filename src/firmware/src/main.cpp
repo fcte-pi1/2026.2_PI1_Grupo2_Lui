@@ -9,6 +9,7 @@
 #include <freertos/task.h>
 
 #include "config/board_pins.hpp"
+#include "config/mechanical_config.hpp"
 #include "config/maze_config.hpp"
 #include "config/network_config.hpp"
 #include "communication/TelemetryClient.h"
@@ -22,6 +23,7 @@
 #include "control/odometry.hpp"
 #include "control/pid_controller.hpp"
 #include "navigation/MazeMap.h"
+#include "navigation/GuidedRoute.h"
 #include "navigation/MazeMissionController.h"
 #include "navigation/PositionTracker.h"
 #include "navigation/RobotStateEstimator.h"
@@ -62,8 +64,8 @@ bool powerReadingValid = false;
 INA226Reading latestPowerReading{};
 
 Odometry odometry;
-PIDController leftPid(0.8f, 0.10f, 0.0f, -120.0f, 120.0f);
-PIDController rightPid(0.8f, 0.10f, 0.0f, -120.0f, 120.0f);
+PIDController leftPid(1.5f, 5.0f, 0.0f, -80.0f, 100.0f);
+PIDController rightPid(1.5f, 5.0f, 0.0f, -80.0f, 100.0f);
 MotionController motion(motors, encoderLeft, encoderRight, imu, odometry,
                         leftPid, rightPid);
 
@@ -180,6 +182,13 @@ mm::NvsMapStorage mapStorage;
 nav::MazeMissionController mission(mazeMap, mapStorage, robotStateEstimator);
 
 bool ready = false;
+bool hardwareReady = false;
+bool attemptUsed = false;
+bool guidedRouteActive = false;
+bool cornerContinuationUsed = false;
+nav::GuidedRoute guidedRoute;
+uint32_t guidedPauseStartedMs = 0;
+MotionControllerConfig motionConfig;
 bool motionResultPending = false;
 uint32_t attemptStartedMs = 0;
 uint32_t lastControlUpdateUs = 0;
@@ -240,6 +249,8 @@ void safeStop(const char *reason) {
 
 void handleMissionUpdate(const nav::MissionUpdate &update) {
     bool started = false;
+    if (update.action != nav::MissionAction::None && update.action != nav::MissionAction::Brake)
+        motors.setEnabled(true);
     switch (update.action) {
         case nav::MissionAction::None:
             return;
@@ -467,9 +478,67 @@ void initializeTelemetry() {
                   static_cast<unsigned long>(mm::network::TELEMETRY_PERIOD_MS));
 }
 
+void handleSerialCommands() {
+    while (Serial.available()) {
+        const char command = Serial.read();
+        if (command == 'x') { safeStop("parada serial"); continue; }
+        if (command == 'h' || command == '?') {
+            Serial.println("g=missao autonoma; t=teste 3F/L/F; c=esquerda/F do ponto atual; x=parar; s=sensores. Para outra tentativa, reinicie e reposicione.");
+        } else if (command == 's') {
+            const auto snapshot = getLateralSnapshot();
+            Serial.printf("SENSORES ready=%u idade=%lums F=%.2f(%u) L=%.2f(%u) R=%.2f(%u) cm; motores=%s\n",
+                snapshot.ready, static_cast<unsigned long>(millis() - snapshot.sampledAtMs),
+                snapshot.front.distanceCm, snapshot.front.valid, snapshot.left.distanceCm, snapshot.left.valid,
+                snapshot.right.distanceCm, snapshot.right.valid, motors.isEnabled() ? "ON" : "OFF");
+        } else if (command == 'g' || command == 't' || command == 'c') {
+            const bool corner = command == 'c';
+            if (!hardwareReady || ready || (corner ? cornerContinuationUsed : attemptUsed)) {
+                Serial.println("INICIO RECUSADO: inicializacao falhou ou tentativa ja utilizada; reinicie.");
+                continue;
+            }
+            motors.setEnabled(false);
+            Serial.println("Calibrando IMU antes da partida; manter robo imovel.");
+            if (!imu.calibrateGyroZ() || !encoderLeft.resetCount() || !encoderRight.resetCount()) {
+                safeStop("calibracao/encoders na partida"); hardwareReady = false; continue;
+            }
+            const Pose2D initialPose = {0, 0, initialHeadingRadians(mazeConfig.initialHeading)};
+            auto trialConfig = motionConfig;
+            if (corner) {
+                trialConfig.maxAngularSpeedDegS = 35.0f;
+                trialConfig.turnKpDegPerSecPerDeg = 2.0f;
+            }
+            if (!motion.begin(trialConfig, initialPose) ||
+                !mission.begin(mazeConfig, gridOrientation.read().yawDegrees)) {
+                safeStop("inicializacao da tentativa"); hardwareReady = false; continue;
+            }
+            attemptUsed = true;
+            motionResultPending = false;
+            freshObservationSamples = 0;
+            observationStartedAtMs = attemptStartedMs = millis();
+            lastProcessedSensorTimestampMs = 0;
+            guidedRouteActive = command != 'g';
+            if (corner) { guidedRoute.resetAtCorner(); cornerContinuationUsed = true; }
+            else guidedRoute.reset();
+            guidedPauseStartedMs = millis();
+            if (!guidedRouteActive) initializeTelemetry();
+            ready = true;
+            Serial.println(corner
+                ? "CONTINUACAO ARMADA: esquerda90 a35graus/s,18cm; pausa1s; x interrompe."
+                : (guidedRouteActive
+                    ? "TESTE GUIADO ARMADO: 3x18cm, esquerda90,18cm; pausa1s entre etapas; x interrompe."
+                    : "TENTATIVA INICIADA; limite 180s; x interrompe."));
+        }
+    }
+}
+
 }  // namespace
 
 void setup() {
+    const bool motorsOK = motors.begin(
+        BoardPins::MOTOR_LEFT.in1, BoardPins::MOTOR_LEFT.in2,
+        BoardPins::MOTOR_RIGHT.in1, BoardPins::MOTOR_RIGHT.in2,
+        BoardPins::MOTOR_NSLEEP, BoardPins::MOTOR_PWM_HZ,
+        BoardPins::MOTOR_PWM_BITS);
     Serial.begin(115200);
     delay(100);
 
@@ -495,6 +564,7 @@ void setup() {
     }
 
     Wire.setClock(BoardPins::I2C_CLOCK_HZ);
+    Wire.setTimeOut(20);
 
     powerMonitorReady = powerMonitor.begin(
         Wire,
@@ -508,15 +578,12 @@ void setup() {
         Serial.println("HU-09: INA226 ausente/não calibrado; bateria será publicada como null.");
     }
 
-    const bool motorsOK = motors.begin(
-        BoardPins::MOTOR_LEFT.in1, BoardPins::MOTOR_LEFT.in2,
-        BoardPins::MOTOR_RIGHT.in1, BoardPins::MOTOR_RIGHT.in2,
-        BoardPins::MOTOR_NSLEEP, BoardPins::MOTOR_PWM_HZ,
-        BoardPins::MOTOR_PWM_BITS);
     const bool leftEncoderOK = encoderLeft.begin(
-        BoardPins::ENCODER_LEFT_A, BoardPins::ENCODER_LEFT_B);
+        BoardPins::ENCODER_LEFT_A, BoardPins::ENCODER_LEFT_B,
+        BoardPins::ENCODER_LEFT_INVERT_DIRECTION);
     const bool rightEncoderOK = encoderRight.begin(
-        BoardPins::ENCODER_RIGHT_A, BoardPins::ENCODER_RIGHT_B);
+        BoardPins::ENCODER_RIGHT_A, BoardPins::ENCODER_RIGHT_B,
+        BoardPins::ENCODER_RIGHT_INVERT_DIRECTION);
 
     // HU-02: verifica se a IMU responde antes de tentar ler seus registradores.
     Wire.beginTransmission(BoardPins::MPU6500_ADDRESS);
@@ -543,11 +610,11 @@ void setup() {
         );
     }
     const bool frontSensorOK = sensorFront.begin(
-        BoardPins::ULTRASONIC_FRONT.trigger, BoardPins::ULTRASONIC_FRONT.echo);
+        BoardPins::ULTRASONIC_FRONT.trigger, BoardPins::ULTRASONIC_FRONT.echo, 20000);
     const bool leftSensorOK = sensorLeft.begin(
-        BoardPins::ULTRASONIC_LEFT.trigger, BoardPins::ULTRASONIC_LEFT.echo);
+        BoardPins::ULTRASONIC_LEFT.trigger, BoardPins::ULTRASONIC_LEFT.echo, 20000);
     const bool rightSensorOK = sensorRight.begin(
-        BoardPins::ULTRASONIC_RIGHT.trigger, BoardPins::ULTRASONIC_RIGHT.echo);
+        BoardPins::ULTRASONIC_RIGHT.trigger, BoardPins::ULTRASONIC_RIGHT.echo, 20000);
 
     if (!motorsOK || !leftEncoderOK || !rightEncoderOK || !imuOK ||
         !frontSensorOK || !leftSensorOK || !rightSensorOK) {
@@ -577,17 +644,12 @@ void setup() {
         return;
     }
 
-    MotionControllerConfig motionConfig;
-    // Os encoders e parâmetros mecânicos ainda exigem calibração no robô real.
-    motionConfig.leftCountsPerMm = 6.74f;
-    motionConfig.rightCountsPerMm = 6.74f;
-    motionConfig.wheelTrackMm = 90.0f;
+    // Geometria medida e perfil V17 validado em bancada; integração requer teste no labirinto.
+    motionConfig.leftCountsPerMm = MechanicalSettings::LEFT_COUNTS_PER_MM;
+    motionConfig.rightCountsPerMm = MechanicalSettings::RIGHT_COUNTS_PER_MM;
+    motionConfig.wheelTrackMm = MechanicalSettings::WHEEL_TRACK_MM;
     motionConfig.cellSizeMm = static_cast<float>(mazeConfig.cellSizeMm);
     motionConfig.imuYawSign = 1.0f;
-    motionConfig.leftFeedForwardPwmPerMmS = 0.8f;
-    motionConfig.rightFeedForwardPwmPerMmS = 0.8f;
-    motionConfig.leftStaticFrictionPwm = 20.0f;
-    motionConfig.rightStaticFrictionPwm = 20.0f;
 
     const Pose2D initialPose = {0.0f, 0.0f,
                                 initialHeadingRadians(mazeConfig.initialHeading)};
@@ -610,19 +672,19 @@ void setup() {
         return;
     }
 
-    observationStartedAtMs = millis();
-    attemptStartedMs = observationStartedAtMs;
-    initializeTelemetry();
-    motors.setEnabled(true);
-    ready = true;
+    motors.setEnabled(false);
+    hardwareReady = true;
+    ready = false;
     Serial.printf("Labirinto %ux%u; início=(%u,%u); objetivo=(%u,%u).\n",
                   mazeConfig.rows, mazeConfig.cols,
                   mazeConfig.start.row, mazeConfig.start.col,
                   mazeConfig.goal.row, mazeConfig.goal.col);
-    Serial.println("Navegação autônoma iniciada; sem intervenção manual durante a tentativa.");
+    Serial.println("PRONTO E PARADO: g=missao autonoma; t=teste 3F/L/F; c=esquerda/F do ponto atual; x=parar; s=sensores; h=ajuda. Reiniciar apos terminar.");
+    Serial.println("Perfil integrado V17: 100mm/s, 55graus/s; limite 180s. Nenhuma partida automatica.");
 }
 
 void loop() {
+    handleSerialCommands();
     const uint32_t nowMs = millis();
     samplePowerMonitor(nowMs);
     publishTelemetryIfDue(nowMs);
@@ -655,11 +717,26 @@ void loop() {
     if (motionResultPending) {
         MotionStatus status = motion.getStatus();
         if (status == MotionStatus::Running) {
+            const auto snapshot = getLateralSnapshot();
+            const bool stale = !snapshot.ready || millis() - snapshot.sampledAtMs > MAX_LATERAL_SAMPLE_AGE_MS;
+            const bool frontBlocked = motion.isMovingForward() &&
+                (!snapshot.front.valid || snapshot.front.distanceCm <= 5.0f);
+            if (stale || frontBlocked) {
+                mission.fail();
+                safeStop(stale ? "sensores desatualizados" : "frente invalida ou obstaculo <=5cm");
+                motionResultPending = false;
+                return;
+            }
             const uint32_t nowUs = micros();
             const uint32_t elapsedUs = static_cast<uint32_t>(nowUs - lastControlUpdateUs);
             if (elapsedUs >= CONTROL_PERIOD_US) {
                 motion.update(static_cast<float>(elapsedUs) / 1000000.0f);
-                robotStateEstimator.updatePose();
+                // Confirm grid turns only after settling. Updating at every
+                // intermediate 75-degree threshold would accumulate yaw-reference
+                // errors across consecutive turns in PositionTracker.
+                if (motion.getMotionType() == MotionType::ForwardCell ||
+                    motion.getStatus() != MotionStatus::Running)
+                    robotStateEstimator.updatePose();
                 lastControlUpdateUs = nowUs;
             }
             if (motion.getStatus() == MotionStatus::Running) {
@@ -671,6 +748,22 @@ void loop() {
         }
 
         motionResultPending = false;
+        Serial.printf("MOVIMENTO status=%u motivo=%u distancia=%.2fmm yaw=%.2fgraus\n",
+            static_cast<unsigned>(status), static_cast<unsigned>(motion.getFailureReason()),
+            motion.getDistanceTravelledMm(), motion.getTurnAngleDeg());
+        if (guidedRouteActive) {
+            guidedRoute.finishMovement(status == MotionStatus::Succeeded);
+            guidedPauseStartedMs = millis();
+            if (guidedRoute.action() == nav::GuidedAction::Failed) {
+                safeStop("falha no teste guiado");
+            } else if (guidedRoute.action() == nav::GuidedAction::Complete) {
+                ready = false;
+                guidedRouteActive = false;
+                motors.setEnabled(false);
+                Serial.println("TESTE GUIADO CONCLUIDO; motores OFF. Reinicie/reposicione antes de outra tentativa.");
+            }
+            return;
+        }
         const nav::MissionUpdate missionUpdate =
             mission.onMotionFinished(status == MotionStatus::Succeeded);
         handleMissionUpdate(missionUpdate);
@@ -678,6 +771,28 @@ void loop() {
             observationStartedAtMs = millis();
             freshObservationSamples = 0;
         }
+        return;
+    }
+
+    if (guidedRouteActive) {
+        if (millis() - guidedPauseStartedMs < 1000) { delay(1); return; }
+        const auto snapshot = getLateralSnapshot();
+        if (!snapshot.ready || millis() - snapshot.sampledAtMs > MAX_LATERAL_SAMPLE_AGE_MS) {
+            safeStop("sensores desatualizados antes da etapa guiada"); return;
+        }
+        const bool forward = guidedRoute.action() == nav::GuidedAction::ForwardCell;
+        if (forward && (!snapshot.front.valid || snapshot.front.distanceCm <= 5.0f)) {
+            safeStop("frente invalida ou obstaculo antes da etapa guiada"); return;
+        }
+        if (!forward && (!snapshot.left.valid || snapshot.left.distanceCm <= 5.0f)) {
+            safeStop("abertura esquerda nao confirmada antes do giro guiado"); return;
+        }
+        Serial.printf("TESTE ETAPA %u/5: %s\n", guidedRoute.step() + 1,
+                      forward ? "avancar18cm" : "esquerda90graus");
+        const nav::MissionUpdate update{nav::MissionState::NotStarted,
+            forward ? nav::MissionAction::MoveForwardOneCell : nav::MissionAction::TurnLeft90,
+            nav::NavigationStatus::NotInitialized};
+        handleMissionUpdate(update);
         return;
     }
 
