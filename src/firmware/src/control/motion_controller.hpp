@@ -39,6 +39,19 @@ enum class MotionFailureReason : uint8_t {
     BrakeNotSettled
 };
 
+// Leituras das paredes vindas do subsistema de ultrassom, em milímetros.
+// xValid=false quando a leitura está ausente ou é implausível; sem eco
+// (caminho livre) também deve ser enviado como inválido.
+struct WallFeedback {
+    float frontMm = 0.0f;
+    float leftMm = 0.0f;
+    float rightMm = 0.0f;
+    bool frontValid = false;
+    bool leftValid = false;
+    bool rightValid = false;
+    uint32_t sampledAtMs = 0;
+};
+
 struct MotionControllerConfig {
     float leftCountsPerMm;
     float rightCountsPerMm;
@@ -62,8 +75,26 @@ struct MotionControllerConfig {
     // Ganho de correção de rumo por yaw da IMU; fatores de encoder são provisórios.
     // Unidade: (mm/s de correcao diferencial) / grau de yaw.
     float straightCorrectionKp;
-    // Reservado: alinhamento lateral desativado ate calibracao fisica (ganho zero).
+    // Centralização lateral (cascata): o erro lateral em mm gera um alvo de
+    // rumo em graus, seguido pela malha de rumo da IMU. Unidade: grau / mm.
+    // Zero desativa a centralização.
     float wallAlignmentKp;
+    // Limite do alvo de rumo gerado pelas paredes, em graus.
+    float maxWallHeadingDeg;
+    // Leitura lateral abaixo disto é considerada parede adjacente, em mm.
+    float lateralWallMaxDistanceMm;
+    // Distância sensor-parede com o robô centralizado. Zero = aprender em
+    // movimento quando houver as duas paredes (ou na largada, pelo main).
+    float lateralCenterDistanceMm;
+    // Amostras de parede mais antigas que isto são ignoradas, em ms.
+    uint32_t wallFeedbackMaxAgeMs;
+
+    // Distância do sensor frontal à parede com o robô no centro da célula.
+    // Zero desativa a parada pela parede frontal. Calibrar no labirinto.
+    float frontStopDistanceMm;
+    // Diferença máxima aceita entre o restante pela parede frontal e pelo
+    // encoder; acima disto a parede vista não é a do fim desta célula.
+    float frontMaxCorrectionMm;
 
     // Feed-forward aproximado do motor: PWM por mm/s + compensação de atrito
     // estático. Calibrar para cada roda.
@@ -106,9 +137,10 @@ public:
 
     // Feedback atualizado pelo subsistema de sensores, em milímetros.
     // Leituras inválidas/desatualizadas devem ser enviadas com valid=false.
-    void setWallAlignmentFeedback(float leftDistanceMm,
-                                  float rightDistanceMm,
-                                  bool valid);
+    void setWallFeedback(const WallFeedback& feedback);
+    // Distância lateral com o robô centralizado (ex.: medida na largada,
+    // entre as duas paredes do beco). Valores <= 0 são ignorados.
+    void setLateralCenterDistanceMm(float distanceMm);
     bool startTurnLeft90();
     bool startTurnRight90();
     bool startTurnAround180(); // meia-volta à direita, como na bancada
@@ -129,6 +161,11 @@ public:
     float getLeftSpeedMmS() const;
     float getRightSpeedMmS() const;
     float getPidErrorMmS() const;
+    float getWallHeadingTargetDeg() const { return wallHeadingTargetDeg_; }
+    float getLateralCenterDistanceMm() const { return lateralCenterMm_; }
+    // Última correção aplicada pela parede frontal (restante frontal menos
+    // restante do encoder), em mm. Zero quando não usada no movimento.
+    float getFrontCorrectionMm() const { return frontCorrectionMm_; }
 
 private:
     bool prepareMotion(MotionType type, uint32_t timeoutMs);
@@ -136,6 +173,10 @@ private:
     void updateForward(float dtSeconds, int32_t leftCount,
                        int32_t rightCount, float leftSpeedMmS,
                        float rightSpeedMmS, uint32_t nowMs);
+    bool wallFeedbackFresh(uint32_t nowMs) const;
+    void updateWallHeadingTarget(uint32_t nowMs);
+    bool frontRemainingMm(uint32_t nowMs, float speedMmS,
+                          float& remainingMm) const;
     void updateTurn(float dtSeconds, float leftSpeedMmS,
                     float rightSpeedMmS, uint32_t nowMs);
     void applyWheelSpeedTargets(float leftTargetMmS,
@@ -184,9 +225,12 @@ private:
     uint8_t settledSamples_ = 0;
 
     float targetDistanceMm_ = 0.0f;
-    float leftWallDistanceMm_ = 0.0f;
-    float rightWallDistanceMm_ = 0.0f;
-    bool wallAlignmentValid_ = false;
+    WallFeedback wall_{};
+    uint32_t lastWallSampleMs_ = 0;
+    bool hasWallSample_ = false;
+    float lateralCenterMm_ = 0.0f;
+    float wallHeadingTargetDeg_ = 0.0f;
+    float frontCorrectionMm_ = 0.0f;
     float distanceTravelledMm_ = 0.0f;
     float targetAngleDeg_ = 0.0f;
     float turnAngleDeg_ = 0.0f;

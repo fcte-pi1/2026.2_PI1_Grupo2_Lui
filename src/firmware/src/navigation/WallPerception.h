@@ -43,9 +43,8 @@ inline constexpr uint16_t kUs100MaxRangeMm = 4500;  // ~450cm
 // applyReading — ausência de eco NÃO é uma leitura inválida).
 bool isPhysicallyPlausible(uint16_t rawDistanceMm);
 
-// Suavização por média móvel de janela fixa (N = 3 amostras), uma
-// instância por direção.
-class MovingAverageFilter3 {
+// Suavização por mediana de janela fixa (N = 3 amostras), uma instância por
+class MedianFilter3 {
 public:
     uint16_t push(uint16_t rawValue);
 
@@ -58,12 +57,12 @@ private:
 
 // Atualiza `reading` a partir de uma nova leitura bruta `echo`, aplicando a
 // validação de FR-002/Edge Cases e a suavização de FR-003 via `filter`
-// (uma instância de MovingAverageFilter3 por direção, mantida pelo
+// (uma instância de MedianFilter3 por direção, mantida pelo
 // chamador). Ausência de eco (`echo.hasEcho == false`) é tratada como
 // "caminho livre" (valor no alcance máximo do sensor), nunca como leitura
 // inválida; só uma leitura com eco porém fisicamente impossível marca
 // `reading.valid = false`, e nesse caso o filtro NÃO é alimentado.
-void applyReading(SensorReading& reading, const RawEcho& echo, MovingAverageFilter3& filter);
+void applyReading(SensorReading& reading, const RawEcho& echo, MedianFilter3& filter);
 
 // Condição de falha de uma direção específica. Consumida apenas por HU-12
 // (diagnóstico) — nunca influencia WallCellState.
@@ -142,7 +141,7 @@ private:
     IWallSensor& sensor_;
     uint16_t thresholdMm_;
 
-    std::array<MovingAverageFilter3, kDirectionCount> filters_{};
+    std::array<MedianFilter3, kDirectionCount> filters_{};
     std::array<SensorReading, kDirectionCount> readings_{};
     std::array<SensorFaultState, kDirectionCount> faults_{};
     WallCellState state_{};

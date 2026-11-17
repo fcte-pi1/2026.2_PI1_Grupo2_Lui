@@ -8,21 +8,32 @@ bool isPhysicallyPlausible(uint16_t rawDistanceMm) {
     return rawDistanceMm >= kUs100MinRangeMm && rawDistanceMm <= kUs100MaxRangeMm;
 }
 
-uint16_t MovingAverageFilter3::push(uint16_t rawValue) {
+uint16_t MedianFilter3::push(uint16_t rawValue) {
     buffer_[cursor_] = rawValue;
     cursor_ = static_cast<uint8_t>((cursor_ + 1) % kWindowSize);
     if (filledCount_ < kWindowSize) {
         ++filledCount_;
     }
 
-    uint32_t sum = 0;
-    for (uint8_t i = 0; i < filledCount_; ++i) {
-        sum += buffer_[i];
+    if (filledCount_ == 1) {
+        return rawValue;
     }
-    return static_cast<uint16_t>(sum / filledCount_);
+    if (filledCount_ == 2) {
+        return buffer_[0] < buffer_[1] ? buffer_[0] : buffer_[1];
+    }
+    const uint16_t a = buffer_[0];
+    const uint16_t b = buffer_[1];
+    const uint16_t c = buffer_[2];
+    if ((a <= b && b <= c) || (c <= b && b <= a)) {
+        return b;
+    }
+    if ((b <= a && a <= c) || (c <= a && a <= b)) {
+        return a;
+    }
+    return c;
 }
 
-void applyReading(SensorReading& reading, const RawEcho& echo, MovingAverageFilter3& filter) {
+void applyReading(SensorReading& reading, const RawEcho& echo, MedianFilter3& filter) {
     reading.timestampMs = echo.timestampMs;
 
     if (!echo.hasEcho) {
@@ -73,7 +84,7 @@ void WallPerception::update() {
     }
 
     // HardwareWallSensor pode expor um snapshot em cache. Processar o mesmo
-    // timestamp mais de uma vez inflaria artificialmente a média móvel.
+    // timestamp mais de uma vez enviesaria a janela do filtro.
     const uint32_t sampleTimestamp = echoes[indexOf(Direction::Front)].timestampMs;
     if (hasProcessedSample_ && sampleTimestamp == lastProcessedTimestampMs_) return;
     hasProcessedSample_ = true;

@@ -295,16 +295,46 @@ void handleMissionUpdate(const nav::MissionUpdate &update) {
     // O sampler lê os três sensores continuamente; o PID e a HU-01 consomem o mesmo snapshot.
 }
 
+// Sem eco (pulseUs == 0) significa caminho livre, como no WallPerception.
+// Só há obstáculo quando o eco existe e a distância é <= limite; um eco
+// abaixo do alcance mínimo do sensor também conta como obstáculo.
+bool echoCloserThan(const UltrasonicReading& reading, float limitCm) {
+    if (reading.pulseUs == 0) return false;
+    const float cm = reading.valid ? reading.distanceCm
+                                   : static_cast<float>(reading.pulseUs) / 58.0f;
+    return cm <= limitCm;
+}
+
+bool echoOpenBeyond(const UltrasonicReading& reading, float limitCm) {
+    return !echoCloserThan(reading, limitCm);
+}
+
 void updateWallAlignmentFeedback() {
     const LateralSnapshot snapshot = getLateralSnapshot();
-    const uint32_t age = static_cast<uint32_t>(millis() - snapshot.sampledAtMs);
-    const bool valid = snapshot.ready && snapshot.left.valid && snapshot.right.valid &&
-                       age <= MAX_LATERAL_SAMPLE_AGE_MS;
-    if (valid) {
-        motion.setWallAlignmentFeedback(snapshot.left.distanceCm * 10.0f,
-                                        snapshot.right.distanceCm * 10.0f, true);
+    if (!snapshot.ready) return;
+    WallFeedback feedback;
+    feedback.sampledAtMs = snapshot.sampledAtMs;
+    feedback.frontValid = snapshot.front.valid;
+    feedback.leftValid = snapshot.left.valid;
+    feedback.rightValid = snapshot.right.valid;
+    feedback.frontMm = snapshot.front.distanceCm * 10.0f;
+    feedback.leftMm = snapshot.left.distanceCm * 10.0f;
+    feedback.rightMm = snapshot.right.distanceCm * 10.0f;
+    motion.setWallFeedback(feedback);
+}
+
+// Na largada (beco sem saída) o robô está entre duas paredes: a média das
+// laterais é a distância de referência para seguir uma parede só.
+void learnLateralCenterAtStart() {
+    const LateralSnapshot snapshot = getLateralSnapshot();
+    const float maxMm = motionConfig.lateralWallMaxDistanceMm;
+    const float l = snapshot.left.distanceCm * 10.0f, r = snapshot.right.distanceCm * 10.0f;
+    if (snapshot.ready && snapshot.left.valid && snapshot.right.valid &&
+        l <= maxMm && r <= maxMm && fabsf(l - r) <= 30.0f) {
+        motion.setLateralCenterDistanceMm((l + r) * 0.5f);
+        Serial.printf("CENTRO LATERAL aprendido: %.1fmm (L=%.1f R=%.1f)\n", (l + r) * 0.5f, l, r);
     } else {
-        motion.setWallAlignmentFeedback(0.0f, 0.0f, false);
+        Serial.println("CENTRO LATERAL nao aprendido na largada; sera aprendido entre duas paredes.");
     }
 }
 
@@ -511,6 +541,7 @@ void handleSerialCommands() {
                 !mission.begin(mazeConfig, gridOrientation.read().yawDegrees)) {
                 safeStop("inicializacao da tentativa"); hardwareReady = false; continue;
             }
+            if (!corner) learnLateralCenterAtStart();
             attemptUsed = true;
             motionResultPending = false;
             freshObservationSamples = 0;
@@ -720,7 +751,7 @@ void loop() {
             const auto snapshot = getLateralSnapshot();
             const bool stale = !snapshot.ready || millis() - snapshot.sampledAtMs > MAX_LATERAL_SAMPLE_AGE_MS;
             const bool frontBlocked = motion.isMovingForward() &&
-                (!snapshot.front.valid || snapshot.front.distanceCm <= 5.0f);
+                echoCloserThan(snapshot.front, 5.0f);
             if (stale || frontBlocked) {
                 mission.fail();
                 safeStop(stale ? "sensores desatualizados" : "frente invalida ou obstaculo <=5cm");
@@ -781,10 +812,10 @@ void loop() {
             safeStop("sensores desatualizados antes da etapa guiada"); return;
         }
         const bool forward = guidedRoute.action() == nav::GuidedAction::ForwardCell;
-        if (forward && (!snapshot.front.valid || snapshot.front.distanceCm <= 5.0f)) {
-            safeStop("frente invalida ou obstaculo antes da etapa guiada"); return;
+        if (forward && echoCloserThan(snapshot.front, 5.0f)) {
+            safeStop("obstaculo frontal antes da etapa guiada"); return;
         }
-        if (!forward && (!snapshot.left.valid || snapshot.left.distanceCm <= 5.0f)) {
+        if (!forward && !echoOpenBeyond(snapshot.left, 5.0f)) {
             safeStop("abertura esquerda nao confirmada antes do giro guiado"); return;
         }
         Serial.printf("TESTE ETAPA %u/5: %s\n", guidedRoute.step() + 1,

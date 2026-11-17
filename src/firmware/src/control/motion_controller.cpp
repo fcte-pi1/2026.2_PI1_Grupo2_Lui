@@ -18,7 +18,14 @@ MotionControllerConfig::MotionControllerConfig()
       maxAngularSpeedDegS(55), minAngularSpeedDegS(10), angularAccelerationDegS2(240),
       turnKpDegPerSecPerDeg(3), positionToleranceMm(1), angleToleranceDeg(0.6f),
       settledSpeedMmS(8), settledGyroDegS(4), straightCorrectionKp(5),
-      wallAlignmentKp(0), leftFeedForwardPwmPerMmS(0.4f), rightFeedForwardPwmPerMmS(0.4f),
+      wallAlignmentKp(MechanicalSettings::WALL_ALIGNMENT_KP_DEG_PER_MM),
+      maxWallHeadingDeg(MechanicalSettings::MAX_WALL_HEADING_DEG),
+      lateralWallMaxDistanceMm(MechanicalSettings::LATERAL_WALL_MAX_DISTANCE_MM),
+      lateralCenterDistanceMm(MechanicalSettings::LATERAL_CENTER_DISTANCE_MM),
+      wallFeedbackMaxAgeMs(MechanicalSettings::WALL_FEEDBACK_MAX_AGE_MS),
+      frontStopDistanceMm(MechanicalSettings::FRONT_WALL_CENTERED_DISTANCE_MM),
+      frontMaxCorrectionMm(MechanicalSettings::FRONT_MAX_CORRECTION_MM),
+      leftFeedForwardPwmPerMmS(0.4f), rightFeedForwardPwmPerMmS(0.4f),
       leftStaticFrictionPwm(90), rightStaticFrictionPwm(90), imuYawSign(1),
       forwardTimeoutMs(6000), turnTimeoutMs(11000), stallTimeoutMs(700), stallMinSpeedMmS(5) {}
 
@@ -34,6 +41,13 @@ bool MotionController::begin(const MotionControllerConfig& c, const Pose2D& pose
         c.minLinearSpeedMmS <= 0 || c.minAngularSpeedDegS <= 0 || c.turnKpDegPerSecPerDeg <= 0 ||
         c.positionToleranceMm <= 0 || c.angleToleranceDeg <= 0 || fabsf(c.imuYawSign) != 1 ||
         !c.forwardTimeoutMs || !c.turnTimeoutMs || !c.stallTimeoutMs ||
+        !isfinite(c.wallAlignmentKp) || c.wallAlignmentKp < 0 ||
+        !isfinite(c.maxWallHeadingDeg) || c.maxWallHeadingDeg < 0 || c.maxWallHeadingDeg > 10 ||
+        !isfinite(c.lateralWallMaxDistanceMm) || c.lateralWallMaxDistanceMm <= 0 ||
+        !isfinite(c.lateralCenterDistanceMm) || c.lateralCenterDistanceMm < 0 ||
+        !isfinite(c.frontStopDistanceMm) ||
+        (c.frontStopDistanceMm != 0 && c.frontStopDistanceMm < 30) ||
+        !isfinite(c.frontMaxCorrectionMm) || c.frontMaxCorrectionMm < 0 || c.frontMaxCorrectionMm > 60 ||
         !leftEncoder_.isInitialized() || !rightEncoder_.isInitialized() || !imu_.isInitialized()) return false;
     int32_t l = 0, r = 0;
     if (!leftEncoder_.readCount(l) || !rightEncoder_.readCount(r)) return false;
@@ -42,6 +56,8 @@ bool MotionController::begin(const MotionControllerConfig& c, const Pose2D& pose
     if (!odometry_.begin(oc, pose, l, r)) return false;
     config_ = c; initialized_ = true; status_ = MotionStatus::Idle; motionType_ = MotionType::None;
     failureReason_ = MotionFailureReason::None; braking_ = false;
+    lateralCenterMm_ = c.lateralCenterDistanceMm; wallHeadingTargetDeg_ = frontCorrectionMm_ = 0;
+    hasWallSample_ = false; wall_ = WallFeedback{}; lastWallSampleMs_ = 0;
     previousLeftCount_ = l; previousRightCount_ = r;
     return true;
 }
@@ -66,6 +82,7 @@ bool MotionController::prepareMotion(MotionType type, uint32_t timeout) {
     lastLeftMeasuredMmS_ = lastRightMeasuredMmS_ = 0;
     lastLeftTargetMmS_ = lastRightTargetMmS_ = 0;
     lastAngularProgress_ = 0; lastAngularProgressMs_ = motionStartedMs_;
+    wallHeadingTargetDeg_ = frontCorrectionMm_ = 0;
     leftPid_.reset(); rightPid_.reset();
     motionType_ = type; failureReason_ = MotionFailureReason::None; status_ = MotionStatus::Running;
     return true;
@@ -87,10 +104,62 @@ bool MotionController::startTurn(float angle, MotionType type) {
 bool MotionController::startTurnLeft90() { return startTurn(90, MotionType::TurnLeft90); }
 bool MotionController::startTurnRight90() { return startTurn(-90, MotionType::TurnRight90); }
 bool MotionController::startTurnAround180() { return startTurn(-180, MotionType::TurnAround180); }
-void MotionController::setWallAlignmentFeedback(float l, float r, bool valid) {
-    // Snapshot retained for diagnostics. Uncalibrated wall gains are not mixed
-    // into the bench-validated IMU heading loop.
-    leftWallDistanceMm_ = l; rightWallDistanceMm_ = r; wallAlignmentValid_ = valid;
+void MotionController::setWallFeedback(const WallFeedback& f) {
+    wall_ = f;
+    if (!isfinite(wall_.frontMm)) wall_.frontValid = false;
+    if (!isfinite(wall_.leftMm)) wall_.leftValid = false;
+    if (!isfinite(wall_.rightMm)) wall_.rightValid = false;
+    hasWallSample_ = true;
+}
+void MotionController::setLateralCenterDistanceMm(float mm) {
+    if (isfinite(mm) && mm > 0 && mm <= config_.lateralWallMaxDistanceMm) lateralCenterMm_ = mm;
+}
+bool MotionController::wallFeedbackFresh(uint32_t now) const {
+    return hasWallSample_ && now - wall_.sampledAtMs <= config_.wallFeedbackMaxAgeMs;
+}
+
+// Erro lateral positivo = robo deslocado para a direita, entao o alvo de rumo
+// e positivo (girar a esquerda, mesmo sentido de TurnLeft90).
+void MotionController::updateWallHeadingTarget(uint32_t now) {
+    if (config_.wallAlignmentKp <= 0 || targetDistanceMm_ < 0 || !wallFeedbackFresh(now) ||
+        fabsf(turnAngleDeg_) > 8) {
+        // Sem referencia confiavel: volta suavemente a segurar so o rumo da IMU.
+        wallHeadingTargetDeg_ *= 0.98f;
+        return;
+    }
+    if (wall_.sampledAtMs == lastWallSampleMs_) return;  // so processa amostras novas
+    lastWallSampleMs_ = wall_.sampledAtMs;
+    const float maxMm = config_.lateralWallMaxDistanceMm;
+    const bool lw = wall_.leftValid && wall_.leftMm > 0 && wall_.leftMm <= maxMm;
+    const bool rw = wall_.rightValid && wall_.rightMm > 0 && wall_.rightMm <= maxMm;
+    float error = 0;
+    if (lw && rw) {
+        error = (wall_.leftMm - wall_.rightMm) * 0.5f;
+        const float center = (wall_.leftMm + wall_.rightMm) * 0.5f;
+        // Aprende a distancia centralizada quando quase centrado.
+        if (lateralCenterMm_ <= 0) lateralCenterMm_ = center;
+        else if (fabsf(error) < 10) lateralCenterMm_ += 0.05f * (center - lateralCenterMm_);
+    } else if (lw && lateralCenterMm_ > 0) {
+        error = wall_.leftMm - lateralCenterMm_;
+    } else if (rw && lateralCenterMm_ > 0) {
+        error = lateralCenterMm_ - wall_.rightMm;
+    } else {
+        wallHeadingTargetDeg_ *= 0.7f;
+        return;
+    }
+    const float desired = clamp(error * config_.wallAlignmentKp,
+                                -config_.maxWallHeadingDeg, config_.maxWallHeadingDeg);
+    wallHeadingTargetDeg_ += 0.4f * (desired - wallHeadingTargetDeg_);
+}
+
+// Restante ate o centro da celula segundo a parede frontal, compensando o
+// atraso da amostra de ultrassom pela velocidade atual.
+bool MotionController::frontRemainingMm(uint32_t now, float speed, float& remaining) const {
+    if (config_.frontStopDistanceMm <= 0 || !wallFeedbackFresh(now) || !wall_.frontValid ||
+        wall_.frontMm <= 0 || fabsf(turnAngleDeg_) > 8) return false;
+    const float ageS = static_cast<float>(now - wall_.sampledAtMs) / 1000.0f;
+    remaining = wall_.frontMm - fmaxf(0, speed) * ageS - config_.frontStopDistanceMm;
+    return true;
 }
 
 void MotionController::beginBrake(uint32_t now, MotionFailureReason reason) {
@@ -135,17 +204,26 @@ void MotionController::updateForward(float dt, int32_t l, int32_t r, float ls, f
     const float lt = (l - startLeftCount_) / config_.leftCountsPerMm * dir;
     const float rt = (r - startRightCount_) / config_.rightCountsPerMm * dir;
     const float target = fabsf(targetDistanceMm_);
-    if (lt < -5 || rt < -5 || lt > target + 20 || rt > target + 20 ||
+    const float overshoot = 20 + (config_.frontStopDistanceMm > 0 && dir > 0 ? config_.frontMaxCorrectionMm : 0);
+    if (lt < -5 || rt < -5 || lt > target + overshoot || rt > target + overshoot ||
         fabsf(rt - lt) > 20 || fabsf(turnAngleDeg_) > 15) {
         beginBrake(now, MotionFailureReason::SafetyLimit); return;
     }
     if (checkTimeoutAndStall(now, 1, 1)) return;
-    const float remaining = target - (lt + rt) * 0.5f;
+    float remaining = target - (lt + rt) * 0.5f;
+    float frontRemaining = 0;
+    if (dir > 0 && frontRemainingMm(now, (ls + rs) * 0.5f, frontRemaining) &&
+        fabsf(frontRemaining - remaining) <= config_.frontMaxCorrectionMm) {
+        // A parede do fim da celula e referencia mais precisa que o encoder.
+        frontCorrectionMm_ = frontRemaining - remaining;
+        remaining = frontRemaining;
+    }
     const float lead = fmaxf(config_.positionToleranceMm, fmaxf(0, (ls + rs) * 0.5f * dir) * 0.07f);
     if (remaining <= lead) { beginBrake(now); return; }
     const float desired = fminf(config_.maxLinearSpeedMmS, fmaxf(config_.minLinearSpeedMmS, sqrtf(2 * 120 * remaining)));
     profiledLinearSpeedMmS_ = fminf(desired, profiledLinearSpeedMmS_ + config_.linearAccelerationMmS2 * dt);
-    const float correction = clamp(turnAngleDeg_ * config_.straightCorrectionKp, -12, 12);
+    updateWallHeadingTarget(now);
+    const float correction = clamp((turnAngleDeg_ - wallHeadingTargetDeg_) * config_.straightCorrectionKp, -12, 12);
     const float leftTarget = dir * fmaxf(0, profiledLinearSpeedMmS_ + dir * correction);
     const float rightTarget = dir * fmaxf(0, profiledLinearSpeedMmS_ - dir * correction);
     applyWheelSpeedTargets(leftTarget, rightTarget, ls, rs, dt);

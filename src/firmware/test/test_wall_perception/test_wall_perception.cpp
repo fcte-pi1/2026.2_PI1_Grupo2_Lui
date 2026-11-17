@@ -118,6 +118,46 @@ static void test_wall_detection_independent_of_maze_size(void) {
     TEST_ASSERT_TRUE(state.wallRight);
 }
 
+
+static void test_single_missing_echo_does_not_erase_wall(void) {
+    MockWallSensor sensor;
+    WallPerception perception(sensor);
+
+    for (uint32_t t = 1; t <= 2; ++t) {
+        sensor.enqueue(Direction::Front, RawEcho{60, true, t});
+        sensor.enqueue(Direction::Left, RawEcho{60, true, t});
+        sensor.enqueue(Direction::Right, RawEcho{60, true, t});
+        perception.update();
+    }
+    sensor.enqueue(Direction::Front, RawEcho{0, false, 3});  // sem eco
+    sensor.enqueue(Direction::Left, RawEcho{60, true, 3});
+    sensor.enqueue(Direction::Right, RawEcho{0, false, 3});  // sem eco
+    perception.update();
+
+    TEST_ASSERT_TRUE(perception.currentState().wallFront);
+    TEST_ASSERT_TRUE(perception.currentState().wallRight);
+}
+
+
+static void test_repeated_missing_echo_is_open_path(void) {
+    MockWallSensor sensor;
+    WallPerception perception(sensor);
+
+    sensor.enqueue(Direction::Front, RawEcho{60, true, 1});
+    sensor.enqueue(Direction::Left, RawEcho{60, true, 1});
+    sensor.enqueue(Direction::Right, RawEcho{60, true, 1});
+    perception.update();
+    for (uint32_t t = 2; t <= 3; ++t) {
+        sensor.enqueue(Direction::Front, RawEcho{0, false, t});
+        sensor.enqueue(Direction::Left, RawEcho{60, true, t});
+        sensor.enqueue(Direction::Right, RawEcho{60, true, t});
+        perception.update();
+    }
+
+    TEST_ASSERT_FALSE(perception.currentState().wallFront);
+    TEST_ASSERT_TRUE(perception.currentState().wallLeft);
+}
+
 // T019 — medição numérica lateral suavizada (US2, SC-002/SC-004).
 static void test_lateral_distance_reflects_filtered_value_not_raw_spike(void) {
     MockWallSensor sensor;
@@ -173,13 +213,18 @@ static void test_lateral_distance_updates_every_cycle(void) {
     perception.update();
     const uint16_t first = perception.lateralDistanceMm(Direction::Left);
 
-    sensor.enqueue(Direction::Left, RawEcho{200, true, 10});
-    sensor.enqueue(Direction::Front, RawEcho{300, true, 10});
-    sensor.enqueue(Direction::Right, RawEcho{300, true, 10});
-    perception.update();
+    // A mediana ignora uma amostra isolada; uma mudança sustentada aparece
+    // em até 2 ciclos (a leitura nunca fica congelada).
+    for (uint32_t t = 10; t <= 20; t += 10) {
+        sensor.enqueue(Direction::Left, RawEcho{200, true, t});
+        sensor.enqueue(Direction::Front, RawEcho{300, true, t});
+        sensor.enqueue(Direction::Right, RawEcho{300, true, t});
+        perception.update();
+    }
     const uint16_t second = perception.lateralDistanceMm(Direction::Left);
 
     TEST_ASSERT_NOT_EQUAL(first, second);
+    TEST_ASSERT_EQUAL_UINT16(200, second);
 }
 
 // T021 — integridade do WallCellState publicado para telemetria (US3, SC-005).
@@ -263,6 +308,8 @@ int main(int argc, char** argv) {
     RUN_TEST(test_wall_detection_binary_flags_per_direction);
     RUN_TEST(test_wall_detection_boundary_is_deterministic);
     RUN_TEST(test_wall_detection_independent_of_maze_size);
+    RUN_TEST(test_single_missing_echo_does_not_erase_wall);
+    RUN_TEST(test_repeated_missing_echo_is_open_path);
     RUN_TEST(test_lateral_distance_reflects_filtered_value_not_raw_spike);
     RUN_TEST(test_same_snapshot_is_not_filtered_twice);
     RUN_TEST(test_lateral_distance_updates_every_cycle);

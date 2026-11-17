@@ -98,7 +98,68 @@ void test_corner_continuation_does_not_repeat_forward_cells(){nav::GuidedRoute r
  TEST_ASSERT_EQUAL((int)nav::GuidedAction::TurnLeft90,(int)route.action());route.finishMovement(true);
  TEST_ASSERT_EQUAL((int)nav::GuidedAction::ForwardCell,(int)route.action());route.finishMovement(true);
  TEST_ASSERT_EQUAL((int)nav::GuidedAction::Complete,(int)route.action());}
-int main(){UNITY_BEGIN();RUN_TEST(test_corner_continuation_does_not_repeat_forward_cells);RUN_TEST(test_guided_route_is_three_forward_left_one_forward);RUN_TEST(test_guided_route_cannot_advance_after_failure);RUN_TEST(test_reverse_signed_motion_keeps_heading_and_brakes);RUN_TEST(test_nonfinite_imu_never_generates_motor_output);RUN_TEST(test_motor_mode_matches_bench_and_disabled_boot);RUN_TEST(test_unarmed_move_rejected);
+WallFeedback walls(float front,bool fv,float left,bool lv,float right,bool rv){
+ WallFeedback w;w.frontMm=front;w.frontValid=fv;w.leftMm=left;w.leftValid=lv;w.rightMm=right;w.rightValid=rv;w.sampledAtMs=fakeNow;return w;}
+void test_lateral_offset_between_two_walls_steers_toward_center(){
+ // L=30 e R=10: robo deslocado 10 mm para a direita, deve virar a esquerda.
+ Fixture f;f.arm();TEST_ASSERT_TRUE(f.motion.startMoveForwardOneCell());
+ for(int n=1;n<=120;++n){float mm=n*0.3f;f.motion.setWallFeedback(walls(0,false,30,true,10,true));
+  f.tick(lroundf(mm*f.cfg.leftCountsPerMm),lroundf(mm*f.cfg.rightCountsPerMm),0);}
+ TEST_ASSERT_EQUAL((int)MotionStatus::Running,(int)f.motion.getStatus());
+ TEST_ASSERT_TRUE(f.motion.getWallHeadingTargetDeg()>0.8f);
+ TEST_ASSERT_TRUE(f.motion.getWallHeadingTargetDeg()<=f.cfg.maxWallHeadingDeg);
+ TEST_ASSERT_TRUE(fakePwm[18]>fakePwm[16]);
+ TEST_ASSERT_FLOAT_WITHIN(0.01f,20,f.motion.getLateralCenterDistanceMm());}
+void test_single_wall_uses_learned_center_distance(){
+ Fixture f;f.motion.setLateralCenterDistanceMm(20);f.arm();f.motion.startMoveForwardOneCell();
+ // So parede direita, 8 mm mais perto que o centro: alvo de rumo a esquerda.
+ for(int n=1;n<=80;++n){float mm=n*0.3f;f.motion.setWallFeedback(walls(0,false,0,false,12,true));
+  f.tick(lroundf(mm*f.cfg.leftCountsPerMm),lroundf(mm*f.cfg.rightCountsPerMm),0);}
+ TEST_ASSERT_TRUE(f.motion.getWallHeadingTargetDeg()>0.5f);
+ // So parede esquerda, mais perto que o centro: alvo vira para a direita.
+ for(int n=81;n<=200;++n){float mm=n*0.3f;f.motion.setWallFeedback(walls(0,false,12,true,0,false));
+  f.tick(lroundf(mm*f.cfg.leftCountsPerMm),lroundf(mm*f.cfg.rightCountsPerMm),0);}
+ TEST_ASSERT_TRUE(f.motion.getWallHeadingTargetDeg()< -0.5f);}
+void test_stale_or_missing_walls_keep_imu_only(){
+ Fixture f;f.arm();f.motion.startMoveForwardOneCell();
+ f.motion.setWallFeedback(walls(0,false,30,true,10,true));
+ for(int n=1;n<=100;++n){float mm=n*0.3f;f.tick(lroundf(mm*f.cfg.leftCountsPerMm),lroundf(mm*f.cfg.rightCountsPerMm),0);}
+
+ TEST_ASSERT_FLOAT_WITHIN(0.3f,0,f.motion.getWallHeadingTargetDeg());}
+void runToBrakeWithFront(Fixture& f,float wallAtTravelMm){
+ for(int n=1;n<900 && !f.braking();++n){float mm=n*0.3f;
+  f.motion.setWallFeedback(walls(f.cfg.frontStopDistanceMm+wallAtTravelMm-mm,true,0,false,0,false));
+  f.tick(lroundf(mm*f.cfg.leftCountsPerMm),lroundf(mm*f.cfg.rightCountsPerMm),0);}
+ TEST_ASSERT_TRUE(f.braking());f.settle(0);}
+void test_front_wall_corrects_cell_end(){
+ // A parede real esta 15 mm antes do que o encoder supoe.
+ Fixture f;f.cfg.frontStopDistanceMm=50;TEST_ASSERT_TRUE(f.motion.begin(f.cfg,{0,0,0}));f.arm();
+ TEST_ASSERT_TRUE(f.motion.startMoveForwardOneCell());runToBrakeWithFront(f,165);
+ TEST_ASSERT_EQUAL((int)MotionStatus::Succeeded,(int)f.motion.getStatus());
+ TEST_ASSERT_FLOAT_WITHIN(5,165,f.motion.getDistanceTravelledMm());
+ TEST_ASSERT_FLOAT_WITHIN(3,-15,f.motion.getFrontCorrectionMm());}
+void test_front_wall_can_extend_short_encoder_move(){
+ Fixture f;f.cfg.frontStopDistanceMm=50;TEST_ASSERT_TRUE(f.motion.begin(f.cfg,{0,0,0}));f.arm();
+ f.motion.startMoveForwardOneCell();runToBrakeWithFront(f,200);
+ TEST_ASSERT_EQUAL((int)MotionStatus::Succeeded,(int)f.motion.getStatus());
+ TEST_ASSERT_FLOAT_WITHIN(5,200,f.motion.getDistanceTravelledMm());}
+void test_far_front_wall_is_ignored(){
+ // Parede da celula seguinte (360 mm): fora da janela de correcao.
+ Fixture f;f.cfg.frontStopDistanceMm=50;TEST_ASSERT_TRUE(f.motion.begin(f.cfg,{0,0,0}));f.arm();
+ f.motion.startMoveForwardOneCell();runToBrakeWithFront(f,360);
+ TEST_ASSERT_EQUAL((int)MotionStatus::Succeeded,(int)f.motion.getStatus());
+ TEST_ASSERT_FLOAT_WITHIN(5,180,f.motion.getDistanceTravelledMm());
+ TEST_ASSERT_FLOAT_WITHIN(0.01f,0,f.motion.getFrontCorrectionMm());}
+void test_front_stop_disabled_by_default(){
+ Fixture f;TEST_ASSERT_EQUAL_FLOAT(0,f.cfg.frontStopDistanceMm);f.arm();f.motion.startMoveForwardOneCell();
+ runToBrakeWithFront(f,160);TEST_ASSERT_FLOAT_WITHIN(5,180,f.motion.getDistanceTravelledMm());}
+void test_invalid_front_stop_config_rejected(){
+ Fixture f;f.cfg.frontStopDistanceMm=10;TEST_ASSERT_FALSE(f.motion.begin(f.cfg,{0,0,0}));}
+int main(){UNITY_BEGIN();
+ RUN_TEST(test_lateral_offset_between_two_walls_steers_toward_center);RUN_TEST(test_single_wall_uses_learned_center_distance);
+ RUN_TEST(test_stale_or_missing_walls_keep_imu_only);RUN_TEST(test_front_wall_corrects_cell_end);
+ RUN_TEST(test_front_wall_can_extend_short_encoder_move);RUN_TEST(test_far_front_wall_is_ignored);
+ RUN_TEST(test_front_stop_disabled_by_default);RUN_TEST(test_invalid_front_stop_config_rejected);RUN_TEST(test_corner_continuation_does_not_repeat_forward_cells);RUN_TEST(test_guided_route_is_three_forward_left_one_forward);RUN_TEST(test_guided_route_cannot_advance_after_failure);RUN_TEST(test_reverse_signed_motion_keeps_heading_and_brakes);RUN_TEST(test_nonfinite_imu_never_generates_motor_output);RUN_TEST(test_motor_mode_matches_bench_and_disabled_boot);RUN_TEST(test_unarmed_move_rejected);
  RUN_TEST(test_linear_completes_only_after_brake_and_quiet);RUN_TEST(test_heading_correction_does_not_brake_right_for_encoder_lead);
  RUN_TEST(test_turn_180_crosses_yaw_wrap);RUN_TEST(test_turn_left_crosses_yaw_wrap);RUN_TEST(test_stalled_wheels_fail_after_braking);
  RUN_TEST(test_imu_failure_disables_immediately);RUN_TEST(test_excess_heading_fails_not_success);RUN_TEST(test_braking_that_never_settles_fails);return UNITY_END();}
