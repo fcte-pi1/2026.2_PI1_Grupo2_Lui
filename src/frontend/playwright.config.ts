@@ -17,6 +17,7 @@ export default defineConfig({
   expect: { timeout: 5_000 },
   use: {
     baseURL: 'http://127.0.0.1:5173',
+    launchOptions: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE } : {},
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',

@@ -25,6 +25,11 @@ struct RawEcho {
     uint16_t rawDistanceMm;
     bool hasEcho;       // false = sem eco (fora de alcance); NÃO é uma leitura inválida.
     uint32_t timestampMs;
+    // Explicit acquisition failure/stale data overrides any distance/no-echo value.
+    // Default preserves simulated sources that intentionally report no echo as open.
+    bool valid = true;
+    // A hardware estimate already filtered once; do not average it again.
+    bool preFiltered = false;
 };
 
 // Fronteira de HAL entre a lógica de percepção e o hardware. Implementada

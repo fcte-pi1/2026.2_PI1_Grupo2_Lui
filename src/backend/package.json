@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "Esta pasta deverá armazenar arquivos referentes a:",
+  "description": "Esta pasta dever\u00e1 armazenar arquivos referentes a:",
   "main": "index.js",
   "keywords": [],
   "type": "module",
@@ -10,7 +10,9 @@
     "build": "tsc",
     "start": "node dist/main.js",
     "test": "tsx --test src/services/__tests__/*.test.ts src/controllers/__tests__/*.test.ts src/ws/__tests__/*.test.ts src/routes/__tests__/*.test.ts src/__tests__/*.test.ts src/lib/__tests__/*.test.ts",
-    "test:coverage": "bash scripts/test-coverage.sh"
+    "test:coverage": "bash scripts/test-coverage.sh",
+    "bluetooth:build": "node scripts/build-bluetooth-native.mjs",
+    "dev:bluetooth": "node --env-file=.env.bluetooth.local --import tsx src/main.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",
@@ -35,6 +37,7 @@
     "prisma@7.10.0": true,
     "@prisma/engines@7.10.0": true,
     "esbuild@0.28.2": true,
-    "@serialport/bindings-cpp@13.0.1": true
+    "@serialport/bindings-cpp@13.0.1": true,
+    "@serialport/bindings-cpp@13.0.0": true
   }
 }

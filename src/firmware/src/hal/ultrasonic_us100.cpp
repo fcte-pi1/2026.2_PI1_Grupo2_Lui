@@ -2,6 +2,12 @@
 
 #include <math.h>
 
+bool UltrasonicUS100::setDistanceOffsetCm(float offsetCm) {
+    if (!isfinite(offsetCm) || fabsf(offsetCm) > 2.0f) return false;
+    _distanceOffsetCm = offsetCm;
+    return true;
+}
+
 bool UltrasonicUS100::begin(uint8_t triggerPin,
                             uint8_t echoPin,
                             uint32_t timeoutUs,
@@ -43,10 +49,14 @@ UltrasonicReading UltrasonicUS100::measure() {
     }
 
     // Aproximação usual para ultrassom: duração do eco / 58 = centímetros.
-    const float centimeters = static_cast<float>(pulseUs) / 58.0f;
+    const float rawCm = static_cast<float>(pulseUs) / 58.0f;
+    const float centimeters = rawCm + _distanceOffsetCm;
+    // A small boundary tolerance accepts timer rounding near the configured
+    // raw minimum, but an offset must not turn a very short echo into valid range.
+    if (rawCm < _minDistanceCm - 0.05f) return {false, centimeters, pulseUs, true};
     if (!isfinite(centimeters) || centimeters < _minDistanceCm ||
         centimeters > _maxDistanceCm) {
-        return {false, NAN, pulseUs};
+        return {false, centimeters, pulseUs, isfinite(centimeters) && centimeters < _minDistanceCm};
     }
 
     return {true, centimeters, pulseUs};

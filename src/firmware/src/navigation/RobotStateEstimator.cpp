@@ -38,6 +38,7 @@ RobotStateEstimator::RobotStateEstimator(tracking::PositionTracker& positionTrac
 void RobotStateEstimator::initialize(const tracking::TrackingState& initialPose,
                                      int16_t initialYawReferenceDegrees) {
     positionTracker_.reset(initialPose, initialYawReferenceDegrees);
+    wallPerception_.reset();
     state_ = RobotStateSnapshot{};
     state_.pose = initialPose;
 }

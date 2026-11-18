@@ -14,6 +14,10 @@
 #ifndef MM_BT_DEVICE_NAME
 #define MM_BT_DEVICE_NAME "MicroMouse"
 #endif
+// Enable only after physical sonar supply/ECHO validation.
+#ifndef MM_REMOTE_MOTION_ENABLED
+#define MM_REMOTE_MOTION_ENABLED 0
+#endif
 #ifndef MM_MAZE_WIDTH
 #define MM_MAZE_WIDTH 4
 #endif

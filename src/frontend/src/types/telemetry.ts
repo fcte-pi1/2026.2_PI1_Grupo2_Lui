@@ -69,4 +69,15 @@ export type MensagemDashboard =
   | MensagemLabirinto
   | MensagemCelula
   | MensagemPosicao
-  | MensagemTelemetria;
+  | MensagemTelemetria
+  | BluetoothDiagnostic
+  | BluetoothLinkStatus;
+
+export interface BluetoothDiagnostic {
+  type:"bt_telemetry_test"; seq:number; uptime_ms:number; heap_bytes:number;
+  motors_enabled:false; ultrasonic_enabled:false; received_at_ms:number;
+  imu:{valid:boolean;yaw_deg:number|null;gyro_z_dps:number|null;accel_g:{x:number|null;y:number|null;z:number|null}};
+}
+export interface BluetoothLinkStatus {
+  type:"bt_link_status";status:"connecting"|"connected"|"disconnected";received_at_ms:number;
+}

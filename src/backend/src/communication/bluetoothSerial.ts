@@ -16,6 +16,7 @@ export interface BluetoothSerialBridgeOptions {
 
 export interface BluetoothSerialBridge {
   close(): Promise<void>;
+  send?(line: string): boolean;
 }
 
 /**
@@ -117,6 +118,11 @@ export function startBluetoothSerialBridge(
   openPort();
 
   return {
+    send: (line) => {
+      if(disposed || !port.isOpen || line.length>512 || /[\r\n]/.test(line))return false;
+      port.write(line+"\n",error=>{if(error)log(`Bluetooth SPP: falha no envio: ${error.message}`);});
+      return true;
+    },
     close: () => {
       disposed = true;
       if (reconnectTimer) clearTimeout(reconnectTimer);

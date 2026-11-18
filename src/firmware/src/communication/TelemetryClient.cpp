@@ -51,6 +51,21 @@ bool TelemetryClient::begin() {
     return true;
 }
 
+bool TelemetryClient::resetMissionCache() {
+    // Never overwrite a closed route while the BT task is exporting it.
+    portENTER_CRITICAL(&stateMux_);
+    const bool busy = pendingSessionEnd_ != nullptr || sessionActive_ || sessionStartPending_ || snapshotReplayPending_.load();
+    portEXIT_CRITICAL(&stateMux_);
+    if (busy || (queue_ && uxQueueMessagesWaiting(queue_) != 0)) return false;
+    portENTER_CRITICAL(&stateMux_);
+    mazeLength_ = latestCellLength_ = sessionStartLength_ = 0;
+    memset(cellValid_, 0, sizeof(cellValid_));
+    memset(cellLengths_, 0, sizeof(cellLengths_));
+    sessionClosedLocally_ = false;
+    portEXIT_CRITICAL(&stateMux_);
+    return true;
+}
+
 bool TelemetryClient::publishJson(const char* json, size_t length) {
     return enqueue(ItemKind::Json, json, length);
 }

@@ -62,8 +62,9 @@ struct MotionControllerConfig {
     // Ganho de correção de rumo por yaw da IMU; fatores de encoder são provisórios.
     // Unidade: (mm/s de correcao diferencial) / grau de yaw.
     float straightCorrectionKp;
-    // Reservado: alinhamento lateral desativado ate calibracao fisica (ganho zero).
+    // Correção lateral limitada, com entrada filtrada por amostras novas.
     float wallAlignmentKp;
+    float wallAlignmentDeadbandMm;
 
     // Feed-forward aproximado do motor: PWM por mm/s + compensação de atrito
     // estático. Calibrar para cada roda.
@@ -109,12 +110,22 @@ public:
     void setWallAlignmentFeedback(float leftDistanceMm,
                                   float rightDistanceMm,
                                   bool valid);
+    // May enable during a forward segment; cannot disable mid-segment and accelerate again.
+    void setFrontApproachMode(bool enabled);
+    bool isFrontApproachMode() const { return frontApproachMode_; }
+    // Refine the final centimetres only within the cell-position tolerance.
+    bool refineFrontApproachTarget(float frontCm);
+    void brakeAtFrontTarget();
     bool startTurnLeft90();
     bool startTurnRight90();
     bool startTurnAround180(); // meia-volta à direita, como na bancada
 
     // Chamar periodicamente pela Task_PID_Control (por exemplo, a cada 5 ms).
     void update(float dtSeconds);
+    // Brake while continuing encoder/IMU tracking. Resume preserves the target.
+    bool setSensorPaused(bool paused);
+    bool isSensorPaused() const { return sensorPaused_; }
+    bool sensorPauseSettled() const;
 
     // Interrompe o movimento. Status passa a Failed com motivo Cancelled.
     void stop();
@@ -166,7 +177,11 @@ private:
     MotionType motionType_ = MotionType::None;
     MotionFailureReason failureReason_ = MotionFailureReason::None;
     bool initialized_ = false;
+    bool sensorPaused_ = false;
+    uint32_t sensorPausedAtMs_ = 0;
     bool braking_ = false;
+    bool frontApproachMode_ = false;
+    float straightReferenceYawDeg_ = 0;
     uint32_t brakeStartedMs_ = 0, quietSinceMs_ = 0;
     uint32_t lastAngularProgressMs_ = 0;
     float lastAngularProgress_ = 0, currentGyroDps_ = 0;

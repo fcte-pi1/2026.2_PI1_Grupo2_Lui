@@ -56,13 +56,17 @@ private:
     uint8_t filledCount_ = 0;
 };
 
+// echo.valid=false representa falha de aquisição e sempre produz Unknown.
+// Ausência de eco só é Open se a fonte explicitamente a considerar válida.
+// Quando echo.preFiltered=true, preserva a estimativa já filtrada no sampler.
 // Atualiza `reading` a partir de uma nova leitura bruta `echo`, aplicando a
 // validação de FR-002/Edge Cases e a suavização de FR-003 via `filter`
 // (uma instância de MovingAverageFilter3 por direção, mantida pelo
 // chamador). Ausência de eco (`echo.hasEcho == false`) é tratada como
 // "caminho livre" (valor no alcance máximo do sensor), nunca como leitura
-// inválida; só uma leitura com eco porém fisicamente impossível marca
-// `reading.valid = false`, e nesse caso o filtro NÃO é alimentado.
+// inválida quando a fonte explicitamente a aceita. Falha de aquisição ou
+// leitura fisicamente impossível invalida a distância e limpa o histórico
+// do filtro; a recuperação começa com a primeira leitura válida nova.
 void applyReading(SensorReading& reading, const RawEcho& echo, MovingAverageFilter3& filter);
 
 // Condição de falha de uma direção específica. Consumida apenas por HU-12
@@ -116,6 +120,7 @@ public:
     // estado de falha por direção (FR-010). Chamar a cada ciclo de
     // Task_Sensors (10ms, FR-008).
     void update();
+    void reset();
 
     // Snapshot mais recente — só é significativo após ao menos uma chamada
     // a update(). Consumido por HU-00 (mapeamento) e HU-10 (telemetria).

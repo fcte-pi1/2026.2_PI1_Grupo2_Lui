@@ -104,9 +104,17 @@ MissionUpdate MazeMissionController::observeCurrentCell() {
     // Não se move para um lado sem observação válida/aresta já percorrida:
     // isso evita interpretar uma falha de sensor como corredor livre.
     const mm::Cell* currentCell = map_.get(x(), y());
-    if (currentCell == nullptr || !currentCell->isKnown(navigation.nextDirection) ||
-        currentCell->hasWall(navigation.nextDirection)) {
+    if (currentCell == nullptr || currentCell->hasWall(navigation.nextDirection))
         return failWith(NavigationStatus::InvalidObservation);
+    if (!currentCell->isKnown(navigation.nextDirection)) {
+        // No rear sensor: a quarter-turn exposes this side to a lateral sensor.
+        // Stay in this cell, take NEW observations, then ask the planner again.
+        // A failed front/side reading is not permission to move or scan blindly.
+        if (navigation.nextDirection != mm::MazeMap::relToAbs(absoluteHeading, mm::Rel::Back))
+            return failWith(NavigationStatus::InvalidObservation);
+        pendingDirection_ = mm::MazeMap::relToAbs(absoluteHeading, mm::Rel::Right);
+        state_ = MissionState::Turning;
+        return update(MissionAction::TurnRight90, navigation.status);
     }
 
     pendingDirection_ = navigation.nextDirection;
@@ -151,8 +159,9 @@ MissionUpdate MazeMissionController::onMotionFinished(bool succeeded) {
         if (heading() != pendingDirection_) {
             return failWith(NavigationStatus::InvalidObservation);
         }
-        state_ = MissionState::Moving;
-        return update(MissionAction::MoveForwardOneCell);
+        // The sonar orientation changed: take fresh observations before moving.
+        state_ = MissionState::AwaitingObservation;
+        return update(MissionAction::None);
     }
 
     if (state_ != MissionState::Moving) {

@@ -1,6 +1,7 @@
 // Integração nativa HU-00/01/02/03/05/06: pio test -e native -f test_maze_mission_controller
 #include <unity.h>
 #include <cstring>
+#include <cstdio>
 
 #include "config/maze_config.hpp"
 #include "navigation/MazeMissionController.h"
@@ -122,13 +123,15 @@ public:
             orientation.setYawDegrees(yaw, timestamp);
             odometry.setAccumulatedDistanceMm(0, timestamp);
             estimator.updatePose();
-            action = mission.onMotionFinished(true);
-            if (action.action != nav::MissionAction::MoveForwardOneCell) return action;
+            return mission.onMotionFinished(true);
         }
 
         const bool moveForward = action.action == nav::MissionAction::MoveForwardOneCell;
         const bool moveBackward = action.action == nav::MissionAction::MoveBackwardOneCell;
         if (!moveForward && !moveBackward) return action;
+        const auto direction = moveForward ? mission.heading() :
+            mm::MazeMap::relToAbs(mission.heading(),mm::Rel::Back);
+        TEST_ASSERT_FALSE(truth.get(mission.x(),mission.y())->hasWall(direction));
         timestamp += 300;
         const int16_t signedDistance = moveForward
             ? tracking::kCellDistanceThresholdMm
@@ -256,19 +259,40 @@ void test_snapshot_nao_inicializado_e_falha_de_persistencia(void) {
     TEST_ASSERT_EQUAL(nav::NavigationStatus::PersistenceError, failedSave.navigationStatus);
 }
 
-void test_caminho_desconhecido_e_tratado_como_observacao_invalida(void) {
+void test_retaguarda_desconhecida_exige_giro_e_nova_observacao(void) {
     MissionFixture fixture;
-    const MazeConfig config = makeMazeConfig(
-        MazeFormat::Maze4x4, MazeCorner::TopLeft, Direction::North);
+    const auto config=makeMazeConfig(MazeFormat::Maze4x4,MazeCorner::TopLeft,Direction::North);
     TEST_ASSERT_TRUE(fixture.begin(config));
-
-    // Bloqueia a saída à direita. O único caminho otimista é para trás (Sul),
-    // que ainda não foi observado; o controlador deve recusar a movimentação.
-    fixture.truth.setWall(config.start.col, config.start.row, mm::Dir::East, true);
-    const nav::MissionUpdate update = fixture.observe();
-    TEST_ASSERT_EQUAL(nav::MissionState::Failed, update.state);
-    TEST_ASSERT_EQUAL(nav::MissionAction::Brake, update.action);
-    TEST_ASSERT_EQUAL(nav::NavigationStatus::InvalidObservation, update.navigationStatus);
+    fixture.truth.setWall(0,0,mm::Dir::East,true);
+    const auto scan=fixture.observe();
+    TEST_ASSERT_EQUAL(nav::MissionState::Turning,scan.state);
+    TEST_ASSERT_EQUAL(nav::MissionAction::TurnRight90,scan.action);
+    const auto stopped=fixture.completeMotion(scan);
+    TEST_ASSERT_EQUAL(nav::MissionState::AwaitingObservation,stopped.state);
+    TEST_ASSERT_EQUAL(nav::MissionAction::None,stopped.action);
+    TEST_ASSERT_EQUAL(0,fixture.mission.x());TEST_ASSERT_EQUAL(0,fixture.mission.y());
+    const auto next=fixture.observe();
+    TEST_ASSERT_EQUAL(nav::MissionState::Turning,next.state);
+    TEST_ASSERT_EQUAL(nav::MissionAction::TurnRight90,next.action);
+    TEST_ASSERT_EQUAL(nav::MissionState::AwaitingObservation,fixture.completeMotion(next).state);
+    TEST_ASSERT_EQUAL(0,fixture.mission.x());TEST_ASSERT_EQUAL(0,fixture.mission.y());
+    TEST_ASSERT_EQUAL(nav::MissionState::AwaitingObservation,fixture.completeMotion(fixture.observe()).state);
+    TEST_ASSERT_EQUAL(0,fixture.mission.x());TEST_ASSERT_EQUAL(1,fixture.mission.y());
+}
+void test_sensor_frontal_sem_eco_invalido_nao_autoriza_movimento(void) {
+    MissionFixture fixture;
+    const auto config=makeMazeConfig(MazeFormat::Maze4x4,MazeCorner::TopLeft,Direction::East);
+    TEST_ASSERT_TRUE(fixture.begin(config));
+    for(int i=0;i<3;++i){++fixture.timestamp;
+        fixture.wallSensor.enqueue(perception::Direction::Front,{0,false,fixture.timestamp,false});
+        fixture.wallSensor.enqueue(perception::Direction::Left,{60,true,fixture.timestamp});
+        fixture.wallSensor.enqueue(perception::Direction::Right,{60,true,fixture.timestamp});
+        fixture.estimator.updateWalls();
+    }
+    const auto update=fixture.mission.observeCurrentCell();
+    TEST_ASSERT_EQUAL(nav::MissionState::Failed,update.state);
+    TEST_ASSERT_EQUAL(nav::MissionAction::Brake,update.action);
+    TEST_ASSERT_EQUAL(0,fixture.mission.x());TEST_ASSERT_EQUAL(0,fixture.mission.y());
 }
 
 void test_finalizacao_de_movimento_rejeita_resultados_invalidos(void) {
@@ -356,6 +380,11 @@ void test_gira_a_esquerda_e_recua_quando_o_caminho_exige(void) {
     const nav::MissionUpdate turn = leftTurn.observe();
     TEST_ASSERT_EQUAL(nav::MissionState::Turning, turn.state);
     TEST_ASSERT_EQUAL(nav::MissionAction::TurnLeft90, turn.action);
+    const auto afterTurn=leftTurn.completeMotion(turn);
+    TEST_ASSERT_EQUAL(nav::MissionState::AwaitingObservation,afterTurn.state);
+    TEST_ASSERT_EQUAL(nav::MissionAction::None,afterTurn.action);
+    TEST_ASSERT_EQUAL(0,leftTurn.mission.x());TEST_ASSERT_EQUAL(0,leftTurn.mission.y());
+    TEST_ASSERT_EQUAL(nav::MissionAction::MoveForwardOneCell,leftTurn.observe().action);
 
     MissionFixture reverse;
     const MazeConfig startEast = makeMazeConfig(
@@ -418,15 +447,91 @@ void test_fail_publico_interrompe_missao(void) {
     TEST_ASSERT_EQUAL(nav::NavigationStatus::InvalidObservation, failed.navigationStatus);
 }
 
+
+uint32_t mazeRandom(uint32_t& seed) { seed=1664525u*seed+1013904223u;return seed; }
+void carveMaze(mm::MazeMap& map,uint32_t seed,bool loops) {
+ const int width=map.width(),height=map.height(),cells=width*height;
+ for(int y=0;y<height;++y)for(int x=0;x<width;++x)
+  for(int d=0;d<4;++d)map.setWall(x,y,static_cast<mm::Dir>(d),true);
+ bool seen[256]{};int stack[256]{},depth=1;seen[0]=true;
+ const int dx[]={0,1,0,-1},dy[]={-1,0,1,0};
+ while(depth){
+  const int at=stack[depth-1],x=at%width,y=at/width;
+  int choices[4],count=0;
+  for(int d=0;d<4;++d){const int nx=x+dx[d],ny=y+dy[d];
+   if(nx>=0&&ny>=0&&nx<width&&ny<height&&!seen[ny*width+nx])choices[count++]=d;}
+  if(!count){--depth;continue;}
+  const int d=choices[mazeRandom(seed)%count];
+  const int next=(y+dy[d])*width+x+dx[d];
+  map.setWall(x,y,static_cast<mm::Dir>(d),false);seen[next]=true;stack[depth++]=next;
+ }
+ for(int i=0;i<cells;++i)TEST_ASSERT_TRUE(seen[i]);
+ if(loops)for(int y=0;y<height;++y)for(int x=0;x<width;++x){
+  if(x+1<width && mazeRandom(seed)%4==0)map.setWall(x,y,mm::Dir::East,false);
+  if(y+1<height && mazeRandom(seed)%4==0)map.setWall(x,y,mm::Dir::South,false);
+ }
+}
+void test_complete_mission_in_768_generated_mazes() {
+ unsigned completed=0,reverses=0;
+ const MazeFormat formats[]={MazeFormat::Maze4x4,MazeFormat::Maze8x4,MazeFormat::Maze12x4};
+ for(auto format:formats)for(unsigned corner=0;corner<4;++corner)for(unsigned axis=0;axis<2;++axis)
+  for(uint32_t seed=1;seed<=32;++seed){
+   const Direction inward=axis==0 ? ((corner&1)?Direction::West:Direction::East)
+                                 : ((corner&2)?Direction::North:Direction::South);
+   const auto config=makeMazeConfig(format,static_cast<MazeCorner>(corner),inward);
+   MissionFixture fixture;TEST_ASSERT_TRUE(fixture.begin(config));
+   carveMaze(fixture.truth,seed,(seed&1)!=0);
+   bool done=false;
+   for(unsigned step=0;step<4096;++step){
+    auto action=fixture.observe();
+    if(action.state==nav::MissionState::Completed){done=true;break;}
+    char context[180];std::snprintf(context,sizeof(context),"width=%u corner=%u axis=%u seed=%lu step=%u x=%u y=%u heading=%u nav=%u",config.cols,corner,axis,static_cast<unsigned long>(seed),step,fixture.mission.x(),fixture.mission.y(),static_cast<unsigned>(fixture.mission.heading()),static_cast<unsigned>(action.navigationStatus));
+    TEST_ASSERT_NOT_EQUAL_MESSAGE(nav::MissionState::Failed,action.state,context);
+    mm::Rel relative=mm::Rel::Front;
+    switch(action.action){
+     case nav::MissionAction::TurnLeft90:relative=mm::Rel::Left;break;
+     case nav::MissionAction::TurnRight90:relative=mm::Rel::Right;break;
+     case nav::MissionAction::MoveBackwardOneCell:++reverses;relative=mm::Rel::Back;break;
+     case nav::MissionAction::TurnAround180:relative=mm::Rel::Back;break;
+     default:TEST_ASSERT_EQUAL(nav::MissionAction::MoveForwardOneCell,action.action);break;
+    }
+    const auto direction=mm::MazeMap::relToAbs(fixture.mission.heading(),relative);
+    if(action.action==nav::MissionAction::MoveForwardOneCell || action.action==nav::MissionAction::MoveBackwardOneCell)
+     TEST_ASSERT_FALSE(fixture.truth.get(fixture.mission.x(),fixture.mission.y())->hasWall(direction));
+    action=fixture.completeMotion(action);
+    TEST_ASSERT_EQUAL(nav::MissionState::AwaitingObservation,action.state);
+   }
+   TEST_ASSERT_TRUE_MESSAGE(done,"Mission did not converge within simulation bound");
+   TEST_ASSERT_EQUAL(config.goal.col,fixture.mission.x());TEST_ASSERT_EQUAL(config.goal.row,fixture.mission.y());
+   TEST_ASSERT_TRUE(fixture.storage.length>0);++completed;
+  }
+ TEST_ASSERT_EQUAL(768,completed);TEST_ASSERT_TRUE(reverses>0);
+}
+void test_disconnected_goal_ends_without_crossing_wall() {
+ MissionFixture fixture;auto config=makeMazeConfig(MazeFormat::Maze4x4,MazeCorner::TopLeft,Direction::East);
+ TEST_ASSERT_TRUE(fixture.begin(config));
+ for(int d=0;d<4;++d)fixture.truth.setWall(3,3,static_cast<mm::Dir>(d),true);
+ bool stopped=false;
+ for(int step=0;step<256;++step){auto action=fixture.observe();
+  if(action.state==nav::MissionState::Failed){TEST_ASSERT_EQUAL(nav::NavigationStatus::NoPath,action.navigationStatus);stopped=true;break;}
+  TEST_ASSERT_NOT_EQUAL(nav::MissionState::Completed,action.state);
+  TEST_ASSERT_EQUAL(nav::MissionState::AwaitingObservation,fixture.completeMotion(action).state);
+ }
+ TEST_ASSERT_TRUE(stopped);
+}
+
 int main(int, char**) {
     UNITY_BEGIN();
+    RUN_TEST(test_complete_mission_in_768_generated_mazes);
+    RUN_TEST(test_disconnected_goal_ends_without_crossing_wall);
     RUN_TEST(test_configura_origem_objetivo_nos_quatro_cantos);
     RUN_TEST(test_rejeita_objetivo_nao_oposto_ao_inicio);
     RUN_TEST(test_missao_usa_pose_estimada_e_persiste_mapa_final);
     RUN_TEST(test_missao_recalcula_rota_ao_identificar_obstaculo_8x4);
     RUN_TEST(test_erro_antes_de_iniciar_e_configuracao_invalida);
     RUN_TEST(test_snapshot_nao_inicializado_e_falha_de_persistencia);
-    RUN_TEST(test_caminho_desconhecido_e_tratado_como_observacao_invalida);
+    RUN_TEST(test_retaguarda_desconhecida_exige_giro_e_nova_observacao);
+    RUN_TEST(test_sensor_frontal_sem_eco_invalido_nao_autoriza_movimento);
     RUN_TEST(test_finalizacao_de_movimento_rejeita_resultados_invalidos);
     RUN_TEST(test_pose_fora_dos_limites_e_rejeitada_e_conversoes_usam_255);
     RUN_TEST(test_sessao_invalida_salta_para_invalid_observation_do_navegador);

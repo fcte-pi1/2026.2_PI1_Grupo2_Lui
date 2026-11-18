@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { MissionControl } from "../components/MissionControl";
+import { BluetoothPanel } from "../components/BluetoothPanel";
 import { useDashboard } from "../hooks/useDashboard";
 import { dashboardStore } from "../services/dashboardStore";
 import { connectTelemetry } from "../services/websocket";
@@ -18,13 +20,14 @@ const TAMANHOS = [
   { rotulo: "12x4", largura: 12, altura: 4 },
 ];
 
-const TIPOS = ["maze", "cell", "position", "telemetry"];
+const TIPOS = ["maze", "cell", "position", "telemetry", "bt_telemetry_test", "bt_link_status"];
 
 function ehMensagemDashboard(data: unknown): data is MensagemDashboard {
   return typeof data === "object" && data !== null && TIPOS.includes((data as { type?: string }).type ?? "");
 }
 
 interface DashboardProps {
+  diagnosticOnly?: boolean;
   onAbrirHistorico: () => void;
   sessoes: Sessao[] | null;
   erroSessoes: string | null;
@@ -34,6 +37,7 @@ interface DashboardProps {
 }
 
 export function Dashboard({
+  diagnosticOnly=false,
   onAbrirHistorico,
   sessoes,
   erroSessoes,
@@ -48,9 +52,10 @@ export function Dashboard({
   );
   const [tamanho, setTamanho] = useState(1);
   const [rodada, setRodada] = useState(0);
+  const tamanhoSimulado=fonte==="simulador"?tamanho:0;
 
   useEffect(() => {
-    const { largura, altura } = TAMANHOS[tamanho];
+    const { largura, altura } = TAMANHOS[tamanhoSimulado];
     dashboardStore.reset(largura, altura);
 
     if (fonte === "simulador") {
@@ -75,9 +80,10 @@ export function Dashboard({
       if (ehMensagemDashboard(data)) dashboardStore.dispatch(data);
     });
     return () => socket.close();
-  }, [fonte, tamanho, rodada, onAtualizarSessoes]);
+  }, [fonte, tamanhoSimulado, rodada, onAtualizarSessoes]);
 
 
+  const exibindoBluetooth=fonte!=="simulador"&&(diagnosticOnly||estado.bluetoothTelemetry!==null);
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-200">
       <header className="sticky top-0 z-10 flex flex-wrap items-center gap-4 border-b border-slate-200 bg-white/90 px-6 py-3 backdrop-blur dark:border-slate-800 dark:bg-slate-900/90">
@@ -96,10 +102,10 @@ export function Dashboard({
             onChange={(e) => setFonte(e.target.value as Fonte)}
             className="rounded-md border border-slate-300 bg-white px-2 py-1 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           >
-            <option value="ws">Robô (WebSocket)</option>
+            <option value="ws">{diagnosticOnly?"Bluetooth real":"Robô (WebSocket)"}</option>
             <option value="simulador">Simulação</option>
           </select>
-          <select
+          {fonte==="simulador"&&<select
             value={tamanho}
             onChange={(e) => setTamanho(Number(e.target.value))}
             className="rounded-md border border-slate-300 bg-white px-2 py-1 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
@@ -109,20 +115,21 @@ export function Dashboard({
                 Labirinto {t.rotulo}
               </option>
             ))}
-          </select>
+          </select>}
           <button
             onClick={() => setRodada((r) => r + 1)}
             className="rounded-md bg-slate-900 px-3 py-1 text-white dark:bg-white dark:text-slate-900"
           >
-            Reiniciar
+            {fonte==="simulador"?"Reiniciar":"Reconectar painel"}
           </button>
         </div>
       </header>
 
       <main className="mx-auto flex max-w-7xl flex-col gap-4 p-6">
+        {fonte!=="simulador"&&<MissionControl/>}
         <BatteryAlert tensao={estado.tensaoBateria} />
         <div className="grid gap-6 lg:grid-cols-[3fr_2fr]">
-          <section className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+          <section className="flex min-w-0 flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
             <h2 className="font-semibold text-slate-900 dark:text-white">
               Mapa do labirinto ({estado.largura}x{estado.altura})
             </h2>
@@ -134,8 +141,9 @@ export function Dashboard({
               </p>
             )}
           </section>
-          <section className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+          <section className="flex min-w-0 flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
             <h2 className="font-semibold text-slate-900 dark:text-white">Status e telemetria</h2>
+            {exibindoBluetooth&&<BluetoothPanel compact data={estado.bluetoothTelemetry} link={estado.bluetoothLink}/>}
             <StatusPanel estado={estado} />
           </section>
         </div>

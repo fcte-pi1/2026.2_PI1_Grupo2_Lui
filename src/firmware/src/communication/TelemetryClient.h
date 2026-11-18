@@ -3,6 +3,7 @@
 #ifdef ARDUINO
 
 #include <cstddef>
+#include <atomic>
 #include <cstdint>
 #include "ILogTransport.h"
 #include "../navigation/SessionBuffer.h"
@@ -33,6 +34,8 @@ public:
     ~TelemetryClient() override = default;
 
     bool begin();
+    int readCommandByte() { return bluetooth_.available() ? bluetooth_.read() : -1; }
+    bool resetMissionCache();
     bool publishJson(const char* json, size_t length);
     bool publishMazeConfig(const char* json, size_t length, uint8_t width, uint8_t height);
     bool publishMapSnapshot(uint8_t cellX, uint8_t cellY, const char* json, size_t length);
@@ -81,7 +84,7 @@ private:
     bool cellValid_[kMaxMapCells] = {false};
     char latestCellPayload_[kPayloadSize] = {0};
     size_t latestCellLength_ = 0;
-    bool snapshotReplayPending_ = false; // escrita/leitura principal na task Bluetooth
+    std::atomic<bool> snapshotReplayPending_{false}; // escrita/leitura principal na task Bluetooth
 
     char sessionStartPayload_[kPayloadSize] = {0};
     size_t sessionStartLength_ = 0;
