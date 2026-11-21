@@ -1,7 +1,7 @@
 #pragma once
 #include <cmath>
 #include <cstdint>
-#include "config/maze_geometry.hpp"
+#include "../config/maze_geometry.hpp"
 
 namespace FrontApproach {
 constexpr float START_CM=12.0f;

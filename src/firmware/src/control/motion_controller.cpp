@@ -1,5 +1,5 @@
 #include "motion_controller.hpp"
-#include "config/mechanical_config.hpp"
+#include "../config/mechanical_config.hpp"
 #include "front_approach_policy.hpp"
 #include <Arduino.h>
 #include <math.h>
