@@ -2,7 +2,7 @@
 #include <cmath>
 #include "IWallSensor.h"
 #include "sonar_snapshot.hpp"
-#include "config/sonar_sampling.hpp"
+#include "../config/sonar_sampling.hpp"
 
 // One coherent hardware frame for Front/Left/Right; no duplicate sonar triggers.
 // This adapter treats a hardware timeout as UNKNOWN, not an observed opening.

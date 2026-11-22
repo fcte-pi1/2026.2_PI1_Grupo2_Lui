@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-#include "config/sonar_sampling.hpp"
+#include "../config/sonar_sampling.hpp"
 // Brake on the first suspect short echo. End the mission only after two
 // short echoes in three distinct frames; repeated control ticks don't vote.
 class FrontProximityGuard {

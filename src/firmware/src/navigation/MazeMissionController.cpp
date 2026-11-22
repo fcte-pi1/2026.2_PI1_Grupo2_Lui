@@ -3,8 +3,8 @@
 namespace nav {
 
 MissionUpdate MazeMissionController::update(MissionAction action,
-                                             NavigationStatus status) const {
-    return {state_, action, status};
+                                             NavigationStatus status, bool turnTowardNextCell) const {
+    return {state_, action, status, turnTowardNextCell};
 }
 
 MissionUpdate MazeMissionController::failWith(NavigationStatus status) {
@@ -33,6 +33,7 @@ bool MazeMissionController::begin(const MazeConfig& config,
     };
     stateEstimator_.initialize(initialPose, initialYawReferenceDegrees);
     pendingDirection_ = static_cast<mm::Dir>(config_.initialHeading);
+    turnTowardNextCell_ = false;
     expectedX_ = config_.start.col;
     expectedY_ = config_.start.row;
     state_ = MissionState::AwaitingObservation;
@@ -113,6 +114,7 @@ MissionUpdate MazeMissionController::observeCurrentCell() {
         if (navigation.nextDirection != mm::MazeMap::relToAbs(absoluteHeading, mm::Rel::Back))
             return failWith(NavigationStatus::InvalidObservation);
         pendingDirection_ = mm::MazeMap::relToAbs(absoluteHeading, mm::Rel::Right);
+        turnTowardNextCell_ = false;
         state_ = MissionState::Turning;
         return update(MissionAction::TurnRight90, navigation.status);
     }
@@ -147,17 +149,24 @@ MissionUpdate MazeMissionController::observeCurrentCell() {
         return update(MissionAction::MoveBackwardOneCell, navigation.status);
     }
     state_ = MissionState::Turning;
-    if (turn == 1) return update(MissionAction::TurnRight90, navigation.status);
-    if (turn == 3) return update(MissionAction::TurnLeft90, navigation.status);
+    turnTowardNextCell_ = turn == 1 || turn == 3;
+    if (turn == 1) return update(MissionAction::TurnRight90, navigation.status, turnTowardNextCell_);
+    if (turn == 3) return update(MissionAction::TurnLeft90, navigation.status, turnTowardNextCell_);
     return update(MissionAction::TurnAround180, navigation.status);
 }
 
-MissionUpdate MazeMissionController::onMotionFinished(bool succeeded) {
+MissionUpdate MazeMissionController::onMotionFinished(bool succeeded, bool frontExitConfirmed) {
     if (!succeeded) return failWith(NavigationStatus::InvalidObservation);
 
     if (state_ == MissionState::Turning) {
         if (heading() != pendingDirection_) {
             return failWith(NavigationStatus::InvalidObservation);
+        }
+        if (frontExitConfirmed) {
+            if (!turnTowardNextCell_ || !currentPoseInBounds())
+                return failWith(NavigationStatus::InvalidObservation);
+            state_ = MissionState::Moving;
+            return update(MissionAction::MoveForwardOneCell, NavigationStatus::Move);
         }
         // The sonar orientation changed: take fresh observations before moving.
         state_ = MissionState::AwaitingObservation;

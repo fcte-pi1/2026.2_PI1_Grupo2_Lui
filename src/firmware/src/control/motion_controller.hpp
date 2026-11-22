@@ -36,7 +36,9 @@ enum class MotionFailureReason : uint8_t {
     Cancelled,
     InvalidDistance,
     SafetyLimit,
-    BrakeNotSettled
+    BrakeNotSettled,
+    Obstacle,
+    WrongDirection
 };
 
 struct MotionControllerConfig {
@@ -84,6 +86,13 @@ struct MotionControllerConfig {
     MotionControllerConfig();
 };
 
+struct WheelTravel {
+    int32_t leftTicks;
+    int32_t rightTicks;
+    float leftMm;
+    float rightMm;
+};
+
 class MotionController {
 public:
     MotionController(MotorDRV8833& motors,
@@ -104,18 +113,25 @@ public:
     bool startMoveBackwardOneCell();
     // Distância assinada em milímetros: positiva avança, negativa dá ré.
     bool startMoveLinear(float signedDistanceMm);
+    bool startGuidedRetreat(float distanceMm);
 
     // Feedback atualizado pelo subsistema de sensores, em milímetros.
     // Leituras inválidas/desatualizadas devem ser enviadas com valid=false.
     void setWallAlignmentFeedback(float leftDistanceMm,
                                   float rightDistanceMm,
                                   bool valid);
+    // Rumo e redução de velocidade dos avanços guiados.
+    void setGuidedLateralSteering(bool slow, float yawOffsetDeg);
     // May enable during a forward segment; cannot disable mid-segment and accelerate again.
     void setFrontApproachMode(bool enabled);
     bool isFrontApproachMode() const { return frontApproachMode_; }
     // Refine the final centimetres only within the cell-position tolerance.
-    bool refineFrontApproachTarget(float frontCm);
+    bool refineFrontApproachTarget(float frontCm, float previousProgressMm = 0.0f);
     void brakeAtFrontTarget();
+    void brakeForObstacle();
+    // Positivo gira à esquerda, negativo gira à direita.
+    bool startGuidedPivot(float degrees);
+    bool startGuidedPivotReturn();
     bool startTurnLeft90();
     bool startTurnRight90();
     bool startTurnAround180(); // meia-volta à direita, como na bancada
@@ -135,7 +151,9 @@ public:
     MotionType getMotionType() const;
     MotionFailureReason getFailureReason() const;
     Pose2D getPose() const;
+    WheelTravel getWheelTravel() const;
     float getDistanceTravelledMm() const;
+    float getLinearTargetMm() const { return targetDistanceMm_; }
     float getTurnAngleDeg() const;
     float getLeftSpeedMmS() const;
     float getRightSpeedMmS() const;
@@ -153,7 +171,8 @@ private:
                                 float rightTargetMmS,
                                 float leftMeasuredMmS,
                                 float rightMeasuredMmS,
-                                float dtSeconds, bool brakeLeft = false, bool brakeRight = false);
+                                float dtSeconds, bool brakeLeft = false, bool brakeRight = false,
+                                float forwardAssistPwm = 0.0f);
     void beginBrake(uint32_t now, MotionFailureReason reason = MotionFailureReason::None);
     void fail(MotionFailureReason reason);
     void succeed();
@@ -202,6 +221,14 @@ private:
     float leftWallDistanceMm_ = 0.0f;
     float rightWallDistanceMm_ = 0.0f;
     bool wallAlignmentValid_ = false;
+    bool guidedSteering_ = false;
+    bool guidedRetreat_ = false;
+    bool guidedPivot_ = false;
+    bool pivotTrimUsed_ = false;
+    float guidedPivotHeadingStepDeg_ = 0.0f;
+    float retreatHeadingDeg_ = 0.0f;
+    bool guidedLateralSlow_ = false;
+    float guidedYawOffsetDeg_ = 0.0f;
     float distanceTravelledMm_ = 0.0f;
     float targetAngleDeg_ = 0.0f;
     float turnAngleDeg_ = 0.0f;

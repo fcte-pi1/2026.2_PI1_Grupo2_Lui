@@ -31,6 +31,7 @@ struct MissionUpdate {
     MissionState state;
     MissionAction action;
     NavigationStatus navigationStatus;
+    bool turnTowardNextCell = false;
 };
 
 // Orquestra HU-00/03/05/06 usando o snapshot HU-01/02 como fonte única de
@@ -47,7 +48,8 @@ public:
 
     // Usa pose e paredes absolutas mais recentes produzidas por RobotStateEstimator.
     MissionUpdate observeCurrentCell();
-    MissionUpdate onMotionFinished(bool succeeded);
+    // Só autoriza a saída direta de uma curva planejada após uma nova leitura frontal livre.
+    MissionUpdate onMotionFinished(bool succeeded, bool frontExitConfirmed = false);
     MissionUpdate fail();
 
     MissionState state() const { return state_; }
@@ -59,7 +61,8 @@ public:
 
 private:
     MissionUpdate update(MissionAction action,
-                         NavigationStatus status = NavigationStatus::NotInitialized) const;
+                         NavigationStatus status = NavigationStatus::NotInitialized,
+                         bool turnTowardNextCell = false) const;
     MissionUpdate failWith(NavigationStatus status);
     bool currentPoseInBounds() const;
 
@@ -71,6 +74,7 @@ private:
     mm::Dir pendingDirection_;
     uint8_t expectedX_;
     uint8_t expectedY_;
+    bool turnTowardNextCell_ = false;
 };
 
 }  // namespace nav

@@ -2,7 +2,7 @@
 #include <array>
 #include <cmath>
 #include <cstdint>
-#include "config/sonar_sampling.hpp"
+#include "../config/sonar_sampling.hpp"
 #include "ultrasonic_reading.hpp"
 struct SonarEstimate {
     bool valid=false;

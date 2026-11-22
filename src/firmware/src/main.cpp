@@ -3,6 +3,7 @@
 #include "communication/RemoteCommand.h"
 #include "navigation/SessionRecorder.h"
 #include <atomic>
+#include <utility>
 #include <Wire.h>
 #include <math.h>
 #include <nvs_flash.h>
@@ -22,8 +23,9 @@
 #include "control/front_approach_policy.hpp"
 #include "control/cell_observation_gate.hpp"
 #include "control/front_proximity_guard.hpp"
+#include "control/guided_lateral_clearance.hpp"
+#include "control/guided_wall_recovery.hpp"
 #include "hal/SnapshotWallSensor.h"
-#include "control/corridor_feedback_filter.hpp"
 #include "config/maze_config.hpp"
 #include "config/network_config.hpp"
 #include "communication/TelemetryClient.h"
@@ -50,7 +52,6 @@ namespace {
 
 constexpr uint32_t CONTROL_PERIOD_US = 5000UL;
 constexpr uint32_t MAX_LATERAL_SAMPLE_AGE_MS = SonarSampling::MAX_SAMPLE_AGE_MS;
-CorridorFeedbackFilter3 corridorFeedbackFilter;
 std::atomic<bool> samplingEnabled{true};
 std::atomic<bool> samplingPaused{false};
 
@@ -110,27 +111,15 @@ LateralSnapshot getLateralSnapshot() {
 
 class MotionDistanceReader final : public tracking::IOdometryReader {
 public:
-    explicit MotionDistanceReader(MotionController& motion) : motion_(motion) {}
-
     tracking::OdometryReading read() override {
-        const float delta = currentMoveDistance() - accumulatorBaselineMm_;
-        float bounded = delta;
-        if (bounded > 32767.0f) bounded = 32767.0f;
-        if (bounded < -32768.0f) bounded = -32768.0f;
-        return {static_cast<int16_t>(lroundf(bounded)), millis()};
+        return {completedDistanceMm_, millis()};
     }
 
-    void resetAccumulator() override { accumulatorBaselineMm_ = currentMoveDistance(); }
-    void beginMotionSegment() { accumulatorBaselineMm_ = currentMoveDistance(); }
+    void resetAccumulator() override { completedDistanceMm_ = 0; }
+    void reportArrival(float distanceMm) { completedDistanceMm_ = static_cast<int16_t>(lroundf(distanceMm)); }
 
 private:
-    float currentMoveDistance() const {
-        return motion_.getMotionType() == MotionType::ForwardCell
-            ? motion_.getDistanceTravelledMm() : 0.0f;
-    }
-
-    MotionController& motion_;
-    float accumulatorBaselineMm_ = 0.0f;
+    int16_t completedDistanceMm_ = 0;
 };
 
 class ClockwiseYawSensor final : public tracking::IOrientationSensor {
@@ -150,7 +139,7 @@ private:
 };
 
 SnapshotWallSensor hardwareWallSensor(getLateralSnapshot, []() -> uint32_t { return millis(); });
-MotionDistanceReader gridOdometry(motion);
+MotionDistanceReader gridOdometry;
 ClockwiseYawSensor gridOrientation(imu);
 tracking::PositionTracker positionTracker(gridOdometry, gridOrientation);
 perception::WallPerception wallPerception(hardwareWallSensor);
@@ -169,17 +158,53 @@ bool ready = false;
 bool hardwareReady = false;
 bool attemptUsed = false;
 bool guidedRouteActive = false;
+bool missionCornerActive = false;
+bool missionMovingForward = false;
+int cornerTurnDirection = 1;
+float missionExitCreditMm = 0.0f;
+float missionLinearProgressMm = 0.0f;
 bool guidedFrontApproach = false;
 bool automaticFrontReferenceUsed=false;
 bool cornerContinuationUsed = false;
 nav::GuidedRoute guidedRoute;
+GuidedLateralClearance guidedLateralClearance;
+GuidedWallRecovery guidedRecovery;
 uint32_t guidedPauseStartedMs = 0;
+float guidedCornerRemainingMm = 0.0f;
+float guidedCornerShiftTravelMm = 0.0f;
+struct GuidedPivotRecovery {
+    enum class Phase { None, BeforeReturn, Returning, BeforeAdjustment, Adjusting };
+    Phase phase = Phase::None;
+    bool frontBlocked = false;
+    bool leftBlocked = false;
+    bool rightBlocked = false;
+} guidedPivotRecovery;
 MotionControllerConfig motionConfig;
+struct PivotDiagnostic {
+    float targetDeg = 0.0f;
+    float peakAxleShiftMm = 0.0f;
+    uint32_t startedMs = 0;
+    uint32_t lastSampleMs = 0;
+
+    bool active() const { return targetDeg != 0.0f; }
+} pivotDiagnostic;
 bool motionResultPending = false;
 uint32_t attemptStartedMs = 0;
 uint32_t lastControlUpdateUs = 0;
 uint32_t lastProcessedSensorTimestampMs = 0;
 CellObservationGate cellObservation;
+
+bool cornerSequenceActive() { return guidedRouteActive || missionCornerActive; }
+
+LateralSnapshot motionSnapshot() {
+    auto frame = getLateralSnapshot();
+    if (cornerSequenceActive() && cornerTurnDirection < 0) {
+        // As regras do canto usam esquerda=interior e direita=exterior.
+        std::swap(frame.left, frame.right);
+        std::swap(frame.filteredLeft, frame.filteredRight);
+    }
+    return frame;
+}
 
 void publishSensorSnapshot(const UltrasonicReading& front,
                            const UltrasonicReading& left,
@@ -252,10 +277,16 @@ void safeStop(const char *reason, mm::EndReason endReason = mm::EndReason::Error
     remoteMissionActive = false;
     remoteState = endReason == mm::EndReason::ManualStop ? "stopped" : "error";
 
+    if (ready && !guidedRouteActive) mission.fail();
     ready = false;
+    missionCornerActive = false;
+    missionMovingForward = false;
+    missionExitCreditMm = 0.0f;
     startDelay.cancel();
+    pivotDiagnostic = {};
+    guidedRecovery = {};
+    guidedPivotRecovery = {};
     frontEchoRecovery.reset();frontProximity.reset();
-    corridorFeedbackFilter.reset();
     motion.stop();
     motors.brake();
     motors.setEnabled(false);
@@ -263,27 +294,134 @@ void safeStop(const char *reason, mm::EndReason endReason = mm::EndReason::Error
     Serial.printf("Tentativa interrompida: %s\n", reason);
 }
 
+void trackStartedMotion() {
+    frontEchoRecovery.reset();
+    frontProximity.reset();
+    motionResultPending = true;
+    lastControlUpdateUs = micros();
+}
+
+bool guidedLinearInterruption(MotionFailureReason reason) {
+    return reason == MotionFailureReason::Obstacle || reason == MotionFailureReason::LeftWheelStalled ||
+        reason == MotionFailureReason::RightWheelStalled || reason == MotionFailureReason::WrongDirection;
+}
+
+bool handleGuidedRecoveryResult(MotionStatus status) {
+    using PivotPhase = GuidedPivotRecovery::Phase;
+    if (guidedPivotRecovery.phase == PivotPhase::BeforeReturn) {
+        if (motion.getFailureReason() != MotionFailureReason::Obstacle ||
+            fabsf(motion.getDistanceTravelledMm()) > 6.0f) {
+            safeStop("curva: posicao de retorno do giro nao confirmada");
+        } else {
+            if (fabsf(motion.getTurnAngleDeg()) < 1.2f)
+                guidedPivotRecovery.phase = PivotPhase::BeforeAdjustment;
+            guidedPauseStartedMs = millis();
+        }
+        return true;
+    }
+    if (guidedPivotRecovery.phase == PivotPhase::Returning) {
+        if (status != MotionStatus::Succeeded) {
+            safeStop("curva: nao foi possivel retornar ao rumo da diagonal");
+        } else {
+            guidedPivotRecovery.phase = PivotPhase::BeforeAdjustment;
+            guidedPauseStartedMs = millis();
+        }
+        return true;
+    }
+    if (guidedPivotRecovery.phase == PivotPhase::Adjusting) {
+        const float travelledMm = motion.getDistanceTravelledMm();
+        if (status != MotionStatus::Succeeded || fabsf(travelledMm) < 2.0f) {
+            safeStop("curva: ajuste de posicao sem progresso confirmado");
+        } else {
+            guidedCornerShiftTravelMm += travelledMm;
+            guidedPivotRecovery = {};
+            guidedRecovery = {};
+            motion.setFrontApproachMode(false);
+            guidedPauseStartedMs = millis();
+            Serial.printf("CURVA: ajuste de %+.1fmm confirmado; repetindo o giro final\n", travelledMm);
+        }
+        return true;
+    }
+    using Phase = GuidedWallRecovery::Phase;
+    if (guidedRecovery.phase == Phase::Braking) {
+        if (!guidedLinearInterruption(motion.getFailureReason())) {
+            safeStop("recuperacao guiada: falha ao confirmar parada");
+            return true;
+        }
+        const bool trimDiagonal = cornerSequenceActive() && guidedRoute.action() == nav::GuidedAction::ShiftIntoCorner &&
+            guidedRecovery.rightBlocked && !guidedRecovery.leftBlocked && !guidedRecovery.frontBlocked;
+        const float retreatLimitMm = trimDiagonal ? nav::guidedCornerRetreatLimitMm(guidedCornerShiftTravelMm) : 30.0f;
+        guidedRecovery.retreatDistance(
+            motion.getDistanceTravelledMm(), motion.getLinearTargetMm(), retreatLimitMm);
+        guidedPauseStartedMs = millis();
+        return true;
+    }
+    if (guidedRecovery.phase == Phase::Adjusting) {
+        if (status != MotionStatus::Succeeded && !guidedLinearInterruption(motion.getFailureReason())) {
+            safeStop("recuperacao guiada: falha de controle durante o ajuste");
+            return true;
+        }
+        guidedRecovery.finishAdjustment(motion.getDistanceTravelledMm(), status == MotionStatus::Succeeded);
+        guidedPauseStartedMs = millis();
+        return true;
+    }
+    return false;
+}
+
 void handleMissionUpdate(const nav::MissionUpdate &update) {
+    using Action = nav::MissionAction;
+    const auto action = update.action;
+    if (update.turnTowardNextCell && (action == Action::TurnLeft90 || action == Action::TurnRight90)) {
+        const auto snapshot = getLateralSnapshot();
+        const uint32_t now = millis();
+        const bool leftTurn = action == Action::TurnLeft90;
+        const auto& rawExit = leftTurn ? snapshot.left : snapshot.right;
+        const auto exit = leftTurn ? snapshot.leftEstimate(now) : snapshot.rightEstimate(now);
+        const auto front = snapshot.frontEstimate(now);
+        if (snapshot.ready && now - snapshot.sampledAtMs <= MAX_LATERAL_SAMPLE_AGE_MS &&
+            snapshot.front.valid && !snapshot.front.tooClose && rawExit.valid && !rawExit.tooClose &&
+            front.valid && exit.valid &&
+            nav::missionCornerEligible(snapshot.front.distanceCm, rawExit.distanceCm, mazeConfig.cellSizeMm) &&
+            nav::missionCornerEligible(front.distanceCm, exit.distanceCm, mazeConfig.cellSizeMm)) {
+            missionCornerActive = true;
+            missionMovingForward = false;
+            cornerTurnDirection = leftTurn ? 1 : -1;
+            guidedRoute.resetAtCorner();
+            guidedCornerRemainingMm = FrontApproach::POSITION_TOLERANCE_MM;
+            guidedCornerShiftTravelMm = 0.0f;
+            guidedFrontApproach = false;
+            guidedLateralClearance.reset();
+            guidedPauseStartedMs = now;
+            Serial.printf("MISSAO: curva em duas etapas para %s\n", leftTurn ? "esquerda" : "direita");
+            return;
+        }
+    }
     bool started = false;
-    if (update.action != nav::MissionAction::None && update.action != nav::MissionAction::Brake) {
+    if (action != Action::None && action != Action::Brake) {
         motion.setFrontApproachMode(false);
         automaticFrontReferenceUsed=false;
+        missionMovingForward = action == Action::MoveForwardOneCell;
+        missionLinearProgressMm = missionMovingForward ? missionExitCreditMm : 0.0f;
+        missionExitCreditMm = 0.0f;
+        guidedFrontApproach = false;
+        if (action == Action::TurnLeft90 || action == Action::TurnRight90 || action == Action::TurnAround180)
+            guidedLateralClearance.reset();
         motors.setEnabled(true);
     }
-    switch (update.action) {
+    switch (action) {
         case nav::MissionAction::None:
             return;
         case nav::MissionAction::MoveForwardOneCell:
-            started = motion.startMoveForwardOneCell();
+            started = motion.startMoveLinear(mazeConfig.cellSizeMm - missionLinearProgressMm);
             break;
         case nav::MissionAction::MoveBackwardOneCell:
             started = motion.startMoveBackwardOneCell();
             break;
         case nav::MissionAction::TurnLeft90:
-            started = motion.startTurnLeft90();
+            started = motion.startGuidedPivot(90.0f);
             break;
         case nav::MissionAction::TurnRight90:
-            started = motion.startTurnRight90();
+            started = motion.startGuidedPivot(-90.0f);
             break;
         case nav::MissionAction::TurnAround180:
             started = motion.startTurnAround180();
@@ -313,27 +451,8 @@ void handleMissionUpdate(const nav::MissionUpdate &update) {
         safeStop("não foi possível iniciar a ação de movimento");
         return;
     }
-    frontEchoRecovery.reset();frontProximity.reset();
-    gridOdometry.beginMotionSegment();
-    motionResultPending = true;
-    lastControlUpdateUs = micros();
+    trackStartedMotion();
     // O sampler lê os três sensores continuamente; o PID e a HU-01 consomem o mesmo snapshot.
-}
-
-void updateWallAlignmentFeedback() {
-    // Turns and the explicit front-wall approach do not steer from side echoes.
-    if (motion.getMotionType() != MotionType::ForwardCell || motion.isFrontApproachMode()) {
-        corridorFeedbackFilter.reset();
-        motion.setWallAlignmentFeedback(0, 0, false);
-        return;
-    }
-    const LateralSnapshot snapshot = getLateralSnapshot();
-    const auto result = corridorFeedbackFilter.update(
-        snapshot.left.distanceCm * 10.0f, snapshot.right.distanceCm * 10.0f,
-        snapshot.ready && snapshot.left.valid && snapshot.right.valid,
-        snapshot.sampledAtMs, millis());
-    if (result.changed)
-        motion.setWallAlignmentFeedback(result.leftMm, result.rightMm, result.valid);
 }
 
 uint32_t generateTelemetrySessionId() {
@@ -521,9 +640,20 @@ bool initializeTelemetry() {
     return true;
 }
 
+MotionControllerConfig guidedMotionConfig() {
+    auto config = motionConfig;
+    config.maxLinearSpeedMmS = 60.0f;
+    config.linearAccelerationMmS2 = 120.0f;
+    config.forwardTimeoutMs = 8500; // Um trecho inteiro pode avançar a 35 mm/s.
+    config.maxAngularSpeedDegS = 35.0f;
+    config.turnKpDegPerSecPerDeg = 2.0f;
+    return config;
+}
+
 bool prepareAttempt(char command, bool fromWebsite = false) {
     const bool corner = command == 'c';
-    if (!samplingEnabled.load() || !hardwareReady || ready || startDelay.pending() || (corner ? cornerContinuationUsed : (attemptUsed && !fromWebsite))) {
+    if (!samplingEnabled.load() || !hardwareReady || ready || startDelay.pending() || pivotDiagnostic.active() ||
+        (corner ? cornerContinuationUsed : (attemptUsed && !fromWebsite))) {
         Serial.println("INICIO RECUSADO: inicializacao falhou ou tentativa ja utilizada; reinicie.");
         return false;
     }
@@ -537,13 +667,7 @@ bool prepareAttempt(char command, bool fromWebsite = false) {
         safeStop("calibracao/encoders na partida"); hardwareReady = false; return false;
     }
     const Pose2D initialPose = {0, 0, initialHeadingRadians(mazeConfig.initialHeading)};
-    auto trialConfig = motionConfig;
-    if (command != 'g') {
-        trialConfig.maxLinearSpeedMmS = 60.0f;
-        trialConfig.linearAccelerationMmS2 = 120.0f;
-        trialConfig.maxAngularSpeedDegS = 35.0f;
-        trialConfig.turnKpDegPerSecPerDeg = 2.0f;
-    }
+    const auto trialConfig = guidedMotionConfig();
     if (!motion.begin(trialConfig, initialPose) ||
         !mission.begin(mazeConfig, gridOrientation.read().yawDegrees)) {
         safeStop("inicializacao da tentativa"); hardwareReady = false; return false;
@@ -554,9 +678,19 @@ bool prepareAttempt(char command, bool fromWebsite = false) {
     attemptStartedMs = millis();
     lastProcessedSensorTimestampMs = 0;
     guidedRouteActive = command != 'g';
+    missionCornerActive = false;
+    missionMovingForward = false;
+    cornerTurnDirection = 1;
+    missionExitCreditMm = missionLinearProgressMm = 0.0f;
     guidedFrontApproach = false;
+    guidedLateralClearance.reset();
+    guidedRecovery = {};
+    guidedPivotRecovery = {};
     if (corner) { guidedRoute.resetAtCorner(); cornerContinuationUsed = true; }
     else guidedRoute.reset();
+    guidedCornerRemainingMm = corner ? mazeConfig.cellSizeMm :
+        3.0f * mazeConfig.cellSizeMm + FrontApproach::POSITION_TOLERANCE_MM;
+    guidedCornerShiftTravelMm = 0.0f;
     guidedPauseStartedMs = millis();
     if (!guidedRouteActive && !initializeTelemetry()) {
         safeStop("inicializacao da telemetria"); return false;
@@ -567,11 +701,94 @@ bool prepareAttempt(char command, bool fromWebsite = false) {
     ready = guidedRouteActive;
     if (!guidedRouteActive) startDelay.arm(millis(), RunConfig::START_DELAY_MS);
     Serial.println(corner
-        ? "CONTINUACAO ARMADA: aproximar3cm,esquerda90 a35graus/s,18cm; pausa1s; x interrompe."
+        ? "CONTINUACAO ARMADA: aproximar3cm,curva a esquerda em duas partes,18cm; pausa1s; x interrompe."
         : (guidedRouteActive
-            ? "TESTE GUIADO ARMADO: 2x18cm a6cm/s,aproximar3cm a2cm/s,esquerda90 a35graus/s,18cm; pausa1s entre etapas; x interrompe."
+            ? "TESTE GUIADO ARMADO: 2x18cm a6cm/s,aproximar3cm a2cm/s,curva a esquerda em duas partes,18cm; pausa1s entre etapas; x interrompe."
             : "MISSAO ARMADA: partida em5s; motores OFF durante espera; x cancela."));
     return true;
+}
+
+void armPivotDiagnostic(float targetDeg) {
+    if (!hardwareReady || !samplingEnabled.load() || ready || startDelay.pending() || pivotDiagnostic.active()) {
+        Serial.println("GIRO TESTE RECUSADO: robo ocupado, sensores pausados ou hardware indisponivel.");
+        return;
+    }
+    motors.setEnabled(false);
+    Serial.println("GIRO TESTE: calibrando IMU; mantenha o robo imovel e em piso livre.");
+    if (!imu.calibrateGyroZ()) {
+        safeStop("falha na calibracao da IMU para o giro");
+        return;
+    }
+    pivotDiagnostic = {};
+    pivotDiagnostic.targetDeg = targetDeg;
+    startDelay.arm(millis(), RunConfig::START_DELAY_MS);
+    Serial.printf("GIRO TESTE ARMADO: %.0f graus para %s em 5s; x cancela.\n",
+                  fabsf(targetDeg), targetDeg > 0.0f ? "esquerda" : "direita");
+}
+
+void updatePivotDiagnostic() {
+    const bool starting = startDelay.consumeIfDue(millis());
+    if (!starting && startDelay.pending()) return;
+
+    const auto frame = getLateralSnapshot();
+    const uint32_t nowMs = millis();
+    if (!frame.ready || nowMs - frame.sampledAtMs > MAX_LATERAL_SAMPLE_AGE_MS) {
+        safeStop("giro teste: quadro dos sensores desatualizado");
+        return;
+    }
+    // Em piso aberto pode não haver eco. Um eco curto continua protegendo a manobra.
+    const auto tooNear = [](const UltrasonicReading& reading) {
+        return reading.tooClose || (reading.valid && reading.distanceCm <= 5.0f);
+    };
+    const bool blocked = tooNear(frame.front) || tooNear(frame.left) || tooNear(frame.right);
+    if (starting) {
+        if (blocked) { safeStop("giro teste: coloque o robo longe das paredes"); return; }
+        imu.resetYaw();
+        if (!motion.begin(guidedMotionConfig(), {0.0f, 0.0f, 0.0f})) {
+            safeStop("giro teste: falha ao iniciar encoders ou IMU");
+            return;
+        }
+        motors.setEnabled(true);
+        if (!motion.startGuidedPivot(pivotDiagnostic.targetDeg)) {
+            safeStop("giro teste: falha ao iniciar movimento");
+            return;
+        }
+        const float arcMm = fabsf(pivotDiagnostic.targetDeg) * MechanicalSettings::kPi / 180.0f *
+            motionConfig.wheelTrackMm * 0.5f;
+        Serial.printf("GIRO TESTE: arco nominal %.1fmm por roda; bitola=%.1fmm; ticks/mm E=%.3f D=%.3f\n",
+                      arcMm, motionConfig.wheelTrackMm, motionConfig.leftCountsPerMm, motionConfig.rightCountsPerMm);
+        pivotDiagnostic.startedMs = pivotDiagnostic.lastSampleMs = millis();
+        lastControlUpdateUs = micros();
+        return;
+    }
+
+    if (blocked) motion.brakeForObstacle();
+    const uint32_t nowUs = micros();
+    const uint32_t elapsedUs = nowUs - lastControlUpdateUs;
+    if (elapsedUs < CONTROL_PERIOD_US) return;
+    lastControlUpdateUs = nowUs;
+    motion.update(static_cast<float>(elapsedUs) / 1000000.0f);
+    const auto pose = motion.getPose();
+    const float shiftMm = hypotf(pose.xMm, pose.yMm);
+    pivotDiagnostic.peakAxleShiftMm = fmaxf(pivotDiagnostic.peakAxleShiftMm, shiftMm);
+
+    const auto status = motion.getStatus();
+    const bool done = status != MotionStatus::Running;
+    if (!done && nowMs - pivotDiagnostic.lastSampleMs < 250) return;
+    pivotDiagnostic.lastSampleMs = nowMs;
+    const auto travel = motion.getWheelTravel();
+    const float encoderDeg = (travel.rightMm - travel.leftMm) / motionConfig.wheelTrackMm *
+        180.0f / MechanicalSettings::kPi;
+    Serial.printf("GIRO %s ms=%lu IMU=%+.2fgraus encoder=%+.2fgraus E=%+.2fmm(%ld ticks) D=%+.2fmm(%ld ticks) eixo=(%+.2f,%+.2f)mm\n",
+                  done ? "FINAL" : "AMOSTRA", static_cast<unsigned long>(nowMs - pivotDiagnostic.startedMs),
+                  motion.getTurnAngleDeg(), encoderDeg, travel.leftMm, static_cast<long>(travel.leftTicks),
+                  travel.rightMm, static_cast<long>(travel.rightTicks), pose.xMm, pose.yMm);
+    if (done) {
+        Serial.printf("GIRO RESULTADO status=%u motivo=%u alvo=%+.0fgraus deriva_final=%.2fmm pico=%.2fmm\n",
+                      static_cast<unsigned>(status), static_cast<unsigned>(motion.getFailureReason()),
+                      pivotDiagnostic.targetDeg, shiftMm, pivotDiagnostic.peakAxleShiftMm);
+        pivotDiagnostic = {};
+    }
 }
 
 void publishCurrentMapCell() {
@@ -580,6 +797,40 @@ void publishCurrentMapCell() {
     const int length=mazeMap.cellPacketJson(mission.x(),mission.y(),mission.heading(),packet,sizeof(packet));
     if(length>0) telemetryClient.publishMapSnapshot(mission.x(),mission.y(),packet,length);
     routeRecorder.onTracking(robotStateEstimator.currentState().pose);
+}
+
+void finishMissionMotion(bool succeeded, bool frontExitConfirmed = false) {
+    if (succeeded && mission.state() == nav::MissionState::Moving) {
+        const auto frame = getLateralSnapshot();
+        const uint32_t now = millis();
+        const auto front = frame.frontEstimate(now);
+        const bool fresh = frame.ready && now - frame.sampledAtMs <= MAX_LATERAL_SAMPLE_AGE_MS;
+        const float travelledMm = fabsf(missionLinearProgressMm);
+        if ((missionMovingForward && missionLinearProgressMm <= 0.0f) ||
+            (!missionMovingForward && missionLinearProgressMm >= 0.0f) ||
+            !FrontApproach::arrivalConfirmed(automaticFrontReferenceUsed, fresh && front.valid,
+                                              front.distanceCm, travelledMm, mazeConfig.cellSizeMm)) {
+            char cause[128];
+            snprintf(cause, sizeof(cause), "chegada nao confirmada: percurso=%+.1fmm frente=%.2fcm celula=%umm",
+                     missionLinearProgressMm, frame.front.distanceCm, mazeConfig.cellSizeMm);
+            safeStop(cause);
+            return;
+        }
+        gridOdometry.reportArrival(missionLinearProgressMm);
+        Serial.printf("CELULA CONFIRMADA: percurso=%+.1fmm; aguardando observacao\n", missionLinearProgressMm);
+    }
+    // A grade recebe uma confirmação por movimento lógico, após o repouso.
+    // Recuos, rotações parciais e a diagonal não avançam uma célula por si sós.
+    if (succeeded) robotStateEstimator.updatePose();
+    gridOdometry.resetAccumulator();
+    missionMovingForward = false;
+    if (!succeeded)
+        snprintf(lastStopReason, sizeof(lastStopReason), "movimento falhou: codigo=%u",
+                 static_cast<unsigned>(motion.getFailureReason()));
+    const auto update = mission.onMotionFinished(succeeded, frontExitConfirmed);
+    publishCurrentMapCell();
+    handleMissionUpdate(update);
+    if (update.state == nav::MissionState::AwaitingObservation) cellObservation.begin(millis());
 }
 
 void publishRobotStatus(uint32_t now, bool force = false) {
@@ -621,7 +872,7 @@ void processRemoteLine(const char* line) {
     if(command.bootId!=remoteBootId) {
         acknowledgeRemote(id,false,"ESP reiniciou; atualize o estado antes da partida");return;
     }
-    if(!strcmp(id,previousStartId) || ready || startDelay.pending() || !hardwareReady) {
+    if(!strcmp(id,previousStartId) || ready || startDelay.pending() || pivotDiagnostic.active() || !hardwareReady) {
         acknowledgeRemote(id,false,"Partida repetida, robo ocupado ou hardware indisponivel");return;
     }
     const int width=command.width,corner=command.corner,heading=command.heading;
@@ -677,6 +928,9 @@ void handleSerialCommands() {
         if (command == 'x') { safeStop("parada serial",mm::EndReason::ManualStop); continue; }
         if (command == 'h' || command == '?') {
             Serial.println("g=missao autonoma em5s; t=2F/aproximar/esquerda/F; c=aproximar/esquerda/F do ponto atual; x=parar; s=sensores; d=ecos brutos; p=pausar ultrassons; r=retomar sensores; i=teste isolado. Para outra tentativa, reinicie e reposicione.");
+            Serial.println("v=teste de giro 90 graus a esquerda; V=90 graus a direita; 5s de espera; piso livre; x cancela.");
+        } else if (command == 'v' || command == 'V') {
+            armPivotDiagnostic(command == 'v' ? 90.0f : -90.0f);
         } else if (command == 'p') {
             safeStop("diagnostico: pausar ultrassons");
             samplingEnabled.store(false);
@@ -892,13 +1146,18 @@ void setup() {
                   mazeConfig.rows, mazeConfig.cols,
                   mazeConfig.start.row, mazeConfig.start.col,
                   mazeConfig.goal.row, mazeConfig.goal.col);
-    Serial.println("PRONTO E PARADO: g=missao autonoma em5s; t=2F/aproximar/esquerda/F; c=aproximar/esquerda/F do ponto atual; x=parar; s=sensores; h=ajuda. Reiniciar apos terminar.");
-    Serial.println("Perfil integrado V17: 100mm/s, 55graus/s; limite 180s. Nenhuma partida automatica.");
+    Serial.println("PRONTO E PARADO: g=missao autonoma; t=trajeto em L; c=continuar da esquina; v/V=teste de giro; x=parar; s=sensores; h=ajuda.");
+    Serial.println("Perfil de movimento: 60mm/s, aproximacao a20mm/s, giros ate35graus/s; limite 180s. Nenhuma partida automatica.");
 }
 
 void loop() {
     handleSerialCommands();
     handleRemoteCommands();
+    if (pivotDiagnostic.active()) {
+        updatePivotDiagnostic();
+        delayMicroseconds(500);
+        return;
+    }
     const uint32_t nowMs = millis();
     const auto ageFrame=getLateralSnapshot();
     if(ageFrame.ready) {
@@ -929,7 +1188,7 @@ void loop() {
     }
 
     const LateralSnapshot sensorSnapshot = getLateralSnapshot();
-    if (sensorSnapshot.ready) {
+    if (sensorSnapshot.ready && !missionCornerActive) {
         if (sensorSnapshot.sampledAtMs != lastProcessedSensorTimestampMs) {
             lastProcessedSensorTimestampMs = sensorSnapshot.sampledAtMs;
             robotStateEstimator.updateWalls();
@@ -942,12 +1201,15 @@ void loop() {
     }
 
     if (motionResultPending) {
+        using RecoveryPhase = GuidedWallRecovery::Phase;
         MotionStatus status = motion.getStatus();
         if (status == MotionStatus::Running) {
-            const auto snapshot = getLateralSnapshot();
-            const bool stale = !snapshot.ready || millis() - snapshot.sampledAtMs > MAX_LATERAL_SAMPLE_AGE_MS;
-            const auto filteredFront=snapshot.frontEstimate(millis());
-            const bool automaticForward=!guidedRouteActive && motion.isMovingForward();
+            const auto snapshot = motionSnapshot();
+            const uint32_t sensorNowMs = millis();
+            const bool stale = !snapshot.ready || sensorNowMs - snapshot.sampledAtMs > MAX_LATERAL_SAMPLE_AGE_MS;
+            const auto filteredFront=snapshot.frontEstimate(sensorNowMs);
+            const bool automaticForward = !cornerSequenceActive() && missionMovingForward && motion.isMovingForward() &&
+                guidedRecovery.phase != RecoveryPhase::Adjusting && guidedRecovery.phase != RecoveryPhase::Braking;
             if(automaticForward && !stale && (FrontApproach::shouldSlow(filteredFront.valid,filteredFront.distanceCm)||FrontApproach::shouldSlow(snapshot.front.valid,snapshot.front.distanceCm)) &&
                !motion.isFrontApproachMode()) {
                 motion.setFrontApproachMode(true);
@@ -963,29 +1225,115 @@ void loop() {
                 (!snapshot.front.valid || !isfinite(snapshot.front.distanceCm) || !snapshot.front.pulseUs ||
                  !filteredFront.valid || proximity==FrontProximityGuard::State::Suspect);
             const bool frontBlocked=proximity==FrontProximityGuard::State::Confirmed;
-            if (stale || frontBlocked) {
-                mission.fail();
+            const bool guidedForward = motion.isMovingForward();
+            const bool shifting = guidedForward && cornerSequenceActive() &&
+                guidedRoute.action() == nav::GuidedAction::ShiftIntoCorner;
+            const bool adjusting = guidedRecovery.phase == RecoveryPhase::Adjusting;
+            const bool retreating = adjusting && guidedRecovery.plannedAdjustmentMm < 0.0f;
+            const bool validRawFront = snapshot.front.valid && !snapshot.front.tooClose &&
+                snapshot.front.pulseUs && isfinite(snapshot.front.distanceCm);
+            const bool clearingFrontBlindZone = retreating && guidedRecovery.clearingFrontBlindZone();
+            if (clearingFrontBlindZone && validRawFront && filteredFront.valid)
+                guidedRecovery.observeFront(fminf(snapshot.front.distanceCm, filteredFront.distanceCm));
+            const bool frontReleasing = clearingFrontBlindZone && snapshot.front.pulseUs &&
+                (snapshot.front.tooClose || validRawFront);
+            const bool retreatFrontInvalid = retreating &&
+                !frontReleasing && (!validRawFront || !filteredFront.valid ||
+                 !isfinite(filteredFront.distanceCm) ||
+                 !guidedRecovery.frontAllowsRetreat(fminf(snapshot.front.distanceCm, filteredFront.distanceCm)));
+            const auto filteredLeft = snapshot.leftEstimate(sensorNowMs);
+            const auto filteredRight = snapshot.rightEstimate(sensorNowMs);
+            const float leftCm = snapshot.left.valid && !snapshot.left.tooClose && filteredLeft.valid
+                ? filteredLeft.distanceCm : NAN;
+            const float rightCm = snapshot.right.valid && !snapshot.right.tooClose && filteredRight.valid
+                ? filteredRight.distanceCm : NAN;
+            const bool rightEchoInvalid = !isfinite(rightCm);
+            const bool rightInvalidDuringShift = shifting && rightEchoInvalid && !(leftCm >= 2.6f && leftCm <= 8.0f);
+            if (stale) {
                 char cause[128];
-                if(stale)
-                    snprintf(cause,sizeof(cause),"sensores desatualizados: idade=%lums limite=%lums",
-                        static_cast<unsigned long>(millis()-snapshot.sampledAtMs),
-                        static_cast<unsigned long>(MAX_LATERAL_SAMPLE_AGE_MS));
-                else if(!snapshot.front.valid)
-                    snprintf(cause,sizeof(cause),"frente invalida: pulso=%luus distancia=%.2fcm perto=%u",
-                        static_cast<unsigned long>(snapshot.front.pulseUs),snapshot.front.distanceCm,snapshot.front.tooClose);
-                else
-                    snprintf(cause,sizeof(cause),"reserva frontal confirmada: bruto=%.2fcm limite=%.2fcm pulso=%luus",
-                        snapshot.front.distanceCm,frontEmergencyCm,static_cast<unsigned long>(snapshot.front.pulseUs));
+                snprintf(cause, sizeof(cause), "sensores desatualizados: idade=%lums limite=%lums",
+                         static_cast<unsigned long>(sensorNowMs - snapshot.sampledAtMs),
+                         static_cast<unsigned long>(MAX_LATERAL_SAMPLE_AGE_MS));
                 safeStop(cause);
                 motionResultPending = false;
                 return;
             }
-            if(motion.isMovingForward()) {
-                const auto decision=frontEchoRecovery.update(!frontInvalid,snapshot.sampledAtMs,millis(),
+            if (guidedForward && guidedRecovery.phase != RecoveryPhase::Braking) {
+                const auto lateral = guidedLateralClearance.update(snapshot);
+                const bool recovering = adjusting || guidedRecovery.phase == RecoveryPhase::Resuming;
+                float offsetWithReference = guidedRecovery.steeringOffset(leftCm, rightCm);
+                const bool leftNeedsReference = lateral.leftUncertain || (recovering && guidedRecovery.leftBlocked);
+                const bool rightNeedsReference = lateral.rightUncertain || (recovering && guidedRecovery.rightBlocked);
+                const bool hasOppositeWall = guidedLateralClearance.oppositeWallOffset(
+                    leftNeedsReference, rightNeedsReference, leftCm, rightCm, offsetWithReference);
+                // Uma saída curta pode começar junto à parede que motivou o ajuste.
+                // Só libere os primeiros milímetros se o outro lado for uma referência válida.
+                const float oppositeCm = guidedRecovery.leftBlocked ? rightCm : leftCm;
+                const bool leavingContact = adjusting && (guidedRecovery.leftBlocked != guidedRecovery.rightBlocked) &&
+                    hasOppositeWall && oppositeCm >= 2.6f &&
+                    motion.getDistanceTravelledMm() < 6.0f;
+                const bool leftBlocked = lateral.leftBlocked &&
+                    !(leavingContact && guidedRecovery.leftBlocked && !lateral.rightBlocked);
+                const bool rightBlocked = lateral.rightBlocked &&
+                    !(leavingContact && guidedRecovery.rightBlocked && !lateral.leftBlocked);
+                if (frontBlocked || leftBlocked || rightBlocked) {
+                    if (!adjusting)
+                        guidedRecovery.request(frontBlocked, leftBlocked, rightBlocked, guidedFrontApproach);
+                    motion.brakeForObstacle();
+                    if (!adjusting)
+                        Serial.printf("RECUPERACAO GUIADA: freando; frente=%.2fcm esquerda=%.2fcm direita=%.2fcm\n",
+                                      snapshot.front.distanceCm, snapshot.left.distanceCm, snapshot.right.distanceCm);
+                } else {
+                    float offset = hasOppositeWall ? offsetWithReference : lateral.yawOffsetDeg;
+                    if (leavingContact)
+                        offset = guidedRecovery.leftBlocked ? fminf(-2.0f, offset) : fmaxf(2.0f, offset);
+                    // As distâncias laterais estão oblíquas durante o avanço diagonal.
+                    if (shifting && !recovering && !hasOppositeWall) offset = 0.0f;
+                    motion.setGuidedLateralSteering(lateral.slow || recovering || shifting || hasOppositeWall,
+                                                   cornerSequenceActive() ? offset * cornerTurnDirection : offset);
+                    if (shifting && !adjusting && !rightEchoInvalid && !motion.isSensorPaused() &&
+                        nav::guidedCornerBrakeAtRightTarget(snapshot.right.distanceCm, lateral.rightProjectedCm))
+                        motion.brakeAtFrontTarget();
+                    if (guidedPivotRecovery.phase == GuidedPivotRecovery::Phase::Adjusting &&
+                        !rightEchoInvalid && nav::guidedCornerRightGapCm(rightCm) <= nav::GUIDED_CORNER_RIGHT_MIN_CM &&
+                        !motion.isSensorPaused())
+                        motion.brakeAtFrontTarget();
+                }
+            }
+            if (!guidedForward) {
+                using PivotPhase = GuidedPivotRecovery::Phase;
+                const bool returning = guidedPivotRecovery.phase == PivotPhase::Returning;
+                const auto type = motion.getMotionType();
+                const bool turning = type == MotionType::TurnLeft90 || type == MotionType::TurnRight90 ||
+                    type == MotionType::TurnAround180;
+                if (turning || retreating) {
+                    const auto lateral = guidedLateralClearance.update(snapshot);
+                    const bool frontTooClose = snapshot.front.tooClose && turning &&
+                        !(returning && guidedPivotRecovery.frontBlocked);
+                    const bool leftTooClose = lateral.leftBlocked &&
+                        !(returning ? guidedPivotRecovery.leftBlocked : retreating && guidedRecovery.leftBlocked);
+                    const bool rightTooClose = lateral.rightBlocked &&
+                        !(returning ? guidedPivotRecovery.rightBlocked : retreating && guidedRecovery.rightBlocked);
+                    if (frontTooClose || leftTooClose || rightTooClose) {
+                        if (turning && cornerSequenceActive() && guidedPivotRecovery.phase == PivotPhase::None &&
+                            guidedRoute.action() == nav::GuidedAction::FinishLeftTurn) {
+                            guidedPivotRecovery = {PivotPhase::BeforeReturn, frontTooClose, leftTooClose, rightTooClose};
+                            Serial.printf("CURVA: proximidade no giro; frente=%u esquerda=%u direita=%u; freando para ajustar\n",
+                                          frontTooClose, leftTooClose, rightTooClose);
+                        }
+                        motion.brakeForObstacle();
+                    }
+                }
+            }
+            if ((motion.isMovingForward() || retreating) && guidedRecovery.phase != RecoveryPhase::Braking) {
+                const auto decision=frontEchoRecovery.update(!frontInvalid && !rightInvalidDuringShift && !retreatFrontInvalid,
+                    snapshot.sampledAtMs,millis(),
                     motion.sensorPauseSettled());
                 if(decision==FrontEchoRecovery::Decision::Failed) {
                     mission.fail();
-                    safeStop("eco frontal instavel: recuperacao excedeu 1200ms ou 3 pausas no trecho");
+                    safeStop(retreating ? "recuperacao guiada: eco frontal invalido ou encurtando durante a re"
+                             : shifting ? "curva: eco frontal ou direito instavel durante a diagonal"
+                                      : "eco frontal instavel: recuperacao excedeu 1200ms ou 3 pausas no trecho");
                     motionResultPending=false;return;
                 }
                 const bool hold=decision==FrontEchoRecovery::Decision::Hold;
@@ -994,51 +1342,49 @@ void loop() {
                     mission.fail();safeStop("falha ao pausar/retomar apos perda do eco frontal");
                     motionResultPending=false;return;
                 }
-                if(hold) {
-                    corridorFeedbackFilter.reset();
-                    motion.setWallAlignmentFeedback(0,0,false);
-                }
                 if(hold!=wasPaused) {
                     if(hold && frontEchoRecoveries<65535)++frontEchoRecoveries;
-                    Serial.println(hold ? "ECO FRONTAL: freando e aguardando novas leituras" : "ECO FRONTAL: duas leituras validas; retomando o restante do trecho");
+                    Serial.println(retreating
+                        ? (hold ? "RECUPERACAO GUIADA: re pausada para conferir o eco frontal"
+                                : "RECUPERACAO GUIADA: eco frontal confirmado; retomando a re")
+                        : shifting
+                        ? (hold ? "CURVA: freando e aguardando os ecos frontal e direito"
+                                : "CURVA: ecos frontal e direito validos; retomando a diagonal")
+                        : (hold ? "ECO FRONTAL: freando e aguardando novas leituras"
+                                : "ECO FRONTAL: duas leituras validas; retomando o restante do trecho"));
                     publishRobotStatus(millis(),true);
                 }
             }
             if(automaticSlow && !motion.isSensorPaused() && filteredFront.valid &&
                filteredFront.distanceCm>FrontApproach::TARGET_CM+FrontApproach::TOLERANCE_CM &&
                filteredFront.distanceCm<=5.0f &&
-               FrontApproach::positionMatchesCell(motion.getDistanceTravelledMm(),mazeConfig.cellSizeMm)) {
+               FrontApproach::positionMatchesCell(missionLinearProgressMm + motion.getDistanceTravelledMm(),mazeConfig.cellSizeMm)) {
                 // A brake in progress may finish; geometry is checked again afterwards.
-                if(motion.refineFrontApproachTarget(filteredFront.distanceCm))automaticFrontReferenceUsed=true;
+                if(motion.refineFrontApproachTarget(filteredFront.distanceCm, missionLinearProgressMm))automaticFrontReferenceUsed=true;
             }
             if(automaticForward && motion.isFrontApproachMode() && !motion.isSensorPaused() &&
                FrontApproach::atTarget(filteredFront.valid,filteredFront.distanceCm)) {
-                if(!FrontApproach::positionMatchesCell(motion.getDistanceTravelledMm(),mazeConfig.cellSizeMm)) {
+                const float advanceMm = missionLinearProgressMm + motion.getDistanceTravelledMm();
+                if(!FrontApproach::positionMatchesCell(advanceMm,mazeConfig.cellSizeMm)) {
                     char cause[128];
                     snprintf(cause,sizeof(cause),"parede antes do centro: eixo avancou %.1fmm; celula=%umm; frente=%.2fcm",
-                        motion.getDistanceTravelledMm(),mazeConfig.cellSizeMm,filteredFront.distanceCm);
+                        advanceMm,mazeConfig.cellSizeMm,filteredFront.distanceCm);
                     mission.fail();safeStop(cause);motionResultPending=false;return;
                 }
                 automaticFrontReferenceUsed=true;
                 motion.brakeAtFrontTarget();
             }
-            if (!motion.isSensorPaused() && guidedFrontApproach && filteredFront.valid &&
+            if (!motion.isSensorPaused() && guidedRecovery.phase != RecoveryPhase::Braking &&
+                guidedFrontApproach && filteredFront.valid &&
                 filteredFront.distanceCm <= MazeSettings::GUIDED_FRONT_TARGET_CM + MazeSettings::GUIDED_FRONT_TOLERANCE_CM)
                 motion.brakeAtFrontTarget();
             const uint32_t nowUs = micros();
             const uint32_t elapsedUs = static_cast<uint32_t>(nowUs - lastControlUpdateUs);
             if (elapsedUs >= CONTROL_PERIOD_US) {
                 motion.update(static_cast<float>(elapsedUs) / 1000000.0f);
-                // Confirm grid turns only after settling. Updating at every
-                // intermediate 75-degree threshold would accumulate yaw-reference
-                // errors across consecutive turns in PositionTracker.
-                if (motion.getMotionType() == MotionType::ForwardCell ||
-                    motion.getStatus() != MotionStatus::Running)
-                    robotStateEstimator.updatePose();
                 lastControlUpdateUs = nowUs;
             }
             if (motion.getStatus() == MotionStatus::Running) {
-                updateWallAlignmentFeedback();
                 delayMicroseconds(500); // evita polling contínuo sem atrasar o ciclo PID
                 return;
             }
@@ -1049,21 +1395,47 @@ void loop() {
         Serial.printf("MOVIMENTO status=%u motivo=%u distancia=%.2fmm yaw=%.2fgraus\n",
             static_cast<unsigned>(status), static_cast<unsigned>(motion.getFailureReason()),
             motion.getDistanceTravelledMm(), motion.getTurnAngleDeg());
-        if (guidedRouteActive) {
-            if (guidedFrontApproach && status == MotionStatus::Succeeded) {
-                const auto snapshot = getLateralSnapshot();
-                const bool atTarget = snapshot.ready && snapshot.front.valid &&
-                    millis() - snapshot.sampledAtMs <= MAX_LATERAL_SAMPLE_AGE_MS &&
-                    fabsf(snapshot.front.distanceCm - MazeSettings::GUIDED_FRONT_TARGET_CM) <= MazeSettings::GUIDED_FRONT_TOLERANCE_CM;
-                if (!atTarget) { safeStop("aproximacao frontal terminou fora da meta de3cm"); return; }
-                Serial.printf("APROXIMACAO CONFIRMADA: frente=%.2fcm\n", snapshot.front.distanceCm);
+        const bool linear = motion.getMotionType() == MotionType::ForwardCell;
+        const bool sequence = cornerSequenceActive();
+        const bool recoverableStop = status == MotionStatus::Failed && linear && (sequence || missionMovingForward) &&
+            guidedLinearInterruption(motion.getFailureReason());
+        if (recoverableStop && guidedRecovery.phase != RecoveryPhase::Braking &&
+            guidedRecovery.phase != RecoveryPhase::Adjusting) {
+            const auto lateral = guidedLateralClearance.update(motionSnapshot());
+            guidedRecovery.request(false, lateral.leftBlocked, lateral.rightBlocked, guidedFrontApproach);
+            Serial.println("RECUPERACAO GUIADA: avanço sem progresso no sentido comandado");
+        }
+        if (linear && (status == MotionStatus::Succeeded || recoverableStop)) {
+            const float travelledMm = motion.getDistanceTravelledMm();
+            if (sequence) {
+                if (guidedRoute.step() <= 2) guidedCornerRemainingMm -= travelledMm;
+                if (guidedRoute.action() == nav::GuidedAction::ShiftIntoCorner)
+                    guidedCornerShiftTravelMm += travelledMm;
+            } else {
+                missionLinearProgressMm += travelledMm;
             }
-            guidedFrontApproach = false;
-            motion.setFrontApproachMode(false);
-            guidedRoute.finishMovement(status == MotionStatus::Succeeded);
+        }
+        if (handleGuidedRecoveryResult(status)) return;
+        guidedRecovery = {};
+        guidedFrontApproach = false;
+        motion.setFrontApproachMode(false);
+        if (sequence) {
+            // A etapa de esquina só termina com a referência frontal confirmada em repouso.
+            if (status != MotionStatus::Succeeded || guidedRoute.action() != nav::GuidedAction::ApproachFrontWall)
+                guidedRoute.finishMovement(status == MotionStatus::Succeeded);
             guidedPauseStartedMs = millis();
             if (guidedRoute.action() == nav::GuidedAction::Failed) {
-                safeStop("falha no teste guiado");
+                const auto reason = motion.getFailureReason();
+                if (reason == MotionFailureReason::LeftWheelStalled)
+                    safeStop("teste guiado: roda esquerda sem contagens novas no encoder");
+                else if (reason == MotionFailureReason::RightWheelStalled)
+                    safeStop("teste guiado: roda direita sem contagens novas no encoder");
+                else if (reason == MotionFailureReason::Obstacle)
+                    safeStop("teste guiado: parede dentro da area de giro do chassi");
+                else if (reason == MotionFailureReason::MotionTimeout && motion.getMotionType() == MotionType::TurnLeft90)
+                    safeStop("teste guiado: giro sem progresso angular ou tempo limite atingido");
+                else
+                    safeStop("falha no teste guiado");
             } else if (guidedRoute.action() == nav::GuidedAction::Complete) {
                 ready = false;
                 guidedRouteActive = false;
@@ -1072,90 +1444,334 @@ void loop() {
             }
             return;
         }
-        if(status==MotionStatus::Succeeded && motion.isMovingForward()) {
-            const auto frame=getLateralSnapshot();
-            const bool fresh=frame.ready && millis()-frame.sampledAtMs<=MAX_LATERAL_SAMPLE_AGE_MS;
-            if(!FrontApproach::arrivalConfirmed(automaticFrontReferenceUsed,fresh&&frame.frontEstimate(millis()).valid,frame.frontEstimate(millis()).distanceCm,
-                motion.getDistanceTravelledMm(),mazeConfig.cellSizeMm)) {
-                char cause[128];
-                snprintf(cause,sizeof(cause),"chegada nao confirmada: avanço=%.1fmm frente=%.2fcm; celula=%umm refFrontal=%u",
-                    motion.getDistanceTravelledMm(),frame.front.distanceCm,mazeConfig.cellSizeMm,automaticFrontReferenceUsed);
-                mission.fail();safeStop(cause);return;
-            }
-            Serial.printf("CELULA CONFIRMADA: avanço=%.1fmm frente=%.2fcm; observar antes da proxima acao\n",
-                motion.getDistanceTravelledMm(),frame.front.distanceCm);
-        }
-        if(status!=MotionStatus::Succeeded)
-            snprintf(lastStopReason,sizeof(lastStopReason),"movimento falhou: codigo=%u",static_cast<unsigned>(motion.getFailureReason()));
-        const nav::MissionUpdate missionUpdate =
-            mission.onMotionFinished(status == MotionStatus::Succeeded);
-        publishCurrentMapCell();
-        handleMissionUpdate(missionUpdate);
-        if (missionUpdate.state == nav::MissionState::AwaitingObservation) {
-            cellObservation.begin(millis());
-        }
+        finishMissionMotion(status == MotionStatus::Succeeded);
         return;
     }
 
-    if (guidedRouteActive) {
+    if (cornerSequenceActive() || guidedRecovery.phase != GuidedWallRecovery::Phase::None) {
         if (millis() - guidedPauseStartedMs < 1000) { delay(1); return; }
-        const auto snapshot = getLateralSnapshot();
-        if (!snapshot.ready || millis() - snapshot.sampledAtMs > MAX_LATERAL_SAMPLE_AGE_MS) {
+        const auto snapshot = motionSnapshot();
+        const uint32_t sensorNowMs = millis();
+        if (!snapshot.ready || sensorNowMs - snapshot.sampledAtMs > MAX_LATERAL_SAMPLE_AGE_MS) {
             safeStop("sensores desatualizados antes da etapa guiada"); return;
         }
-        const bool approach = guidedRoute.action() == nav::GuidedAction::ApproachFrontWall;
-        if (approach) {
-            if (!snapshot.front.valid || snapshot.front.distanceCm <= MazeSettings::GUIDED_FRONT_EMERGENCY_CM) {
-                safeStop("aproximacao frontal invalida ou sem reserva"); return;
+        const auto action = cornerSequenceActive() ? guidedRoute.action() : nav::GuidedAction::ForwardCell;
+        const auto front = snapshot.frontEstimate(sensorNowMs);
+        const bool frontValid = snapshot.front.valid && !snapshot.front.tooClose && snapshot.front.pulseUs &&
+            isfinite(snapshot.front.distanceCm) && front.valid && isfinite(front.distanceCm);
+        if (missionCornerActive && action == nav::GuidedAction::ForwardCell) {
+            const float frontCm = fminf(front.distanceCm, snapshot.front.distanceCm);
+            if (!frontValid || !nav::guidedLeftOpening(frontCm, mazeConfig.cellSizeMm)) {
+                safeStop("missao: abertura frontal nao confirmada apos a curva");
+                return;
             }
-            const float extraMm = (snapshot.front.distanceCm - MazeSettings::GUIDED_FRONT_TARGET_CM) * 10.0f;
-            if (fabsf(extraMm) <= MazeSettings::GUIDED_FRONT_TOLERANCE_CM * 10.0f) {
-                guidedRoute.finishMovement(true); guidedPauseStartedMs = millis();
-                Serial.println("APROXIMACAO: ja na faixa de3cm; sem movimento."); return;
-            }
-            if (extraMm <= 0 || extraMm > mazeConfig.cellSizeMm) {
-                safeStop("parede fora da faixa prevista para aproximacao de esquina"); return;
-            }
-            guidedFrontApproach = true;
-            motion.setFrontApproachMode(true);
-            motors.setEnabled(true);
-            if (!motion.startMoveLinear(extraMm)) { safeStop("falha ao iniciar aproximacao"); return; }
-            frontEchoRecovery.reset();frontProximity.reset();
-            gridOdometry.beginMotionSegment();
-            motionResultPending = true; lastControlUpdateUs = micros();
-            Serial.printf("TESTE ETAPA 3/5: aproximacao lenta, alvo3cm; max20mm/s; extra estimado%.1fmm\n", extraMm);
+            missionExitCreditMm = nav::guidedCornerExitProgressMm(guidedCornerShiftTravelMm);
+            missionCornerActive = false;
+            guidedLateralClearance.reset();
+            Serial.printf("MISSAO: curva concluida; avancando %.1fmm apos a diagonal\n",
+                          mazeConfig.cellSizeMm - missionExitCreditMm);
+            finishMissionMotion(true, true);
             return;
         }
-        const bool forward = guidedRoute.action() == nav::GuidedAction::ForwardCell;
-        if (forward && (!snapshot.front.valid || snapshot.front.distanceCm <= 5.0f)) {
-            safeStop("frente invalida ou obstaculo antes da etapa guiada"); return;
+        using PivotPhase = GuidedPivotRecovery::Phase;
+        if (guidedPivotRecovery.phase == PivotPhase::BeforeReturn) {
+            motors.setEnabled(true);
+            if (!motion.startGuidedPivotReturn()) {
+                safeStop("curva: falta percurso angular confirmado para desfazer o giro");
+                return;
+            }
+            guidedLateralClearance.reset();
+            guidedPivotRecovery.phase = PivotPhase::Returning;
+            trackStartedMotion();
+            Serial.println("CURVA: desfazendo o giro parcial pelo arco percorrido");
+            return;
         }
+        if (guidedPivotRecovery.phase == PivotPhase::BeforeAdjustment) {
+            const auto left = snapshot.leftEstimate(sensorNowMs);
+            const auto right = snapshot.rightEstimate(sensorNowMs);
+            const float leftCm = snapshot.left.valid && !snapshot.left.tooClose && left.valid ? left.distanceCm : NAN;
+            const float rightCm = snapshot.right.valid && !snapshot.right.tooClose && right.valid
+                ? fminf(right.distanceCm, snapshot.right.distanceCm) : NAN;
+            const bool rightBlocked = guidedPivotRecovery.rightBlocked;
+            const bool leftBlocked = guidedPivotRecovery.leftBlocked ||
+                (guidedPivotRecovery.frontBlocked && !rightBlocked);
+            float offsetDeg = 0.0f;
+            const bool hasOppositeWall = guidedLateralClearance.oppositeWallOffset(
+                leftBlocked, rightBlocked, leftCm, rightCm, offsetDeg);
+            const float adjustMm = frontValid && hasOppositeWall
+                ? nav::guidedCornerRepositionMm(rightBlocked, fminf(front.distanceCm, snapshot.front.distanceCm),
+                                              rightCm, guidedCornerShiftTravelMm)
+                : 0.0f;
+            if (adjustMm == 0.0f) {
+                char cause[128];
+                snprintf(cause, sizeof(cause), "curva: sem espaco confirmado para ajustar; esquerda=%.2fcm direita=%.2fcm",
+                         leftCm, rightCm);
+                safeStop(cause);
+                return;
+            }
+            guidedRecovery.request(false, leftBlocked, rightBlocked, false);
+            guidedRecovery.planAdjustment(adjustMm);
+            guidedPivotRecovery.phase = PivotPhase::Adjusting;
+            Serial.printf("CURVA: ajuste pela parede %s; percurso %+.1fmm; correcao estimada %.1fgraus\n",
+                          leftBlocked ? "direita" : "esquerda", adjustMm, offsetDeg);
+            return;
+        }
+        if (guidedRecovery.phase == GuidedWallRecovery::Phase::BeforeAdjustment) {
+            const float signedMm = guidedRecovery.plannedAdjustmentMm;
+            const bool reversing = signedMm < 0.0f;
+            const bool frontInBlindZone = reversing && guidedRecovery.frontBlocked &&
+                snapshot.front.tooClose && snapshot.front.pulseUs;
+            const float frontBeforeCm = frontValid ? fminf(front.distanceCm, snapshot.front.distanceCm) : NAN;
+            if ((!frontValid && !frontInBlindZone) || (!reversing && frontBeforeCm * 10.0f < 52.0f + signedMm)) {
+                safeStop("recuperacao guiada: eco frontal invalido ou sem espaco para o ajuste");
+                return;
+            }
+            guidedFrontApproach = false;
+            motion.setFrontApproachMode(!reversing);
+            motors.setEnabled(true);
+            // Com eco abaixo da faixa, uma ré curta e já percorrida libera a face do sensor.
+            const float adjustmentMm = frontInBlindZone ? fminf(-signedMm, 10.0f) : fabsf(signedMm);
+            const bool started = reversing ? motion.startGuidedRetreat(adjustmentMm) : motion.startMoveLinear(adjustmentMm);
+            if (!started) { safeStop("recuperacao guiada: falha ao iniciar ajuste"); return; }
+            guidedRecovery.startAdjustment(frontBeforeCm);
+            trackStartedMotion();
+            Serial.printf("RECUPERACAO GUIADA: %s %.1fmm; frente=%.2fcm\n",
+                          reversing ? "recuo pelo trecho percorrido" : "avanco para sair do travamento",
+                          adjustmentMm, frontBeforeCm);
+            return;
+        }
+        if (guidedRecovery.phase == GuidedWallRecovery::Phase::Checking) {
+            const float frontMinCm = guidedRecovery.approach ? MazeSettings::GUIDED_FRONT_EMERGENCY_CM : 5.0f;
+            const auto lateral = guidedLateralClearance.update(snapshot);
+            const auto left = snapshot.leftEstimate(sensorNowMs);
+            const auto right = snapshot.rightEstimate(sensorNowMs);
+            const float leftCm = snapshot.left.valid && left.valid ? left.distanceCm : NAN;
+            const float rightCm = snapshot.right.valid && right.valid ? right.distanceCm : NAN;
+            const float frontCm = fminf(front.distanceCm, snapshot.front.distanceCm);
+            if (!frontValid && guidedRecovery.frontBlocked && snapshot.front.tooClose &&
+                snapshot.front.pulseUs && guidedRecovery.failedAdjustmentMm == 0.0f &&
+                !lateral.leftBlocked && !lateral.rightBlocked && guidedRecovery.availableRetreatMm() >= 5.0f) {
+                guidedRecovery.planAdjustment(-fminf(10.0f, guidedRecovery.availableRetreatMm()));
+                return;
+            }
+            if (!frontValid || (lateral.leftBlocked && lateral.rightBlocked)) {
+                safeStop("recuperacao guiada: falta referencia frontal ou espaco nas laterais");
+                return;
+            }
+            float yawOffset = guidedRecovery.steeringOffset(leftCm, rightCm);
+            const bool hasOppositeWall = guidedLateralClearance.oppositeWallOffset(
+                guidedRecovery.leftBlocked, guidedRecovery.rightBlocked, leftCm, rightCm, yawOffset);
+            const bool knownSideStillClose =
+                (lateral.leftBlocked && guidedRecovery.leftBlocked && !lateral.rightBlocked) ||
+                (lateral.rightBlocked && guidedRecovery.rightBlocked && !lateral.leftBlocked);
+            const float oppositeCm = guidedRecovery.leftBlocked ? rightCm : leftCm;
+            const float forwardSpaceMm = (frontCm - 5.0f) * 10.0f - 2.0f;
+            if (guidedRecovery.failedAdjustmentMm < 0.0f) {
+                // O último movimento para trás travou. Avance devagar dentro do trecho pendente.
+                const float advanceMm = fminf(15.0f, fminf(forwardSpaceMm, guidedRecovery.remainingMm));
+                if (advanceMm < 5.0f || ((lateral.leftBlocked || lateral.rightBlocked) &&
+                                         (!knownSideStillClose || !hasOppositeWall || oppositeCm < 2.6f))) {
+                    safeStop("recuperacao guiada: sem espaco confirmado para avancar apos travar na re");
+                    return;
+                }
+                guidedRecovery.planAdjustment(advanceMm);
+                return;
+            }
+            if (guidedRecovery.failedAdjustmentMm > 0.0f || knownSideStillClose || frontCm <= frontMinCm) {
+                const float retreatMm = fminf(15.0f, guidedRecovery.availableRetreatMm());
+                if (retreatMm < 5.0f) {
+                    safeStop("recuperacao guiada: sem trecho percorrido para recuar mais");
+                    return;
+                }
+                guidedRecovery.planAdjustment(-retreatMm);
+                return;
+            }
+            if (lateral.leftBlocked || lateral.rightBlocked ||
+                (!hasOppositeWall && ((guidedRecovery.leftBlocked && !isfinite(leftCm)) ||
+                                     (guidedRecovery.rightBlocked && !isfinite(rightCm))))) {
+                safeStop("recuperacao guiada: parede lateral de referencia indisponivel");
+                return;
+            }
+            if (action == nav::GuidedAction::ShiftIntoCorner &&
+                nav::guidedCornerShiftReached(guidedCornerShiftTravelMm) && snapshot.right.valid && right.valid &&
+                nav::guidedCornerRightGapCm(fminf(right.distanceCm, snapshot.right.distanceCm)) >=
+                    nav::GUIDED_CORNER_RIGHT_MIN_CM &&
+                nav::guidedCornerBrakeAtRightTarget(snapshot.right.distanceCm, NAN)) {
+                guidedRecovery = {};
+                guidedRoute.finishMovement(true);
+                Serial.printf("CURVA: diagonal preservada apos a re (%.1fmm); verificando giro final\n",
+                              guidedCornerShiftTravelMm);
+                return;
+            }
+            const bool startsAtCellCentre = action == nav::GuidedAction::ForwardCell &&
+                (!cornerSequenceActive() || guidedRoute.step() < 2) &&
+                guidedRecovery.originalTargetMm() >= mazeConfig.cellSizeMm - 5.0f;
+            const float centreRetreatMm = guidedRecovery.centreRetreatMm(startsAtCellCentre, forwardSpaceMm);
+            if (centreRetreatMm >= 4.0f) {
+                guidedRecovery.planAdjustment(-centreRetreatMm);
+                Serial.printf("RECUPERACAO GUIADA: buscando o centro anterior; re %.1fmm\n", centreRetreatMm);
+                return;
+            }
+            guidedFrontApproach = guidedRecovery.approach;
+            motion.setFrontApproachMode(true);
+            const float remainingMm = guidedRecovery.remainingMm;
+            if (remainingMm <= 1.0f && remainingMm >= -2.0f) {
+                guidedFrontApproach = false;
+                motion.setFrontApproachMode(false);
+                guidedRecovery = {};
+                if (!cornerSequenceActive()) finishMissionMotion(true);
+                else if (action != nav::GuidedAction::ApproachFrontWall) guidedRoute.finishMovement(true);
+                return;
+            }
+            motors.setEnabled(true);
+            if (remainingMm < 0.0f || !motion.startMoveLinear(remainingMm)) {
+                safeStop("recuperacao guiada: distancia pendente invalida");
+                return;
+            }
+            guidedRecovery.phase = GuidedWallRecovery::Phase::Resuming;
+            trackStartedMotion();
+            Serial.printf("RECUPERACAO GUIADA: retomando %.1fmm, ajuste de rumo %.1fgraus\n",
+                          remainingMm, yawOffset);
+            return;
+        }
+        if (action == nav::GuidedAction::ApproachFrontWall) {
+            if (!frontValid || snapshot.front.distanceCm <= MazeSettings::GUIDED_FRONT_EMERGENCY_CM) {
+                safeStop("aproximacao frontal invalida ou sem reserva"); return;
+            }
+            const auto plan = nav::planGuidedCorner(front.distanceCm, mazeConfig.cellSizeMm, guidedCornerRemainingMm);
+            if (plan.action == nav::GuidedCornerAction::AtTarget) {
+                if (!nav::guidedFrontAtCorner(snapshot.front.distanceCm)) {
+                    safeStop("eco frontal nao confirmou a posicao de curva"); return;
+                }
+                guidedRoute.finishMovement(true); guidedPauseStartedMs = millis();
+                Serial.printf("APROXIMACAO CONFIRMADA: frente=%.2fcm\n", front.distanceCm);
+                return;
+            }
+            if (plan.action == nav::GuidedCornerAction::TooClose ||
+                snapshot.front.distanceCm < MazeSettings::GUIDED_FRONT_TARGET_CM - MazeSettings::GUIDED_FRONT_TOLERANCE_CM) {
+                safeStop("esquina: frente abaixo da faixa de3cm para o giro"); return;
+            }
+            if (plan.action == nav::GuidedCornerAction::NoTravelLeft) {
+                char cause[128];
+                snprintf(cause, sizeof(cause), "esquina nao confirmada: frente=%.2fcm; limite de avanco atingido",
+                         front.distanceCm);
+                safeStop(cause); return;
+            }
+            guidedFrontApproach = plan.action == nav::GuidedCornerAction::ApproachSlowly;
+            if (!guidedFrontApproach && snapshot.front.distanceCm <= 5.0f) {
+                safeStop("esquina: eco frontal curto antes do avanco"); return;
+            }
+            motion.setFrontApproachMode(guidedFrontApproach);
+            motors.setEnabled(true);
+            if (!motion.startMoveLinear(plan.distanceMm)) { safeStop("falha ao iniciar aproximacao"); return; }
+            trackStartedMotion();
+            Serial.printf("%s: %s; frente=%.2fcm; trecho=%.1fmm; restante=%.1fmm\n",
+                          missionCornerActive ? "MISSAO CURVA" : "TESTE ETAPA 3/5",
+                          guidedFrontApproach ? "aproximacao lenta" : "avanco ate a esquina",
+                          front.distanceCm, plan.distanceMm, guidedCornerRemainingMm);
+            return;
+        }
+        const bool forward = action == nav::GuidedAction::ForwardCell;
         if (forward && guidedRoute.step() < 2) {
-            const float segmentMm = nav::guidedPreCornerMoveMm(snapshot.front.distanceCm);
-            if (segmentMm <= 1.0f) {
+            if (!frontValid) {
+                safeStop("frente invalida antes do avanco guiado"); return;
+            }
+            if (front.distanceCm <= FrontApproach::START_CM) {
                 guidedRoute.resetAtCorner(); guidedPauseStartedMs = millis();
                 Serial.println("ESQUINA: transicao antecipada para aproximacao lenta; sem insistir em celula inteira.");
                 return;
             }
+            const float segmentMm = nav::guidedPreCornerMoveMm(front.distanceCm, mazeConfig.cellSizeMm);
+            if (snapshot.front.distanceCm <= 5.0f) {
+                safeStop("eco frontal curto antes do avanco guiado"); return;
+            }
             motion.setFrontApproachMode(false);
             motors.setEnabled(true);
             if (!motion.startMoveLinear(segmentMm)) { safeStop("falha ao iniciar trecho antes da curva"); return; }
-            frontEchoRecovery.reset();frontProximity.reset();
-            gridOdometry.beginMotionSegment();
-            motionResultPending = true; lastControlUpdateUs = micros();
+            trackStartedMotion();
             Serial.printf("TESTE ETAPA %u/5: avancar ate%.1fmm, preservando8cm antes da aproximacao\n",
                           guidedRoute.step() + 1, segmentMm);
             return;
         }
-        if (!forward && (!snapshot.left.valid || snapshot.left.distanceCm <= 5.0f)) {
-            safeStop("abertura esquerda nao confirmada antes do giro guiado"); return;
+        if (forward && (!frontValid || snapshot.front.distanceCm <= 5.0f || front.distanceCm <= 5.0f)) {
+            safeStop("frente invalida ou obstaculo antes do avanco apos o giro"); return;
         }
-        Serial.printf("TESTE ETAPA %u/5: %s\n", guidedRoute.step() + 1,
-                      forward ? "avancar18cm" : "esquerda90graus");
-        const nav::MissionUpdate update{nav::MissionState::NotStarted,
-            forward ? nav::MissionAction::MoveForwardOneCell : nav::MissionAction::TurnLeft90,
-            nav::NavigationStatus::NotInitialized};
-        handleMissionUpdate(update);
+        const bool turnEntry = action == nav::GuidedAction::BeginLeftTurn;
+        if (turnEntry) {
+            if (!frontValid || !nav::guidedFrontAtCorner(front.distanceCm) ||
+                !nav::guidedFrontAtCorner(snapshot.front.distanceCm)) {
+                safeStop("posicao frontal da esquina nao confirmada antes do giro"); return;
+            }
+            const auto left = snapshot.leftEstimate(sensorNowMs);
+            if (!snapshot.left.valid || !left.valid ||
+                !nav::guidedLeftOpening(snapshot.left.distanceCm, mazeConfig.cellSizeMm) ||
+                !nav::guidedLeftOpening(left.distanceCm, mazeConfig.cellSizeMm)) {
+                safeStop("abertura de saida nao confirmada antes do giro"); return;
+            }
+        }
+        const auto right = snapshot.rightEstimate(sensorNowMs);
+        const float rightCm = fminf(right.distanceCm, snapshot.right.distanceCm);
+        const char* turnLogPrefix = missionCornerActive ? "MISSAO CURVA" : "TESTE ETAPA 4/5";
+        const bool rightValid = snapshot.right.valid && !snapshot.right.tooClose && right.valid &&
+            isfinite(snapshot.right.distanceCm) && isfinite(right.distanceCm);
+        if (action == nav::GuidedAction::ShiftIntoCorner) {
+            const float frontCm = fminf(front.distanceCm, snapshot.front.distanceCm);
+            const float shiftMm = frontValid && rightValid && !snapshot.left.tooClose
+                ? nav::guidedCornerShiftMm(frontCm, rightCm) : 0.0f;
+            if (shiftMm == 0.0f) {
+                char cause[128];
+                snprintf(cause, sizeof(cause), "curva: avanco diagonal sem folga; frente=%.2fcm direita=%.2fcm",
+                         frontCm, rightCm);
+                safeStop(cause);
+                return;
+            }
+            motion.setFrontApproachMode(true);
+            motors.setEnabled(true);
+            if (!motion.startMoveLinear(shiftMm)) { safeStop("falha ao iniciar avanco diagonal"); return; }
+            trackStartedMotion();
+            Serial.printf("%s: avanco diagonal ate %.1fmm; frente=%.2fcm lado externo=%.2fcm; alvo perpendicular=%.2fcm\n",
+                          turnLogPrefix, shiftMm, frontCm, rightCm, nav::GUIDED_CORNER_RIGHT_TARGET_CM);
+            return;
+        }
+        if (turnEntry || action == nav::GuidedAction::FinishLeftTurn) {
+            const bool leftTooClose = snapshot.left.tooClose;
+            const bool rightTooClose = snapshot.right.tooClose ||
+                (rightValid && nav::guidedCornerRightGapCm(rightCm) < nav::GUIDED_CORNER_RIGHT_MIN_CM);
+            if (!turnEntry && nav::guidedCornerShiftReached(guidedCornerShiftTravelMm) &&
+                leftTooClose != rightTooClose) {
+                guidedPivotRecovery = {PivotPhase::BeforeAdjustment, false, leftTooClose, rightTooClose};
+                Serial.println("CURVA: ajustando a folga lateral antes do giro final");
+                return;
+            }
+            if (!turnEntry && (!nav::guidedCornerShiftReached(guidedCornerShiftTravelMm) ||
+                               !frontValid || snapshot.front.distanceCm <= 5.0f || front.distanceCm <= 5.0f ||
+                               !rightValid || rightTooClose || leftTooClose)) {
+                char cause[128];
+                snprintf(cause, sizeof(cause), "curva: giro final sem folga; diagonal=%.1fmm frente=%.2fcm direita=%.2fcm",
+                         guidedCornerShiftTravelMm, front.distanceCm, rightCm);
+                safeStop(cause);
+                return;
+            }
+            guidedLateralClearance.reset();
+            const float degrees = turnEntry ? nav::GUIDED_CORNER_ENTRY_DEG : nav::GUIDED_CORNER_EXIT_DEG;
+            motors.setEnabled(true);
+            if (!motion.startGuidedPivot(degrees * cornerTurnDirection)) { safeStop("falha ao iniciar giro parcial"); return; }
+            trackStartedMotion();
+            if (turnEntry)
+                Serial.printf("%s: primeiro giro a %s %.0fgraus\n", turnLogPrefix,
+                              cornerTurnDirection > 0 ? "esquerda" : "direita", degrees);
+            else
+                Serial.printf("%s: segundo giro a %s %.0fgraus; diagonal=%.1fmm interior=%.2fcm exterior=%.2fcm; folga estimada=%.2fcm\n",
+                              turnLogPrefix, cornerTurnDirection > 0 ? "esquerda" : "direita", degrees,
+                              guidedCornerShiftTravelMm, snapshot.left.distanceCm, rightCm,
+                              nav::guidedCornerRightGapCm(rightCm));
+            return;
+        }
+        const float exitMm = mazeConfig.cellSizeMm - nav::guidedCornerExitProgressMm(guidedCornerShiftTravelMm);
+        motors.setEnabled(true);
+        if (!motion.startMoveLinear(exitMm)) { safeStop("falha ao iniciar avanco apos o giro"); return; }
+        trackStartedMotion();
+        Serial.printf("TESTE ETAPA 5/5: avancar %.1fmm apos a curva\n", exitMm);
         return;
     }
 

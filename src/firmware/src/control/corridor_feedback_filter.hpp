@@ -2,7 +2,7 @@
 #include <array>
 #include <cmath>
 #include <cstdint>
-#include "config/sonar_sampling.hpp"
+#include "../config/sonar_sampling.hpp"
 
 // Only used for lateral steering. Front emergency checks bypass this window.
 // A window consists of distinct hardware frames, never repeated control ticks.

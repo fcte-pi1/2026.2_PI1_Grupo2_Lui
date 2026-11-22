@@ -104,7 +104,7 @@ public:
         return mission.observeCurrentCell();
     }
 
-    nav::MissionUpdate completeMotion(nav::MissionUpdate action) {
+    nav::MissionUpdate completeMotion(nav::MissionUpdate action, bool frontExitConfirmed = false) {
         if (action.state == nav::MissionState::Failed ||
             action.action == nav::MissionAction::Brake) return action;
 
@@ -123,7 +123,7 @@ public:
             orientation.setYawDegrees(yaw, timestamp);
             odometry.setAccumulatedDistanceMm(0, timestamp);
             estimator.updatePose();
-            return mission.onMotionFinished(true);
+            return mission.onMotionFinished(true, frontExitConfirmed);
         }
 
         const bool moveForward = action.action == nav::MissionAction::MoveForwardOneCell;
@@ -267,6 +267,7 @@ void test_retaguarda_desconhecida_exige_giro_e_nova_observacao(void) {
     const auto scan=fixture.observe();
     TEST_ASSERT_EQUAL(nav::MissionState::Turning,scan.state);
     TEST_ASSERT_EQUAL(nav::MissionAction::TurnRight90,scan.action);
+    TEST_ASSERT_FALSE(scan.turnTowardNextCell);
     const auto stopped=fixture.completeMotion(scan);
     TEST_ASSERT_EQUAL(nav::MissionState::AwaitingObservation,stopped.state);
     TEST_ASSERT_EQUAL(nav::MissionAction::None,stopped.action);
@@ -274,10 +275,39 @@ void test_retaguarda_desconhecida_exige_giro_e_nova_observacao(void) {
     const auto next=fixture.observe();
     TEST_ASSERT_EQUAL(nav::MissionState::Turning,next.state);
     TEST_ASSERT_EQUAL(nav::MissionAction::TurnRight90,next.action);
+    TEST_ASSERT_TRUE(next.turnTowardNextCell);
     TEST_ASSERT_EQUAL(nav::MissionState::AwaitingObservation,fixture.completeMotion(next).state);
     TEST_ASSERT_EQUAL(0,fixture.mission.x());TEST_ASSERT_EQUAL(0,fixture.mission.y());
     TEST_ASSERT_EQUAL(nav::MissionState::AwaitingObservation,fixture.completeMotion(fixture.observe()).state);
     TEST_ASSERT_EQUAL(0,fixture.mission.x());TEST_ASSERT_EQUAL(1,fixture.mission.y());
+}
+
+void test_curva_com_saida_confirmada_avanca_antes_de_mapear_a_proxima_celula(void) {
+    MissionFixture fixture;
+    const auto config = makeMazeConfig(MazeFormat::Maze4x4, MazeCorner::TopLeft, Direction::South);
+    TEST_ASSERT_TRUE(fixture.begin(config));
+    fixture.truth.setWall(0, 0, mm::Dir::South, true);
+    const auto turn = fixture.observe();
+    TEST_ASSERT_EQUAL(nav::MissionAction::TurnLeft90, turn.action);
+    TEST_ASSERT_TRUE(turn.turnTowardNextCell);
+
+    const auto exit = fixture.completeMotion(turn, true);
+    TEST_ASSERT_EQUAL(nav::MissionState::Moving, exit.state);
+    TEST_ASSERT_EQUAL(nav::MissionAction::MoveForwardOneCell, exit.action);
+    TEST_ASSERT_EQUAL(0, fixture.mission.x());
+    TEST_ASSERT_EQUAL(0, fixture.mission.y());
+    TEST_ASSERT_EQUAL(nav::MissionState::AwaitingObservation, fixture.completeMotion(exit).state);
+    TEST_ASSERT_EQUAL(1, fixture.mission.x());
+    TEST_ASSERT_EQUAL(0, fixture.mission.y());
+
+    MissionFixture exploration;
+    const auto scanConfig = makeMazeConfig(MazeFormat::Maze4x4, MazeCorner::TopLeft, Direction::North);
+    TEST_ASSERT_TRUE(exploration.begin(scanConfig));
+    exploration.truth.setWall(0, 0, mm::Dir::East, true);
+    const auto scan = exploration.observe();
+    TEST_ASSERT_EQUAL(nav::MissionAction::TurnRight90, scan.action);
+    TEST_ASSERT_FALSE(scan.turnTowardNextCell);
+    TEST_ASSERT_EQUAL(nav::MissionState::Failed, exploration.completeMotion(scan, true).state);
 }
 void test_sensor_frontal_sem_eco_invalido_nao_autoriza_movimento(void) {
     MissionFixture fixture;
@@ -380,6 +410,7 @@ void test_gira_a_esquerda_e_recua_quando_o_caminho_exige(void) {
     const nav::MissionUpdate turn = leftTurn.observe();
     TEST_ASSERT_EQUAL(nav::MissionState::Turning, turn.state);
     TEST_ASSERT_EQUAL(nav::MissionAction::TurnLeft90, turn.action);
+    TEST_ASSERT_TRUE(turn.turnTowardNextCell);
     const auto afterTurn=leftTurn.completeMotion(turn);
     TEST_ASSERT_EQUAL(nav::MissionState::AwaitingObservation,afterTurn.state);
     TEST_ASSERT_EQUAL(nav::MissionAction::None,afterTurn.action);
@@ -531,6 +562,7 @@ int main(int, char**) {
     RUN_TEST(test_erro_antes_de_iniciar_e_configuracao_invalida);
     RUN_TEST(test_snapshot_nao_inicializado_e_falha_de_persistencia);
     RUN_TEST(test_retaguarda_desconhecida_exige_giro_e_nova_observacao);
+    RUN_TEST(test_curva_com_saida_confirmada_avanca_antes_de_mapear_a_proxima_celula);
     RUN_TEST(test_sensor_frontal_sem_eco_invalido_nao_autoriza_movimento);
     RUN_TEST(test_finalizacao_de_movimento_rejeita_resultados_invalidos);
     RUN_TEST(test_pose_fora_dos_limites_e_rejeitada_e_conversoes_usam_255);

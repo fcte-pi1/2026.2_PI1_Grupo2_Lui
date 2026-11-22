@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-#include "config/sonar_sampling.hpp"
+#include "../config/sonar_sampling.hpp"
 // Wait at the cell centre for three distinct coherent, valid frames.
 class CellObservationGate {
 public:

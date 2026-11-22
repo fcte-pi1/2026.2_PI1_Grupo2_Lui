@@ -100,7 +100,7 @@ pio device monitor -e esp32dev -p /dev/cu.usbserial-0001 -b 115200
 
 Aguarde a calibração da IMU com o robô imóvel e a mensagem **PRONTO E PARADO**. Gravar, ligar a bateria ou pressionar EN não inicia a missão automaticamente.
 
-Clique no terminal do monitor para dar foco. Envie **uma letra por comando**, em minúscula. O monitor padrão envia os caracteres conforme você digita; Enter não é necessário. Se você adicionou `send_on_enter` aos filtros, pressione Enter para enviá-los. Não digite frases: cada letra pode corresponder a um comando.
+Clique no terminal do monitor para dar foco. Envie **uma letra por comando**, respeitando maiúsculas e minúsculas. O monitor padrão envia os caracteres conforme você digita; Enter não é necessário. Se você adicionou `send_on_enter` aos filtros, pressione Enter para enviá-los. Não digite frases: cada letra pode corresponder a um comando.
 
 | Comando | Resultado |
 |---|---|
@@ -114,10 +114,13 @@ Clique no terminal do monitor para dar foco. Envie **uma letra por comando**, em
 | `g` | Prepara missão autônoma e arma partida após **5 segundos** |
 | `t` | Teste guiado específico: até duas células, aproximar, esquerda, uma célula |
 | `c` | Continuação guiada da esquina: aproximar, esquerda, uma célula |
+| `v` / `V` | Ensaio de giro em piso livre. `v` gira 90° à esquerda e `V` à direita, após calibrar a IMU e aguardar 5 s |
 
 `s` e `d` não fazem uma medição nova se os sensores estiverem pausados. Para medir parado, use `i`, ou `r` e depois `s`. `t` e `c` são testes de movimento e não são comandos de diagnóstico parado.
 
 **Ctrl+C fecha o monitor; não é comando de parada do robô. Envie `x` antes de fechar, se quiser interromper uma tentativa.** [Monitor oficial do PlatformIO](https://docs.platformio.org/en/latest/core/userguide/device/cmd_monitor.html)
+
+Para comparar os giros no piso, marque o ponto médio entre as rodas motrizes, posicione uma régua no chão e filme de cima. Deixe o robô imóvel até o fim da espera e repita cada sentido na mesma superfície. As linhas `GIRO AMOSTRA` mostram os deslocamentos assinados de cada roda, as contagens e o ângulo da IMU e dos encoders. A linha `GIRO RESULTADO` informa a deriva final e a maior deriva estimada durante o giro. Compare essa estimativa com o deslocamento da marca no vídeo para avaliar escorregamento e erros nas escalas dos encoders.
 
 ## 7. Iniciar a missão completa — após validar a montagem
 
@@ -203,11 +206,13 @@ A revisão foi gravada em esp32dev_remote_test. No ensaio real subsequente não 
 
 ## Aproximação autônoma da parede antes da curva
 
-O avanço normal habilita o modo lento quando uma leitura frontal válida chega a 12 cm. O limite de velocidade passa a 20 mm/s e permanece até terminar o trecho. O modo desabilita a correção lateral (aberturas não puxam o robô para o lado), mantendo o controle de rumo pela IMU. O prazo desse trecho aumenta para até 12 s, sem alterar os 180 s da missão.
+Na missão `g`, o avanço tem limite de 60 mm/s e passa a 20 mm/s quando uma leitura frontal válida chega a 12 cm. O modo lento usa a IMU e os sensores laterais para corrigir o rumo. O prazo do trecho lento aumenta para até 12 s, dentro dos 180 s da missão.
 
 Enquanto a velocidade medida ainda exceder 30 mm/s, a reserva frontal permanece 5 cm. Após desacelerar, a reserva passa a 2 cm e a referência de parada é 3 cm, com tolerância de 0,5 cm. Nos centímetros finais, o alvo pode ser refinado dentro de ±20 mm da célula nominal; não há extensão livre do avanço. Parede detectada antes dessa faixa provoca parada de diagnóstico.
 
 Quando a parede foi usada para refinar o alvo ou frear a aproximação, confirmar o deslocamento exige quadro fresco, leitura frontal de 3±0,5 cm e avanço dos encoders dentro de ±20 mm do passo da célula. Células de corredor aberto são confirmadas pelo avanço dos encoders, sem exigir parede a 3 cm; em seguida aguardam observações válidas antes de outra ação. Se as referências usadas não forem confirmadas, a missão para com diagnóstico da chegada. Essas referências não substituem a medição física da posição do eixo nem comprovam a envoltória do chassi durante uma curva.
+
+Ao encontrar uma parede próxima à frente e uma saída lateral confirmada na rota, a missão executa a curva do ensaio guiado. Gira 65°, avança até 50 mm na diagonal com alvo perpendicular de 2,0 cm da parede externa e completa os 25°. A saída à direita espelha os sensores e o sentido de giro. Após confirmar a abertura de frente, a missão desconta do próximo avanço a parte da diagonal percorrida na direção de saída. O mapa recebe a próxima observação ao completar a célula.
 
 A recuperação de eco permanece ativa com o robô freado; ecos inválidos não viram corredor livre. O modo de aproximação é limpo antes da próxima operação. Testes de política, velocidade, refinamento limitado, prazo e transição para giro: suíte completa com 182 casos aprovados. Perfil compilado: esp32dev_remote_test.
 

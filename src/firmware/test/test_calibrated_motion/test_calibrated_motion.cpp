@@ -7,6 +7,8 @@
 #include "config/sensor_calibration.hpp"
 #include "hal/ultrasonic_us100.hpp"
 #include "control/corridor_feedback_filter.hpp"
+#include "control/guided_lateral_clearance.hpp"
+#include "control/guided_wall_recovery.hpp"
 #include "control/start_delay.hpp"
 #include "control/front_echo_recovery.hpp"
 #include "control/front_approach_policy.hpp"
@@ -45,6 +47,9 @@ struct Fixture {
  void tick(int32_t l,int32_t r,float y,float g=0,uint32_t ms=5){counts[32]=l;counts[25]=r;yaw=y;gyro=g;fakeNow+=ms;motion.update(ms/1000.0f);}
  bool braking(){return fakePwm[16]==255 && fakePwm[18]==255 && fakeDigital[17] && fakeDigital[19];}
  void settle(float y){for(int n=0;n<210 && motion.getStatus()==MotionStatus::Running;++n)tick(counts[32],counts[25],y);}
+ void tickMm(float l,float r,float y,float g=0,uint32_t ms=5){
+     tick(lroundf(l*cfg.leftCountsPerMm),lroundf(r*cfg.rightCountsPerMm),y,g,ms);
+ }
 };
 void setUp(){}
 void tearDown(){}
@@ -68,6 +73,234 @@ void test_heading_correction_does_not_brake_right_for_encoder_lead(){
  for(int n=1;n<=300;++n){float mm=n*0.3f;f.tick(lroundf(mm*f.cfg.leftCountsPerMm),lroundf(mm*1.08f*f.cfg.rightCountsPerMm),-1);}
  TEST_ASSERT_EQUAL((int)MotionStatus::Running,(int)f.motion.getStatus());
  TEST_ASSERT_FALSE(fakePwm[18]==255 && fakeDigital[19]);TEST_ASSERT_TRUE(fakePwm[18]<=220);}
+
+void test_guided_pivot_syncs_both_wheels_and_targets_corridor_heading() {
+    Fixture f;
+    yaw = 6.0f;
+    f.arm();
+    TEST_ASSERT_TRUE(f.motion.startGuidedPivot(90.0f));
+    for (int step = 1; step <= 6; ++step)
+        f.tickMm(-step, step, 6.0f + step, 10.0f, 100);
+    TEST_ASSERT_EQUAL(HIGH, fakeDigital[17]);
+    TEST_ASSERT_LESS_THAN(255, fakePwm[16]);
+    TEST_ASSERT_EQUAL(LOW, fakeDigital[19]);
+    TEST_ASSERT_GREATER_THAN(0, fakePwm[18]);
+
+    float finalYaw = 12.0f;
+    for (float angle = 7.0f; angle <= 84.0f && !f.braking(); angle += 0.5f) {
+        const float arc = angle * 3.14159265f / 180.0f * f.cfg.wheelTrackMm * 0.5f;
+        finalYaw = angle + 6.0f;
+        f.tickMm(-arc, arc, finalYaw, 12.5f, 40);
+    }
+    TEST_ASSERT_TRUE(f.braking());
+    f.settle(finalYaw);
+    TEST_ASSERT_TRUE(f.motion.getStatus() == MotionStatus::Succeeded);
+    TEST_ASSERT_FLOAT_WITHIN(1.2f, 90.0f, yaw);
+    TEST_ASSERT_FLOAT_WITHIN(1.0f, 0.0f, f.motion.getDistanceTravelledMm());
+}
+
+void test_guided_pivot_preserves_drive_and_ramp_when_the_reverse_wheel_starts_first() {
+    for (const bool leftTurn : {true, false}) {
+        Fixture f;
+        f.arm();
+        TEST_ASSERT_TRUE(f.motion.startGuidedPivot(leftTurn ? 90.0f : -90.0f));
+        const int reversePin = leftTurn ? 16 : 18;
+        const int forwardPin = leftTurn ? 18 : 16;
+        const float direction = leftTurn ? 1.0f : -1.0f;
+        for (int step = 1; step <= 5; ++step) {
+            const float progress = step * 0.2f;
+            const float leftMm = leftTurn ? -2.19f * progress : 0.0f;
+            const float rightMm = leftTurn ? 0.75f * progress : -1.50f * progress;
+            f.tickMm(leftMm, rightMm, progress * direction, 4.0f * direction, 50);
+        }
+        TEST_ASSERT_TRUE(f.motion.getStatus() == MotionStatus::Running);
+        TEST_ASSERT_EQUAL(HIGH, fakeDigital[reversePin + 1]);
+        TEST_ASSERT_LESS_THAN(255, fakePwm[reversePin]);
+        TEST_ASSERT_EQUAL(LOW, fakeDigital[forwardPin + 1]);
+        TEST_ASSERT_GREATER_THAN(135, fakePwm[forwardPin]);
+    }
+}
+
+void test_guided_pivot_still_times_out_if_angular_progress_stops() {
+    Fixture f;
+    f.arm();
+    TEST_ASSERT_TRUE(f.motion.startGuidedPivot(90.0f));
+    for (int sample = 1; sample <= 15 && !f.braking(); ++sample)
+        f.tickMm(-0.5f * sample, 0.5f * sample, 1.0f, 0.0f, 50);
+    TEST_ASSERT_TRUE(f.braking());
+    f.settle(1.0f);
+    TEST_ASSERT_TRUE(f.motion.getFailureReason() == MotionFailureReason::MotionTimeout);
+}
+
+void test_guided_right_pivot_reports_signed_wheel_travel() {
+    Fixture f;
+    yaw = -5.0f;
+    f.arm();
+    TEST_ASSERT_TRUE(f.motion.startGuidedPivot(-90.0f));
+    TEST_ASSERT_TRUE(f.motion.getMotionType() == MotionType::TurnRight90);
+    for (float turn = 0.5f; turn <= 85.0f && !f.braking(); turn += 0.5f) {
+        const float arc = turn * 0.01745329252f * f.cfg.wheelTrackMm * 0.5f;
+        f.tickMm(arc, -arc, -5.0f - turn, -12.5f, 40);
+    }
+    TEST_ASSERT_TRUE(f.braking());
+    f.settle(yaw);
+    TEST_ASSERT_TRUE(f.motion.getStatus() == MotionStatus::Succeeded);
+    const auto travel = f.motion.getWheelTravel();
+    TEST_ASSERT_GREATER_THAN(0, travel.leftTicks);
+    TEST_ASSERT_LESS_THAN(0, travel.rightTicks);
+    TEST_ASSERT_FLOAT_WITHIN(1.2f, -90.0f, yaw);
+    TEST_ASSERT_FLOAT_WITHIN(1.0f, 0.0f, travel.leftMm + travel.rightMm);
+}
+
+void test_guided_pivot_trims_overshoot_after_settling() {
+    Fixture f;
+    f.arm();
+    TEST_ASSERT_TRUE(f.motion.startGuidedPivot(90.0f));
+    const float mmPerDegree = 3.14159265f / 180.0f * f.cfg.wheelTrackMm * 0.5f;
+    for (float angle = 0.5f; angle <= 90.0f && !f.braking(); angle += 0.5f)
+        f.tickMm(-angle * mmPerDegree, angle * mmPerDegree, angle, 12.5f, 40);
+    TEST_ASSERT_TRUE(f.braking());
+    for (int n = 0; n < 66; ++n) f.tickMm(-92.5f * mmPerDegree, 92.5f * mmPerDegree, 92.5f);
+    TEST_ASSERT_TRUE(f.motion.getStatus() == MotionStatus::Running);
+    TEST_ASSERT_EQUAL(LOW, fakeDigital[17]);
+    TEST_ASSERT_EQUAL(HIGH, fakeDigital[19]);
+    f.tickMm(-90.2f * mmPerDegree, 90.2f * mmPerDegree, 90.2f, -8.0f);
+    TEST_ASSERT_TRUE(f.braking());
+    f.settle(90.2f);
+    TEST_ASSERT_TRUE(f.motion.getStatus() == MotionStatus::Succeeded);
+}
+
+void test_guided_wall_recovery_counts_the_reverse_in_the_pending_target() {
+    Fixture f;
+    GuidedWallRecovery recovery;
+    f.arm();
+    TEST_ASSERT_TRUE(f.motion.startMoveLinear(100.0f));
+    f.tickMm(50.0f, 50.0f, 0.0f);
+    TEST_ASSERT_TRUE(f.motion.setSensorPaused(true));
+    recovery.request(false, true, false, false);
+    f.motion.brakeForObstacle();
+    f.settle(0.0f);
+    TEST_ASSERT_TRUE(f.motion.getFailureReason() == MotionFailureReason::Obstacle);
+    const float retreat = recovery.retreatDistance(f.motion.getDistanceTravelledMm(), f.motion.getLinearTargetMm());
+    TEST_ASSERT_FLOAT_WITHIN(0.1f, 30.0f, retreat);
+    f.arm();
+    TEST_ASSERT_TRUE(f.motion.startGuidedRetreat(retreat));
+    recovery.startAdjustment(40.99f);
+    for (int n = 1; n <= 60 && !f.braking(); ++n)
+        f.tickMm(50.0f - n * 0.5f, 50.0f - n * 0.5f, 0.0f, 0.0f, 25);
+    f.settle(0.0f);
+    TEST_ASSERT_TRUE(f.motion.getStatus() == MotionStatus::Succeeded);
+    recovery.finishAdjustment(f.motion.getDistanceTravelledMm(), true);
+    TEST_ASSERT_TRUE(recovery.phase == GuidedWallRecovery::Phase::Checking);
+    TEST_ASSERT_FLOAT_WITHIN(0.1f, 100.0f - 50.0f - f.motion.getDistanceTravelledMm(), recovery.remainingMm);
+    TEST_ASSERT_EQUAL_FLOAT(-6.0f, recovery.steeringOffset(3.0f, 5.0f));
+
+    const float leftStartMm = counts[32] / f.cfg.leftCountsPerMm;
+    const float rightStartMm = counts[25] / f.cfg.rightCountsPerMm;
+    f.arm();
+    TEST_ASSERT_TRUE(f.motion.startMoveLinear(recovery.remainingMm));
+    f.motion.setGuidedLateralSteering(true, recovery.steeringOffset(3.0f, 5.0f));
+    for (int n = 1; n <= 160 && !f.braking(); ++n)
+        f.tickMm(leftStartMm + n * 0.5f, rightStartMm + n * 0.5f, 0.0f, 0.0f, 25);
+    f.settle(0.0f);
+    TEST_ASSERT_TRUE(f.motion.getStatus() == MotionStatus::Succeeded);
+    TEST_ASSERT_FLOAT_WITHIN(2.0f, 100.0f, 0.5f *
+        (counts[32] / f.cfg.leftCountsPerMm + counts[25] / f.cfg.rightCountsPerMm));
+}
+
+void test_guided_wall_recovery_requires_traversed_space() {
+    GuidedWallRecovery recovery;
+    recovery.request(true, false, false, false);
+    TEST_ASSERT_EQUAL_FLOAT(0.0f, recovery.retreatDistance(12.0f, 180.0f));
+    TEST_ASSERT_TRUE(recovery.failedAdjustmentMm < 0.0f);
+    TEST_ASSERT_EQUAL_FLOAT(6.0f, recovery.steeringOffset(7.0f, 3.0f));
+}
+
+void test_guided_corner_recovery_preserves_diagonal_and_checks_front_echo() {
+    GuidedWallRecovery recovery;
+    recovery.request(false, false, true, false);
+    const float limitMm = nav::guidedCornerRetreatLimitMm(34.0f);
+    const float retreatMm = recovery.retreatDistance(34.0f, 50.0f, limitMm);
+    TEST_ASSERT_FLOAT_WITHIN(0.01f, 8.5f, retreatMm);
+    TEST_ASSERT_TRUE(recovery.phase == GuidedWallRecovery::Phase::BeforeAdjustment);
+    recovery.startAdjustment(40.99f);
+    TEST_ASSERT_TRUE(recovery.frontAllowsRetreat(41.60f));
+    TEST_ASSERT_TRUE(recovery.frontAllowsRetreat(40.50f));
+    TEST_ASSERT_FALSE(recovery.frontAllowsRetreat(38.0f));
+    TEST_ASSERT_FALSE(recovery.frontAllowsRetreat(NAN));
+    recovery.finishAdjustment(-retreatMm, true);
+    TEST_ASSERT_TRUE(nav::guidedCornerShiftReached(34.0f - retreatMm));
+
+    GuidedWallRecovery frontContact;
+    frontContact.request(true, false, false, false);
+    TEST_ASSERT_EQUAL_FLOAT(30.0f, frontContact.retreatDistance(47.11f, 50.0f));
+    frontContact.startAdjustment(NAN);
+    TEST_ASSERT_TRUE(frontContact.clearingFrontBlindZone());
+    frontContact.observeFront(2.92f);
+    TEST_ASSERT_FALSE(frontContact.clearingFrontBlindZone());
+    TEST_ASSERT_TRUE(frontContact.frontAllowsRetreat(3.12f));
+}
+
+void test_guided_recovery_can_retry_over_previously_verified_distance() {
+    GuidedWallRecovery recovery;
+    recovery.request(false, false, true, false);
+    TEST_ASSERT_EQUAL_FLOAT(30.0f, recovery.retreatDistance(60.0f, 100.0f));
+    recovery.startAdjustment(45.0f);
+    recovery.finishAdjustment(-29.0f, true);
+    for (int attempt = 0; attempt < 8; ++attempt) {
+        recovery.phase = GuidedWallRecovery::Phase::Resuming;
+        recovery.request(false, false, true, false);
+        TEST_ASSERT_EQUAL_FLOAT(28.0f, recovery.retreatDistance(2.0f, recovery.remainingMm));
+        recovery.startAdjustment(45.0f);
+        recovery.finishAdjustment(-2.0f, true);
+    }
+    TEST_ASSERT_EQUAL_FLOAT(100.0f, recovery.originalTargetMm());
+}
+
+void test_guided_recovery_preserves_direction_and_chooses_reachable_centre() {
+    GuidedWallRecovery recovery;
+    recovery.request(false, false, true, false);
+    TEST_ASSERT_EQUAL_FLOAT(30.0f, recovery.retreatDistance(70.0f, 180.0f));
+    recovery.startAdjustment(25.0f);
+    recovery.finishAdjustment(-10.0f, false);
+    TEST_ASSERT_TRUE(recovery.failedAdjustmentMm < 0.0f);
+    TEST_ASSERT_EQUAL_FLOAT(120.0f, recovery.remainingMm);
+    TEST_ASSERT_EQUAL_FLOAT(0.0f, recovery.centreRetreatMm(true, 160.0f));
+    recovery.planAdjustment(15.0f);
+    recovery.startAdjustment(26.0f);
+    recovery.finishAdjustment(0.0f, false);
+    TEST_ASSERT_TRUE(recovery.failedAdjustmentMm > 0.0f);
+    TEST_ASSERT_EQUAL_FLOAT(55.0f, recovery.availableRetreatMm());
+
+    GuidedWallRecovery nearerStart;
+    nearerStart.request(false, true, false, false);
+    TEST_ASSERT_EQUAL_FLOAT(30.0f, nearerStart.retreatDistance(60.0f, 180.0f));
+    nearerStart.startAdjustment(30.0f);
+    nearerStart.finishAdjustment(-28.0f, true);
+    TEST_ASSERT_EQUAL_FLOAT(27.0f, nearerStart.centreRetreatMm(true, 35.0f));
+}
+
+void test_guided_recovery_detects_motion_against_either_linear_command() {
+    for (const float direction : {-1.0f, 1.0f}) {
+        Fixture f;
+        f.arm();
+        TEST_ASSERT_TRUE(f.motion.startMoveLinear(30.0f * direction));
+        f.tickMm(-7.0f * direction, -7.0f * direction, 0.0f);
+        TEST_ASSERT_TRUE(f.braking());
+        f.settle(0.0f);
+        TEST_ASSERT_TRUE(f.motion.getFailureReason() == MotionFailureReason::WrongDirection);
+    }
+}
+
+void test_guided_centring_uses_opposite_wall_and_rejects_missing_echo() {
+    GuidedLateralClearance clearance;
+    float offset = 0.0f;
+    TEST_ASSERT_TRUE(clearance.oppositeWallOffset(false, true, 4.0f, NAN, offset));
+    TEST_ASSERT_GREATER_THAN_FLOAT(0.0f, offset);
+    TEST_ASSERT_TRUE(clearance.oppositeWallOffset(true, false, NAN, 4.0f, offset));
+    TEST_ASSERT_LESS_THAN_FLOAT(0.0f, offset);
+    TEST_ASSERT_FALSE(clearance.oppositeWallOffset(true, false, 1.8f, NAN, offset));
+}
 void test_turn_180_crosses_yaw_wrap(){
  Fixture f;yaw=-170;f.arm();TEST_ASSERT_TRUE(f.motion.startTurnAround180());
  float finalYaw=yaw;
@@ -100,17 +333,76 @@ void test_nonfinite_imu_never_generates_motor_output(){Fixture f;f.arm();f.motio
 void test_guided_route_is_two_forward_approach_left_forward(){
  nav::GuidedRoute route;
  const nav::GuidedAction expected[]={nav::GuidedAction::ForwardCell,nav::GuidedAction::ForwardCell,
- nav::GuidedAction::ApproachFrontWall,nav::GuidedAction::TurnLeft90,nav::GuidedAction::ForwardCell};
- for(int i=0;i<5;++i){TEST_ASSERT_EQUAL(i,route.step());TEST_ASSERT_EQUAL((int)expected[i],(int)route.action());route.finishMovement(true);}
- TEST_ASSERT_EQUAL((int)nav::GuidedAction::Complete,(int)route.action());route.finishMovement(true);TEST_ASSERT_EQUAL(5,route.step());}
+ nav::GuidedAction::ApproachFrontWall,nav::GuidedAction::BeginLeftTurn,nav::GuidedAction::ShiftIntoCorner,
+ nav::GuidedAction::FinishLeftTurn,nav::GuidedAction::ForwardCell};
+ for(int i=0;i<7;++i){TEST_ASSERT_EQUAL(i,route.step());TEST_ASSERT_EQUAL((int)expected[i],(int)route.action());route.finishMovement(true);}
+ TEST_ASSERT_EQUAL((int)nav::GuidedAction::Complete,(int)route.action());route.finishMovement(true);TEST_ASSERT_EQUAL(7,route.step());}
 void test_guided_route_cannot_advance_after_failure(){nav::GuidedRoute route;route.finishMovement(true);route.finishMovement(false);
  route.finishMovement(true);TEST_ASSERT_EQUAL(1,route.step());TEST_ASSERT_EQUAL((int)nav::GuidedAction::Failed,(int)route.action());
  route.reset();TEST_ASSERT_EQUAL(0,route.step());TEST_ASSERT_EQUAL((int)nav::GuidedAction::ForwardCell,(int)route.action());}
 void test_corner_continuation_does_not_repeat_forward_cells(){nav::GuidedRoute route;route.resetAtCorner();
  TEST_ASSERT_EQUAL((int)nav::GuidedAction::ApproachFrontWall,(int)route.action());route.finishMovement(true);
- TEST_ASSERT_EQUAL((int)nav::GuidedAction::TurnLeft90,(int)route.action());route.finishMovement(true);
+ TEST_ASSERT_EQUAL((int)nav::GuidedAction::BeginLeftTurn,(int)route.action());route.finishMovement(true);
+ TEST_ASSERT_EQUAL((int)nav::GuidedAction::ShiftIntoCorner,(int)route.action());route.finishMovement(true);
+ TEST_ASSERT_EQUAL((int)nav::GuidedAction::FinishLeftTurn,(int)route.action());route.finishMovement(true);
  TEST_ASSERT_EQUAL((int)nav::GuidedAction::ForwardCell,(int)route.action());route.finishMovement(true);
  TEST_ASSERT_EQUAL((int)nav::GuidedAction::Complete,(int)route.action());}
+
+void test_guided_corner_shift_limits_advance_and_credits_exit_progress() {
+    TEST_ASSERT_EQUAL_FLOAT(0.0f, nav::guidedCornerShiftMm(12.0f, 3.6f));
+    TEST_ASSERT_EQUAL_FLOAT(0.0f, nav::guidedCornerShiftMm(7.6f, 6.0f));
+    TEST_ASSERT_EQUAL_FLOAT(0.0f, nav::guidedCornerShiftMm(12.0f, NAN));
+    TEST_ASSERT_EQUAL_FLOAT(0.0f, nav::guidedCornerShiftMm(44.04f, 4.49f));
+    const float shiftMm = nav::guidedCornerShiftMm(44.04f, 4.91f);
+    TEST_ASSERT_EQUAL_FLOAT(50.0f, shiftMm);
+    TEST_ASSERT_FLOAT_WITHIN(0.1f, 45.3f, nav::guidedCornerExitProgressMm(shiftMm));
+    TEST_ASSERT_FLOAT_WITHIN(0.1f, 43.0f, nav::guidedCornerShiftMm(9.3f, 4.91f));
+    TEST_ASSERT_EQUAL_FLOAT(50.0f, nav::guidedCornerShiftMm(12.0f, 6.0f));
+    TEST_ASSERT_FALSE(nav::guidedCornerShiftReached(24.9f));
+    TEST_ASSERT_TRUE(nav::guidedCornerShiftReached(25.0f));
+}
+
+void test_guided_corner_brakes_at_projected_right_wall_target() {
+    TEST_ASSERT_EQUAL_FLOAT(65.0f, nav::GUIDED_CORNER_ENTRY_DEG);
+    TEST_ASSERT_EQUAL_FLOAT(25.0f, nav::GUIDED_CORNER_EXIT_DEG);
+    TEST_ASSERT_FLOAT_WITHIN(0.01f, 2.0f, nav::guidedCornerRightGapCm(2.21f));
+    TEST_ASSERT_FALSE(nav::guidedCornerBrakeAtRightTarget(5.87f, 5.50f));
+    TEST_ASSERT_FALSE(nav::guidedCornerBrakeAtRightTarget(2.50f, 2.30f));
+    TEST_ASSERT_TRUE(nav::guidedCornerBrakeAtRightTarget(2.27f, 2.03f));
+    TEST_ASSERT_TRUE(nav::guidedCornerBrakeAtRightTarget(2.20f, NAN));
+    TEST_ASSERT_FALSE(nav::guidedCornerBrakeAtRightTarget(NAN, 2.20f));
+}
+
+void test_mission_corner_requires_near_front_and_open_exit() {
+    TEST_ASSERT_TRUE(nav::missionCornerEligible(3.46f, 40.0f, 180.0f));
+    TEST_ASSERT_FALSE(nav::missionCornerEligible(22.0f, 40.0f, 180.0f));
+    TEST_ASSERT_FALSE(nav::missionCornerEligible(2.0f, 40.0f, 180.0f));
+    TEST_ASSERT_FALSE(nav::missionCornerEligible(3.46f, 4.0f, 180.0f));
+    TEST_ASSERT_FALSE(nav::missionCornerEligible(3.46f, NAN, 180.0f));
+}
+
+void test_guided_corner_pivots_use_a_common_ninety_degree_heading() {
+    for (const float direction : {1.0f, -1.0f}) {
+        Fixture f;
+        float accumulatedArc = 0.0f;
+        for (const float step : {nav::GUIDED_CORNER_ENTRY_DEG, nav::GUIDED_CORNER_EXIT_DEG}) {
+            const float startingYaw = yaw;
+            f.arm();
+            TEST_ASSERT_TRUE(f.motion.startGuidedPivot(step * direction));
+            float arc = 0.0f;
+            for (float turn = 0.5f; turn <= step + 1.0f && !f.braking(); turn += 0.5f) {
+                arc = turn * direction * 0.01745329252f * f.cfg.wheelTrackMm * 0.5f;
+                f.tickMm(-accumulatedArc - arc, accumulatedArc + arc,
+                         startingYaw + turn * direction, 12.5f * direction, 40);
+            }
+            TEST_ASSERT_TRUE(f.braking());
+            f.settle(yaw);
+            TEST_ASSERT_TRUE(f.motion.getStatus() == MotionStatus::Succeeded);
+            accumulatedArc += arc;
+        }
+        TEST_ASSERT_FLOAT_WITHIN(1.2f, 90.0f * direction, yaw);
+    }
+}
 void test_confirmed_geometry_is_17_free_plus_1_wall(){
  TEST_ASSERT_EQUAL(170,MazeSettings::CLEAR_CELL_MM);TEST_ASSERT_EQUAL(10,MazeSettings::WALL_THICKNESS_MM);
  TEST_ASSERT_EQUAL(180,MazeSettings::CELL_SIZE_MM);}
@@ -123,6 +415,186 @@ void test_opening_does_not_enter_wall_alignment_loop(){
  int leftPwm=fakePwm[16],rightPwm=fakePwm[18];
  Fixture b;b.arm();b.motion.startMoveForwardOneCell();b.tick(1,1,0);
  TEST_ASSERT_EQUAL(leftPwm,fakePwm[16]);TEST_ASSERT_EQUAL(rightPwm,fakePwm[18]);}
+void test_guided_advance_steers_before_single_wall_reaches_steering_clearance() {
+    for (const bool leftWall : {true, false}) {
+        GuidedLateralClearance clearance;
+        SonarSnapshot snapshot;
+        auto& wall = leftWall ? snapshot.left : snapshot.right;
+        wall = {true, 5.1f, 280};
+        snapshot.sampledAtMs = 100;
+        TEST_ASSERT_FALSE(clearance.update(snapshot).slow);
+        wall.distanceCm = 4.5f;
+        snapshot.sampledAtMs = 200;
+        const auto feedback = clearance.update(snapshot);
+        TEST_ASSERT_TRUE(feedback.slow);
+        TEST_ASSERT_FALSE(feedback.leftBlocked || feedback.rightBlocked);
+        TEST_ASSERT_EQUAL_FLOAT(feedback.yawOffsetDeg, clearance.update(snapshot).yawOffsetDeg);
+
+        Fixture f;
+        f.arm();
+        TEST_ASSERT_TRUE(f.motion.startMoveForwardOneCell());
+        f.motion.setGuidedLateralSteering(feedback.slow, feedback.yawOffsetDeg);
+        for (int n = 1; n <= 4; ++n) f.tick(n, n, 0, 0, 50);
+        const int outerWheel = leftWall ? 16 : 18;
+        const int innerWheel = leftWall ? 18 : 16;
+        TEST_ASSERT_EQUAL(LOW, fakeDigital[outerWheel + 1]);
+        TEST_ASSERT_EQUAL(LOW, fakeDigital[innerWheel + 1]);
+        TEST_ASSERT_GREATER_THAN(0, fakePwm[innerWheel]);
+        TEST_ASSERT_GREATER_THAN(fakePwm[innerWheel], fakePwm[outerWheel]);
+
+        wall.distanceCm = 4.6f;
+        snapshot.sampledAtMs = 300;
+        TEST_ASSERT_FALSE(clearance.update(snapshot).slow);
+    }
+}
+
+void test_guided_advance_uses_opposite_wall_when_echo_is_lost_after_fast_closing() {
+    GuidedLateralClearance clearance;
+    SonarSnapshot snapshot;
+    snapshot.left = {true, 4.3f, 220};
+    snapshot.sampledAtMs = 100;
+    TEST_ASSERT_FALSE(clearance.update(snapshot).leftBlocked);
+    snapshot.left = {true, 3.0f, 145};
+    snapshot.sampledAtMs = 200;
+    TEST_ASSERT_FALSE(clearance.update(snapshot).leftBlocked);
+    snapshot.left = {false, NAN, 0};
+    snapshot.right = {true, 4.58f, 228};
+    snapshot.sampledAtMs = 300;
+    const auto dropped = clearance.update(snapshot);
+    TEST_ASSERT_TRUE(dropped.leftUncertain);
+    TEST_ASSERT_FALSE(dropped.leftBlocked);
+    float offset = 0.0f;
+    TEST_ASSERT_TRUE(clearance.oppositeWallOffset(dropped.leftUncertain, dropped.rightUncertain,
+                                                NAN, 4.58f, offset));
+    TEST_ASSERT_LESS_THAN_FLOAT(0.0f, offset);
+
+    clearance.reset();
+    snapshot.left = {true, 2.50f, 116};
+    snapshot.right = {true, 2.65f, 116};
+    const auto narrowCorridor = clearance.update(snapshot);
+    TEST_ASSERT_TRUE(narrowCorridor.slow);
+    TEST_ASSERT_FALSE(narrowCorridor.leftBlocked || narrowCorridor.rightBlocked);
+
+    snapshot.right = {false, 2.6f, 80, true};
+    snapshot.sampledAtMs = 400;
+    TEST_ASSERT_TRUE(clearance.update(snapshot).rightBlocked);
+    snapshot.right = {true, 1.9f, 110};
+    snapshot.sampledAtMs = 500;
+    TEST_ASSERT_TRUE(clearance.update(snapshot).rightBlocked);
+}
+
+void test_guided_corner_reposition_respects_clearance_and_completed_diagonal() {
+    TEST_ASSERT_FLOAT_WITHIN(0.1f, 12.0f, nav::guidedCornerRepositionMm(false, 45.0f, 3.62f, 42.8f));
+    TEST_ASSERT_FLOAT_WITHIN(0.01f, -4.3f, nav::guidedCornerRepositionMm(true, 45.0f, NAN, 29.8f));
+    TEST_ASSERT_EQUAL_FLOAT(0.0f, nav::guidedCornerRepositionMm(false, 45.0f, 2.0f, 42.8f));
+    TEST_ASSERT_EQUAL_FLOAT(0.0f, nav::guidedCornerRepositionMm(false, 45.0f, 5.5f, 63.0f));
+    TEST_ASSERT_EQUAL_FLOAT(0.0f, nav::guidedCornerRepositionMm(true, 45.0f, 3.0f, 28.0f));
+}
+
+void test_guided_pivot_retraces_obstacle_angle_and_keeps_heading_for_retry() {
+    Fixture f;
+    f.arm();
+    TEST_ASSERT_TRUE(f.motion.startGuidedPivot(25.0f));
+    for (int step = 1; step <= 25; ++step) {
+        const float progress = step / 25.0f;
+        f.tickMm(-19.10f * progress, 11.38f * progress, 14.54f * progress, 10.0f, 40);
+    }
+    f.motion.brakeForObstacle();
+    f.settle(14.54f);
+    TEST_ASSERT_TRUE(f.motion.getFailureReason() == MotionFailureReason::Obstacle);
+    TEST_ASSERT_FLOAT_WITHIN(0.3f, -3.86f, f.motion.getDistanceTravelledMm());
+
+    f.arm();
+    TEST_ASSERT_TRUE(f.motion.startGuidedPivotReturn());
+    for (int step = 1; step <= 30 && !f.braking(); ++step) {
+        const float remaining = 1.0f - step / 30.0f;
+        f.tickMm(-19.10f * remaining, 11.38f * remaining, 14.54f * remaining, -9.0f, 50);
+    }
+    TEST_ASSERT_TRUE(f.braking());
+    f.settle(yaw);
+    TEST_ASSERT_TRUE(f.motion.getStatus() == MotionStatus::Succeeded);
+    TEST_ASSERT_FLOAT_WITHIN(1.2f, 0.0f, yaw);
+
+    const float startLeft = counts[32] / f.cfg.leftCountsPerMm;
+    const float startRight = counts[25] / f.cfg.rightCountsPerMm;
+    f.arm();
+    TEST_ASSERT_TRUE(f.motion.startGuidedPivot(25.0f));
+    const float startYaw = yaw;
+    for (float angle = startYaw + 0.5f; angle <= 25.5f && !f.braking(); angle += 0.5f) {
+        const float arc = (angle - startYaw) * 0.01745329252f * f.cfg.wheelTrackMm * 0.5f;
+        f.tickMm(startLeft - arc, startRight + arc, angle, 10.0f, 50);
+    }
+    TEST_ASSERT_TRUE(f.braking());
+    f.settle(yaw);
+    TEST_ASSERT_TRUE(f.motion.getStatus() == MotionStatus::Succeeded);
+    TEST_ASSERT_FLOAT_WITHIN(1.2f, 25.0f, yaw);
+}
+
+void test_guided_lateral_avoidance_can_steer_during_slow_front_approach() {
+    Fixture f;
+    f.motion.setFrontApproachMode(true);
+    f.arm();
+    TEST_ASSERT_TRUE(f.motion.startMoveLinear(25));
+    f.motion.setGuidedLateralSteering(true, 3.0f);
+    f.tick(0, 0, 0);
+    TEST_ASSERT_EQUAL(LOW, fakeDigital[17]);
+    TEST_ASSERT_EQUAL(LOW, fakeDigital[19]);
+    TEST_ASSERT_GREATER_THAN(0, fakePwm[16]);
+    for (int n = 1; n <= 6; ++n) f.tick(n, n, 0, 0, 50);
+    TEST_ASSERT_EQUAL(LOW, fakeDigital[17]);
+    TEST_ASSERT_GREATER_THAN(fakePwm[16], fakePwm[18]);
+    TEST_ASSERT_TRUE(f.motion.isFrontApproachMode());
+}
+
+void test_guided_lateral_avoidance_slows_even_with_symmetric_clearance() {
+    int uncorrectedPwm;
+    {
+        Fixture f;
+        f.arm();
+        TEST_ASSERT_TRUE(f.motion.startMoveForwardOneCell());
+        for (int n = 1; n <= 11; ++n) f.tick(n, n, 0, 0, 50);
+        uncorrectedPwm = fakePwm[16];
+    }
+    Fixture f;
+    f.arm();
+    TEST_ASSERT_TRUE(f.motion.startMoveForwardOneCell());
+    f.motion.setGuidedLateralSteering(true, 0.0f);
+    for (int n = 1; n <= 11; ++n) f.tick(n, n, 0, 0, 50);
+    TEST_ASSERT_TRUE(fakePwm[16] < uncorrectedPwm);
+}
+
+void test_guided_slow_approach_drives_both_wheels_and_reports_real_right_stall() {
+    Fixture f;
+    f.motion.setFrontApproachMode(true);
+    f.arm();
+    TEST_ASSERT_TRUE(f.motion.startMoveLinear(34.9f));
+    f.motion.setGuidedLateralSteering(true, -3.0f);
+    f.tick(0, 0, 2.0f);
+    TEST_ASSERT_EQUAL(LOW, fakeDigital[19]);
+    TEST_ASSERT_GREATER_THAN(0, fakePwm[18]);
+    for (int n = 1; n <= 14; ++n) f.tick(n, 0, 2.0f, 0, 50);
+    f.settle(2.0f);
+    TEST_ASSERT_TRUE(f.motion.getFailureReason() == MotionFailureReason::RightWheelStalled);
+}
+
+void test_guided_centering_corrects_before_clearance_limit_and_through_opening() {
+    GuidedLateralClearance clearance;
+    SonarSnapshot snapshot;
+    snapshot.left = {true, 4.2f, 215};
+    snapshot.right = {true, 6.0f, 310};
+    GuidedLateralClearance::Feedback feedback;
+    for (snapshot.sampledAtMs = 100; snapshot.sampledAtMs <= 300; snapshot.sampledAtMs += 100)
+        feedback = clearance.update(snapshot);
+    TEST_ASSERT_FALSE(feedback.slow);
+    TEST_ASSERT_TRUE(feedback.yawOffsetDeg < 0.0f);
+
+    snapshot.right = {true, 19.0f, 1050};
+    TEST_ASSERT_TRUE(clearance.update(snapshot).yawOffsetDeg < 0.0f);
+    snapshot.sampledAtMs = 500;
+    snapshot.left = {true, 5.1f, 265};
+    TEST_ASSERT_EQUAL_FLOAT(0.0f, clearance.update(snapshot).yawOffsetDeg);
+}
+
 void test_front_approach_has_low_speed_and_can_brake_on_sensor_target(){
  Fixture f;f.motion.setFrontApproachMode(true);f.arm();TEST_ASSERT_TRUE(f.motion.startMoveLinear(25));
  for(int n=1;n<100;++n)f.tick(n/5,n/5,0);
@@ -136,6 +608,45 @@ void test_pre_corner_distance_respects_wall_and_cell_budget(){
  TEST_ASSERT_FLOAT_WITHIN(0.01f,100,nav::guidedPreCornerMoveMm(18));
  TEST_ASSERT_FLOAT_WITHIN(0.01f,0,nav::guidedPreCornerMoveMm(7));
  TEST_ASSERT_FLOAT_WITHIN(0.01f,0,nav::guidedPreCornerMoveMm(NAN));}
+void test_guided_corner_approaches_after_truncated_advance_and_long_front_echo() {
+    constexpr float cell = MazeSettings::CELL_SIZE_MM;
+    float remaining = 3 * cell - 175 - 120;
+    // Um eco curto no trecho anterior pode encurtá-lo. A 22 cm, a
+    // aproximação anterior pediria um movimento único de 190 mm.
+    auto plan = nav::planGuidedCorner(22.0f, cell, remaining);
+    TEST_ASSERT_TRUE(plan.action == nav::GuidedCornerAction::Advance);
+    TEST_ASSERT_FLOAT_WITHIN(0.01f, 140.0f, plan.distanceMm);
+    remaining -= plan.distanceMm;
+
+    plan = nav::planGuidedCorner(8.0f, cell, remaining);
+    TEST_ASSERT_TRUE(plan.action == nav::GuidedCornerAction::ApproachSlowly);
+    TEST_ASSERT_FLOAT_WITHIN(0.01f, 50.0f, plan.distanceMm);
+    remaining -= plan.distanceMm;
+    TEST_ASSERT_TRUE(nav::planGuidedCorner(3.0f, cell, remaining).action == nav::GuidedCornerAction::AtTarget);
+}
+
+void test_guided_corner_limits_travel_and_requires_room_to_turn() {
+    constexpr float cell = MazeSettings::CELL_SIZE_MM;
+    auto plan = nav::planGuidedCorner(45.0f, cell, 220.0f);
+    TEST_ASSERT_TRUE(plan.action == nav::GuidedCornerAction::Advance);
+    TEST_ASSERT_FLOAT_WITHIN(0.01f, cell, plan.distanceMm);
+    plan = nav::planGuidedCorner(27.0f, cell, 40.0f);
+    TEST_ASSERT_FLOAT_WITHIN(0.01f, 40.0f, plan.distanceMm);
+    TEST_ASSERT_TRUE(nav::planGuidedCorner(23.0f, cell, 0.0f).action == nav::GuidedCornerAction::NoTravelLeft);
+    TEST_ASSERT_TRUE(nav::planGuidedCorner(2.4f, cell, cell).action == nav::GuidedCornerAction::TooClose);
+    TEST_ASSERT_FALSE(nav::guidedLeftOpening(6.0f, cell));
+    TEST_ASSERT_FALSE(nav::guidedLeftOpening(NAN, cell));
+    TEST_ASSERT_TRUE(nav::guidedLeftOpening(15.0f, cell));
+}
+
+void test_guided_corner_log_reaches_slow_approach_without_a_short_restart() {
+    constexpr float cell = MazeSettings::CELL_SIZE_MM;
+    const float remaining = 3 * cell + FrontApproach::POSITION_TOLERANCE_MM - 178.64f - 177.52f - 147.10f;
+    const auto plan = nav::planGuidedCorner(8.29f, cell, remaining);
+    TEST_ASSERT_TRUE(plan.action == nav::GuidedCornerAction::ApproachSlowly);
+    TEST_ASSERT_FLOAT_WITHIN(0.01f, 52.9f, plan.distanceMm);
+}
+
 void test_sonar_calibrates_before_minimum_range_check(){
  UltrasonicUS100 sensor;sensor.begin(4,35);sensor.setDistanceOffsetCm(SensorCalibration::RIGHT_OFFSET_CM);
  fakeEchoPulse=115;auto value=sensor.measure();TEST_ASSERT_TRUE(value.valid);TEST_ASSERT_EQUAL(115,value.pulseUs);
@@ -344,6 +855,19 @@ void test_front_target_refinement_is_bounded_and_rejects_missing_or_early_readin
  TEST_ASSERT_FALSE(f.motion.refineFrontApproachTarget(2));
  f.motion.setSensorPaused(true);TEST_ASSERT_FALSE(f.motion.refineFrontApproachTarget(4));
 }
+void test_front_target_refinement_includes_progress_from_the_previous_segment() {
+    Fixture f;
+    f.arm();
+    TEST_ASSERT_TRUE(f.motion.startMoveLinear(140.0f));
+    f.motion.setFrontApproachMode(true);
+    for (int i = 1; i <= 1300; ++i) {
+        const float mm = i * 0.1f;
+        f.tick(lroundf(mm * f.cfg.leftCountsPerMm), lroundf(mm * f.cfg.rightCountsPerMm), 0);
+    }
+    TEST_ASSERT_FALSE(f.motion.refineFrontApproachTarget(4.0f));
+    TEST_ASSERT_TRUE(f.motion.refineFrontApproachTarget(4.0f, 40.0f));
+    TEST_ASSERT_FLOAT_WITHIN(1.0f, 140.0f, f.motion.getLinearTargetMm());
+}
 void test_front_approach_extended_deadline_allows_slow_completion(){
  Fixture f;f.cfg.forwardTimeoutMs=500;TEST_ASSERT_TRUE(f.motion.begin(f.cfg,{0,0,0}));
  f.arm();f.motion.startMoveForwardOneCell();f.motion.setFrontApproachMode(true);
@@ -465,6 +989,33 @@ void test_isolated_short_echo_brakes_then_resumes_the_same_motion(){
 }
 
 int main(){UNITY_BEGIN();
+ RUN_TEST(test_guided_corner_brakes_at_projected_right_wall_target);
+ RUN_TEST(test_mission_corner_requires_near_front_and_open_exit);
+ RUN_TEST(test_guided_corner_reposition_respects_clearance_and_completed_diagonal);
+ RUN_TEST(test_guided_pivot_retraces_obstacle_angle_and_keeps_heading_for_retry);
+ RUN_TEST(test_guided_pivot_preserves_drive_and_ramp_when_the_reverse_wheel_starts_first);
+ RUN_TEST(test_guided_pivot_still_times_out_if_angular_progress_stops);
+ RUN_TEST(test_guided_right_pivot_reports_signed_wheel_travel);
+ RUN_TEST(test_guided_corner_recovery_preserves_diagonal_and_checks_front_echo);
+ RUN_TEST(test_guided_recovery_can_retry_over_previously_verified_distance);
+ RUN_TEST(test_guided_corner_shift_limits_advance_and_credits_exit_progress);
+ RUN_TEST(test_guided_corner_pivots_use_a_common_ninety_degree_heading);
+ RUN_TEST(test_guided_pivot_syncs_both_wheels_and_targets_corridor_heading);
+ RUN_TEST(test_guided_pivot_trims_overshoot_after_settling);
+ RUN_TEST(test_guided_wall_recovery_counts_the_reverse_in_the_pending_target);
+ RUN_TEST(test_guided_wall_recovery_requires_traversed_space);
+ RUN_TEST(test_guided_recovery_preserves_direction_and_chooses_reachable_centre);
+ RUN_TEST(test_guided_recovery_detects_motion_against_either_linear_command);
+ RUN_TEST(test_guided_centring_uses_opposite_wall_and_rejects_missing_echo);
+ RUN_TEST(test_guided_corner_log_reaches_slow_approach_without_a_short_restart);
+ RUN_TEST(test_guided_slow_approach_drives_both_wheels_and_reports_real_right_stall);
+ RUN_TEST(test_guided_centering_corrects_before_clearance_limit_and_through_opening);
+ RUN_TEST(test_guided_corner_approaches_after_truncated_advance_and_long_front_echo);
+ RUN_TEST(test_guided_corner_limits_travel_and_requires_room_to_turn);
+ RUN_TEST(test_guided_advance_steers_before_single_wall_reaches_steering_clearance);
+ RUN_TEST(test_guided_advance_uses_opposite_wall_when_echo_is_lost_after_fast_closing);
+ RUN_TEST(test_guided_lateral_avoidance_can_steer_during_slow_front_approach);
+ RUN_TEST(test_guided_lateral_avoidance_slows_even_with_symmetric_clearance);
  RUN_TEST(test_median_rejects_single_short_valid_spike_and_accepts_real_wall);
  RUN_TEST(test_median_tolerates_one_lateral_failure_but_not_repeated_loss);
  RUN_TEST(test_median_discards_below_range_one_cm_without_corrupting_twelve_cm);
@@ -481,6 +1032,7 @@ int main(){UNITY_BEGIN();
  RUN_TEST(test_front_approach_policy_requires_measured_slow_speed_and_position);
  RUN_TEST(test_front_approach_can_be_enabled_mid_segment_and_cannot_accelerate_again);
  RUN_TEST(test_front_target_refinement_is_bounded_and_rejects_missing_or_early_readings);
+ RUN_TEST(test_front_target_refinement_includes_progress_from_the_previous_segment);
  RUN_TEST(test_front_approach_extended_deadline_allows_slow_completion);
  RUN_TEST(test_front_target_brake_then_corner_turn_requires_approach_mode_reset);
  RUN_TEST(test_pause_time_is_not_mistaken_for_motion_timeout);
