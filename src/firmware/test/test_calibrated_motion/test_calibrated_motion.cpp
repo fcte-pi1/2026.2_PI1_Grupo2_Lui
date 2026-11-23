@@ -14,6 +14,8 @@
 #include "control/front_approach_policy.hpp"
 #include "control/cell_observation_gate.hpp"
 #include "control/front_proximity_guard.hpp"
+#include "control/straight_proximity_guard.hpp"
+#include "control/corner_sonar_gate.hpp"
 #include "hal/sonar_median3.hpp"
 #include "hal/sonar_snapshot.hpp"
 
@@ -917,7 +919,7 @@ void test_cell_observation_handles_clock_wrap(){
 void test_open_corridor_cell_does_not_require_a_front_wall_at_three_cm(){
  TEST_ASSERT_TRUE(FrontApproach::arrivalConfirmed(false,true,21.1f,176.9f,180));
  TEST_ASSERT_TRUE(FrontApproach::arrivalConfirmed(false,false,NAN,176.9f,180));
- TEST_ASSERT_FALSE(FrontApproach::arrivalConfirmed(true,true,21.1f,176.9f,180));
+ TEST_ASSERT_TRUE(FrontApproach::arrivalConfirmed(true,true,21.1f,176.9f,180));
  TEST_ASSERT_TRUE(FrontApproach::arrivalConfirmed(true,true,3.4f,176.9f,180));
  TEST_ASSERT_FALSE(FrontApproach::arrivalConfirmed(false,true,21.1f,140,180));
 }
@@ -988,7 +990,182 @@ void test_isolated_short_echo_brakes_then_resumes_the_same_motion(){
  TEST_ASSERT_FALSE(f.braking());TEST_ASSERT_TRUE(f.motion.getDistanceTravelledMm()>0);
 }
 
+void test_rolling_arc_moves_axle_forward_in_both_turn_directions() {
+ for(float dir : {-1.0f,1.0f}) {
+  Fixture f;f.arm();TEST_ASSERT_TRUE(f.motion.startRollingArc90(dir*90,30));
+  float last=0;
+  for(float a=1;a<=90 && !f.braking();a+=1){
+   const float rad=a*0.01745329252f;
+   f.tickMm((30-dir*60)*rad,(30+dir*60)*rad,dir*a,dir*20,50);last=a;
+  }
+  TEST_ASSERT_TRUE(f.braking());f.settle(dir*last);
+  TEST_ASSERT_TRUE(f.motion.getStatus()==MotionStatus::Succeeded);
+  TEST_ASSERT_FLOAT_WITHIN(1.2f,dir*90,f.motion.getTurnAngleDeg());
+  TEST_ASSERT_FLOAT_WITHIN(1.5f,30*1.5707963f,f.motion.getDistanceTravelledMm());
+  TEST_ASSERT_FLOAT_WITHIN(2,30,f.motion.getPose().xMm);
+  TEST_ASSERT_FLOAT_WITHIN(2,dir*30,f.motion.getPose().yMm);
+ }
+}
+void test_rolling_arc_rejects_unsupported_geometry() {
+ Fixture f;f.arm();
+ TEST_ASSERT_FALSE(f.motion.startRollingArc90(90,NAN));
+ TEST_ASSERT_FALSE(f.motion.startRollingArc90(90,0));
+ TEST_ASSERT_FALSE(f.motion.startRollingArc90(90,60));
+ TEST_ASSERT_FALSE(f.motion.startRollingArc90(45,30));
+ TEST_ASSERT_TRUE(f.motion.getStatus()==MotionStatus::Idle);
+}
+void test_rolling_arc_pauses_then_resumes_without_losing_target() {
+ Fixture f;f.arm();TEST_ASSERT_TRUE(f.motion.startRollingArc90(90,30));
+ for(int a=1;a<=30;a++){float r=a*0.01745329252f;f.tickMm(-30*r,90*r,a,20,50);}
+ TEST_ASSERT_TRUE(f.motion.setSensorPaused(true));
+ for(int n=0;n<70;n++)f.tick(counts[32],counts[25],30,0);
+ TEST_ASSERT_TRUE(f.motion.sensorPauseSettled());TEST_ASSERT_TRUE(f.motion.setSensorPaused(false));
+ float last=30;
+ for(int a=31;a<=90;a++){float r=a*0.01745329252f;f.tickMm(-30*r,90*r,a,20,50);last=a;if(f.braking())break;}
+ f.settle(last);TEST_ASSERT_TRUE(f.motion.getStatus()==MotionStatus::Succeeded);
+}
+void test_rolling_arc_preserves_stop_and_obstacle_protection() {
+ for(bool obstacle : {false,true}) {
+  Fixture f;f.arm();TEST_ASSERT_TRUE(f.motion.startRollingArc90(-90,30));
+  f.tickMm(1.5f,-0.5f,-1,10,50);
+  if(obstacle){f.motion.brakeForObstacle();f.settle(-1);}
+  else f.motion.stop();
+  TEST_ASSERT_TRUE(f.motion.getStatus()==MotionStatus::Failed);
+  TEST_ASSERT_TRUE(f.motion.getFailureReason()==(obstacle?MotionFailureReason::Obstacle:MotionFailureReason::Cancelled));
+  TEST_ASSERT_FALSE(f.motors.isEnabled());
+ }
+}
+void test_rolling_arc_stops_on_wrong_wheel_direction_and_encoder_loss() {
+ Fixture f;f.arm();TEST_ASSERT_TRUE(f.motion.startRollingArc90(90,30));
+ f.tickMm(6,-6,0,0,50);f.settle(0);
+ TEST_ASSERT_TRUE(f.motion.getFailureReason()==MotionFailureReason::WrongDirection);
+ Fixture g;g.arm();TEST_ASSERT_TRUE(g.motion.startRollingArc90(90,30));encoderValid=false;
+ g.tick(0,0,0);TEST_ASSERT_TRUE(g.motion.getFailureReason()==MotionFailureReason::EncoderReadFailed);
+ TEST_ASSERT_FALSE(g.motors.isEnabled());
+}
+
+void test_straight_short_side_echo_pauses_without_confirming_from_repeated_ticks() {
+ StraightProximityGuard guard;SonarSnapshot frame{};
+ frame.sampledAtMs=100;frame.left={false,1.5f,60,true};frame.right={true,3.0f,174,false};
+ auto feedback=guard.update(frame);TEST_ASSERT_TRUE(feedback.pause);TEST_ASSERT_FALSE(feedback.leftConfirmed);
+ for(int n=0;n<20;n++)TEST_ASSERT_FALSE(guard.update(frame).leftConfirmed);
+ frame.sampledAtMs=190;frame.left={true,3.0f,174,false};
+ feedback=guard.update(frame);TEST_ASSERT_FALSE(feedback.pause);TEST_ASSERT_FALSE(feedback.leftConfirmed);
+ frame.sampledAtMs=280;feedback=guard.update(frame);TEST_ASSERT_FALSE(feedback.leftConfirmed);
+}
+void test_straight_side_obstacle_requires_distinct_samples_and_resets_between_segments() {
+ for(bool left:{true,false}){
+  StraightProximityGuard guard;SonarSnapshot frame{};
+  frame.left={true,3.0f,174,false};frame.right=frame.left;
+  auto& side=left?frame.left:frame.right;side={false,1.5f,60,true};
+  frame.sampledAtMs=100;TEST_ASSERT_TRUE(guard.update(frame).pause);
+  frame.sampledAtMs=200;auto result=guard.update(frame);
+  TEST_ASSERT_TRUE(left?result.leftConfirmed:result.rightConfirmed);
+  guard.reset();frame.sampledAtMs=300;result=guard.update(frame);
+  TEST_ASSERT_FALSE(result.leftConfirmed);TEST_ASSERT_FALSE(result.rightConfirmed);
+ }
+}
+
+void test_straight_recovered_echoes_do_not_accumulate_a_reverse_or_abort_budget() {
+ FrontEchoRecovery recovery;
+ for(uint32_t i=1;i<=5;i++){
+  const auto t=i*1000;
+  TEST_ASSERT_TRUE(recovery.update(false,t,t,false,true)==FrontEchoRecovery::Decision::Hold);
+  TEST_ASSERT_TRUE(recovery.update(true,t+100,t+100,false,true)==FrontEchoRecovery::Decision::Hold);
+  TEST_ASSERT_TRUE(recovery.update(true,t+300,t+300,true,true)==FrontEchoRecovery::Decision::Proceed);
+ }
+ TEST_ASSERT_TRUE(recovery.update(false,6000,6000,false,true)==FrontEchoRecovery::Decision::Hold);
+ TEST_ASSERT_TRUE(recovery.update(false,7200,7200,true,true)==FrontEchoRecovery::Decision::Failed);
+}
+
+void test_arc_model_deviation_is_warning_and_exit_credit_tracks_real_advance() {
+ for(float dir:{-1.0f,1.0f}){
+  Fixture f;f.arm();TEST_ASSERT_TRUE(f.motion.startRollingArc90(dir*90,30));
+  float last=0;
+  for(int a=1;a<=90 && !f.braking();a++){
+   const float rad=a*0.01745329252f;
+   f.tickMm((10-dir*60)*rad,(10+dir*60)*rad,dir*a,dir*20,50);last=a;
+  }
+  TEST_ASSERT_TRUE(f.motion.arcPathWarning());
+  TEST_ASSERT_GREATER_THAN(12.0f,f.motion.getArcPathErrorMm());
+  f.settle(dir*last);TEST_ASSERT_TRUE(f.motion.getStatus()==MotionStatus::Succeeded);
+  TEST_ASSERT_FLOAT_WITHIN(2,10,f.motion.getArcExitProgressMm());
+ }
+}
+void test_arc_targets_more_forward_per_degree_with_lower_angular_rate() {
+ for(float dir:{-1.0f,1.0f}){
+  Fixture f;f.arm();TEST_ASSERT_TRUE(f.motion.startRollingArc90(dir*90,30));
+  for(int a=1;a<=10;a++){
+   const float rad=a*0.01745329252f;
+   f.tickMm((30-dir*60)*rad,(30+dir*60)*rad,dir*a,dir*16,50);
+  }
+  const float left=f.motion.getLeftTargetMmS(),right=f.motion.getRightTargetMmS();
+  const float omega=(right-left)/f.cfg.wheelTrackMm;
+  const float forward=(left+right)*0.5f;
+  TEST_ASSERT_TRUE(forward/fabsf(omega)>32.0f);
+  TEST_ASSERT_TRUE(fabsf(omega)*57.2957795f<=16.01f);
+  TEST_ASSERT_GREATER_THAN(0.0f,forward);
+ }
+}
+void test_arc_keeps_independent_heading_and_wheel_travel_limits() {
+ {Fixture f;f.arm();f.motion.startRollingArc90(90,30);
+  const float rad=105*0.01745329252f;f.tickMm(-30*rad,90*rad,105,0,50);f.settle(105);
+  TEST_ASSERT_TRUE(f.motion.getFailureReason()==MotionFailureReason::SafetyLimit);
+  TEST_ASSERT_EQUAL_UINT8(1,f.motion.arcHardLimit());}
+ {Fixture f;f.arm();f.motion.startRollingArc90(90,30);f.tickMm(-1,181,10,0,50);f.settle(10);
+  TEST_ASSERT_TRUE(f.motion.getFailureReason()==MotionFailureReason::SafetyLimit);
+  TEST_ASSERT_EQUAL_UINT8(2,f.motion.arcHardLimit());}
+}
+
+void test_arrival_accepts_reported_170mm_case_without_accepting_untravelled_cell() {
+ TEST_ASSERT_TRUE(FrontApproach::arrivalConfirmed(true,true,4.44f,170.8f,180));
+ TEST_ASSERT_TRUE(FrontApproach::arrivalConfirmed(true,false,NAN,170.8f,180));
+ TEST_ASSERT_FALSE(FrontApproach::arrivalConfirmed(true,true,3.0f,140.0f,180));
+ TEST_ASSERT_FALSE(FrontApproach::arrivalConfirmed(false,true,3.0f,NAN,180));
+}
+void test_corner_sonar_gate_excludes_held_and_pre_turn_frames() {
+ CornerSonarGate gate;TEST_ASSERT_TRUE(gate.accepts(100));
+ gate.suspend(200);TEST_ASSERT_FALSE(gate.accepts(250));
+ TEST_ASSERT_FALSE(gate.pauseExpired(499));TEST_ASSERT_TRUE(gate.pauseExpired(500));
+ gate.resume(1000);TEST_ASSERT_FALSE(gate.suspended());
+ TEST_ASSERT_FALSE(gate.accepts(200));TEST_ASSERT_FALSE(gate.accepts(999));
+ TEST_ASSERT_TRUE(gate.accepts(1000));TEST_ASSERT_TRUE(gate.accepts(1100));
+}
+void test_corner_sonar_gate_restores_after_cancel_and_handles_timer_wrap() {
+ CornerSonarGate gate;gate.suspend(UINT32_MAX-200);
+ TEST_ASSERT_TRUE(gate.pauseExpired(100));
+ gate.resume(UINT32_MAX-10);TEST_ASSERT_TRUE(gate.accepts(20));
+ TEST_ASSERT_FALSE(gate.accepts(UINT32_MAX-11));
+ gate.suspend(50);TEST_ASSERT_FALSE(gate.accepts(90));
+ gate.resume(100);TEST_ASSERT_TRUE(gate.accepts(101));
+}
+void test_corner_retreat_compensates_front_offset_before_inertial_arc() {
+ TEST_ASSERT_FLOAT_WITHIN(0.01f,30,FrontApproach::cornerRetreatMm(3,30));
+ const float retreat=FrontApproach::cornerRetreatMm(4.44f,30);
+ TEST_ASSERT_FLOAT_WITHIN(0.01f,15.6f,retreat);
+ const float initialOffset=(3.0f-4.44f)*10.0f;
+ TEST_ASSERT_FLOAT_WITHIN(0.01f,0,initialOffset-retreat+30);
+ TEST_ASSERT_FLOAT_WITHIN(0.01f,10,FrontApproach::cornerRetreatMm(5,30));
+ TEST_ASSERT_EQUAL_FLOAT(0,FrontApproach::cornerRetreatMm(NAN,30));
+ TEST_ASSERT_EQUAL_FLOAT(0,FrontApproach::cornerRetreatMm(1.5f,30));
+}
+
 int main(){UNITY_BEGIN();
+ RUN_TEST(test_arrival_accepts_reported_170mm_case_without_accepting_untravelled_cell);
+ RUN_TEST(test_corner_sonar_gate_excludes_held_and_pre_turn_frames);
+ RUN_TEST(test_corner_sonar_gate_restores_after_cancel_and_handles_timer_wrap);
+ RUN_TEST(test_corner_retreat_compensates_front_offset_before_inertial_arc);
+ RUN_TEST(test_arc_model_deviation_is_warning_and_exit_credit_tracks_real_advance);
+ RUN_TEST(test_arc_targets_more_forward_per_degree_with_lower_angular_rate);
+ RUN_TEST(test_arc_keeps_independent_heading_and_wheel_travel_limits);
+ RUN_TEST(test_straight_recovered_echoes_do_not_accumulate_a_reverse_or_abort_budget);
+ RUN_TEST(test_straight_short_side_echo_pauses_without_confirming_from_repeated_ticks);
+ RUN_TEST(test_straight_side_obstacle_requires_distinct_samples_and_resets_between_segments);
+ RUN_TEST(test_rolling_arc_moves_axle_forward_in_both_turn_directions);
+ RUN_TEST(test_rolling_arc_rejects_unsupported_geometry);
+ RUN_TEST(test_rolling_arc_pauses_then_resumes_without_losing_target);
+ RUN_TEST(test_rolling_arc_preserves_stop_and_obstacle_protection);
+ RUN_TEST(test_rolling_arc_stops_on_wrong_wheel_direction_and_encoder_loss);
  RUN_TEST(test_guided_corner_brakes_at_projected_right_wall_target);
  RUN_TEST(test_mission_corner_requires_near_front_and_open_exit);
  RUN_TEST(test_guided_corner_reposition_respects_clearance_and_completed_diagonal);

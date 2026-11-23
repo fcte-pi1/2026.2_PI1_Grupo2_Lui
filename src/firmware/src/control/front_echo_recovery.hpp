@@ -10,7 +10,7 @@ public:
     static constexpr uint8_t REQUIRED_GOOD_FRAMES=2;
     static constexpr uint8_t MAX_EPISODES=3;
     void reset(){*this=FrontEchoRecovery{};}
-    Decision update(bool valid, uint32_t sampledAt, uint32_t now, bool settled) {
+    Decision update(bool valid, uint32_t sampledAt, uint32_t now, bool settled, bool resetAfterRecovery=false) {
         if(failed_)return Decision::Failed;
         if(!holding_) {
             if(valid)return Decision::Proceed;
@@ -25,7 +25,11 @@ public:
         } else if(!valid)goodFrames_=0;
         if(valid && goodFrames_>=REQUIRED_GOOD_FRAMES && settled &&
            static_cast<uint32_t>(now-startedAt_)>=MIN_HOLD_MS) {
-            holding_=false;return Decision::Proceed;
+            holding_=false;
+            // Na reta, episódios recuperados não somam um motivo para dar ré ou abortar.
+            // Cada pausa continua limitada e o prazo global da missão permanece ativo.
+            if(resetAfterRecovery)episodes_=0;
+            return Decision::Proceed;
         }
         return Decision::Hold;
     }

@@ -23,6 +23,8 @@
 #include "control/front_approach_policy.hpp"
 #include "control/cell_observation_gate.hpp"
 #include "control/front_proximity_guard.hpp"
+#include "control/straight_proximity_guard.hpp"
+#include "control/corner_sonar_gate.hpp"
 #include "control/guided_lateral_clearance.hpp"
 #include "control/guided_wall_recovery.hpp"
 #include "hal/SnapshotWallSensor.h"
@@ -153,12 +155,25 @@ nav::MazeMissionController mission(mazeMap, mapStorage, robotStateEstimator);
 StartDelay startDelay;
 FrontEchoRecovery frontEchoRecovery;
 FrontProximityGuard frontProximity;
+StraightProximityGuard straightProximity;
 uint16_t frontEchoRecoveries=0;
 bool ready = false;
 bool hardwareReady = false;
 bool attemptUsed = false;
 bool guidedRouteActive = false;
 bool missionCornerActive = false;
+enum class RollingPhase { None, BeforeRetreat, Retreat, BeforeArc, Arc, ConfirmExit, WaitSonarPause };
+RollingPhase rollingPhase=RollingPhase::None;
+constexpr float ROLLING_RETREAT_MM=30.0f;
+float rollingRadiusMm=30.0f;
+float rollingPlannedRetreatMm=30.0f;
+CornerSonarGate rollingSonarGate;
+CellObservationGate rollingEntryGate;
+float rollingExitProgressMm=0.0f;
+bool rollingPathWarningSent=false;
+int rollingDirection=1;
+uint32_t rollingPhaseMs=0, rollingPauseMs=0, rollingExitStamp=0;
+unsigned rollingExitVotes=0;
 bool missionMovingForward = false;
 int cornerTurnDirection = 1;
 float missionExitCreditMm = 0.0f;
@@ -271,7 +286,16 @@ void finishRoute(mm::EndReason reason) {
         telemetryClient.publishSessionEnd(routeBuffer);
 }
 
+void restoreRollingSonar() {
+    if(rollingSonarGate.suspended()){
+        rollingSonarGate.resume(millis());
+        samplingEnabled.store(true);
+        Serial.println("CURVA: ultrassons retomados; aguardando leituras posteriores ao giro");
+    }
+}
+
 void safeStop(const char *reason, mm::EndReason endReason = mm::EndReason::Error) {
+    restoreRollingSonar();
     snprintf(lastStopReason,sizeof(lastStopReason),"%s",reason);
     terminalTelemetryPublished = false;
     remoteMissionActive = false;
@@ -280,6 +304,7 @@ void safeStop(const char *reason, mm::EndReason endReason = mm::EndReason::Error
     if (ready && !guidedRouteActive) mission.fail();
     ready = false;
     missionCornerActive = false;
+    rollingPhase=RollingPhase::None;
     missionMovingForward = false;
     missionExitCreditMm = 0.0f;
     startDelay.cancel();
@@ -371,6 +396,31 @@ bool handleGuidedRecoveryResult(MotionStatus status) {
 void handleMissionUpdate(const nav::MissionUpdate &update) {
     using Action = nav::MissionAction;
     const auto action = update.action;
+    if (update.turnTowardNextCell && (action==Action::TurnLeft90 || action==Action::TurnRight90)) {
+        const auto frame=getLateralSnapshot();const auto front=frame.frontEstimate(millis());
+        const auto exit=action==Action::TurnLeft90 ? frame.leftEstimate(millis()) : frame.rightEstimate(millis());
+        const auto* cell=mazeMap.get(mission.x(),mission.y());
+        const auto exitDir=mm::MazeMap::relToAbs(mission.heading(),
+            action==Action::TurnLeft90?mm::Rel::Left:mm::Rel::Right);
+        const bool mappedCorner=cell && cell->isKnown(mission.heading()) && cell->hasWall(mission.heading()) &&
+            cell->isKnown(exitDir) && !cell->hasWall(exitDir);
+        if (mappedCorner || (front.valid && exit.valid &&
+            nav::missionCornerEligible(front.distanceCm,exit.distanceCm,mazeConfig.cellSizeMm))) {
+            const auto back=mm::MazeMap::relToAbs(mission.heading(),mm::Rel::Back);
+            const int dx=back==Direction::East?1:back==Direction::West?-1:0;
+            const int dy=back==Direction::South?1:back==Direction::North?-1:0;
+            const auto* previous=mazeMap.get(int(mission.x())+dx,int(mission.y())+dy);
+            if (!cell || !cell->isKnown(back) || cell->hasWall(back) || !previous || !previous->visited) {
+                safeStop("curva com recuo: retaguarda ainda nao percorrida/confirmada");return;
+            }
+            rollingDirection=action==Action::TurnLeft90?1:-1;
+            rollingPhase=RollingPhase::BeforeRetreat;rollingPhaseMs=millis();rollingPauseMs=0;
+            rollingEntryGate.begin(rollingPhaseMs);
+            rollingExitVotes=0;rollingExitStamp=0;motionResultPending=false;
+            Serial.printf("CURVA COM RECUO: re %.1fmm; arco 90 graus para %s; sem partida automatica extra\n",
+                          ROLLING_RETREAT_MM,rollingDirection>0?"esquerda":"direita");return;
+        }
+    }
     if (update.turnTowardNextCell && (action == Action::TurnLeft90 || action == Action::TurnRight90)) {
         const auto snapshot = getLateralSnapshot();
         const uint32_t now = millis();
@@ -412,6 +462,7 @@ void handleMissionUpdate(const nav::MissionUpdate &update) {
         case nav::MissionAction::None:
             return;
         case nav::MissionAction::MoveForwardOneCell:
+            straightProximity.reset();
             started = motion.startMoveLinear(mazeConfig.cellSizeMm - missionLinearProgressMm);
             break;
         case nav::MissionAction::MoveBackwardOneCell:
@@ -679,6 +730,7 @@ bool prepareAttempt(char command, bool fromWebsite = false) {
     lastProcessedSensorTimestampMs = 0;
     guidedRouteActive = command != 'g';
     missionCornerActive = false;
+    rollingPhase=RollingPhase::None;
     missionMovingForward = false;
     cornerTurnDirection = 1;
     missionExitCreditMm = missionLinearProgressMm = 0.0f;
@@ -816,6 +868,9 @@ void finishMissionMotion(bool succeeded, bool frontExitConfirmed = false) {
             safeStop(cause);
             return;
         }
+        if(automaticFrontReferenceUsed && !FrontApproach::confirmed(fresh && front.valid,front.distanceCm,travelledMm,mazeConfig.cellSizeMm))
+            Serial.printf("CHEGADA AVISO: percurso=%+.1fmm aceito pela odometria; frente=%.2fcm divergente\n",
+                missionLinearProgressMm,front.distanceCm);
         gridOdometry.reportArrival(missionLinearProgressMm);
         Serial.printf("CELULA CONFIRMADA: percurso=%+.1fmm; aguardando observacao\n", missionLinearProgressMm);
     }
@@ -1150,6 +1205,105 @@ void setup() {
     Serial.println("Perfil de movimento: 60mm/s, aproximacao a20mm/s, giros ate35graus/s; limite 180s. Nenhuma partida automatica.");
 }
 
+// Após confirmar posição/saída, recuo e arco usam somente IMU e encoders.
+bool updateRollingCorner() {
+    if(rollingPhase==RollingPhase::None)return false;
+    const uint32_t now=millis();
+    if(rollingPhase==RollingPhase::WaitSonarPause){
+        if(!samplingPaused.load()){
+            if(rollingSonarGate.pauseExpired(now))safeStop("curva: task nao confirmou a suspensao dos ultrassons");
+            return true;
+        }
+        motors.setEnabled(true);
+        if(!motion.startGuidedRetreat(rollingPlannedRetreatMm)){safeStop("curva: falha ao iniciar recuo");return true;}
+        rollingPhase=RollingPhase::Retreat;lastControlUpdateUs=micros();return true;
+    }
+    if(rollingPhase==RollingPhase::BeforeArc){
+        if(now-rollingPhaseMs<300)return true;
+        motors.setEnabled(true);rollingPathWarningSent=false;rollingExitProgressMm=0;
+        if(!motion.startRollingArc90(90.0f*rollingDirection,rollingRadiusMm)){
+            safeStop("curva: falha ao iniciar arco");return true;
+        }
+        rollingPhase=RollingPhase::Arc;lastControlUpdateUs=micros();return true;
+    }
+    if(rollingPhase==RollingPhase::Retreat || rollingPhase==RollingPhase::Arc){
+        // Nenhum snapshot ultrassônico é consultado durante estes movimentos.
+        const auto us=micros(),elapsed=us-lastControlUpdateUs;
+        if(elapsed>=CONTROL_PERIOD_US){motion.update(elapsed/1000000.0f);lastControlUpdateUs=us;}
+        if(rollingPhase==RollingPhase::Arc && motion.arcPathWarning() && !rollingPathWarningSent){
+            rollingPathWarningSent=true;
+            Serial.printf("ARCO AVISO: desvio do modelo %.1fmm; continuando pela IMU\n",motion.getArcPathErrorMm());
+        }
+        if(motion.getStatus()==MotionStatus::Failed){
+            char cause[128];snprintf(cause,sizeof(cause),"curva: etapa=%u codigo=%u limite=%u giro=%.1f avanco=%.1f desvio=%.1fmm",
+                unsigned(rollingPhase),unsigned(motion.getFailureReason()),unsigned(motion.arcHardLimit()),
+                motion.getTurnAngleDeg(),motion.getDistanceTravelledMm(),motion.getArcPathErrorMm());
+            safeStop(cause);return true;
+        }
+        if(motion.getStatus()!=MotionStatus::Succeeded)return true;
+        if(rollingPhase==RollingPhase::Retreat){
+            const float actual=motion.getDistanceTravelledMm();
+            if(actual>=0 || fabsf(actual+rollingPlannedRetreatMm)>3){safeStop("curva: recuo fora da tolerancia");return true;}
+            rollingRadiusMm=ROLLING_RETREAT_MM;
+            rollingPhase=RollingPhase::BeforeArc;
+            Serial.printf("CURVA: recuo confirmado %.1fmm; arco sem sonar, raio %.1fmm\n",-actual,rollingRadiusMm);
+        }else{
+            rollingExitProgressMm=motion.getArcExitProgressMm();
+            if(!isfinite(rollingExitProgressMm) || rollingExitProgressMm<0 || rollingExitProgressMm>80){
+                safeStop("arco: deslocamento de saida fora da faixa");return true;
+            }
+            Serial.printf("ARCO CONCLUIDO: giro=%.1f; avanco na nova direcao=%.1fmm\n",
+                motion.getTurnAngleDeg(),rollingExitProgressMm);
+            restoreRollingSonar();
+            rollingPhase=RollingPhase::ConfirmExit;rollingExitVotes=0;rollingExitStamp=0;
+        }
+        rollingPhaseMs=now;return true;
+    }
+    // Antes de suspender e depois de retomar, só aceitar quadros novos e válidos.
+    const auto frame=getLateralSnapshot();
+    const bool fresh=frame.ready && now-frame.sampledAtMs<=MAX_LATERAL_SAMPLE_AGE_MS &&
+        rollingSonarGate.accepts(frame.sampledAtMs);
+    const auto f=frame.frontEstimate(now),l=frame.leftEstimate(now),rr=frame.rightEstimate(now);
+    const bool valid=fresh && f.valid && l.valid && rr.valid && frame.front.valid && frame.left.valid && frame.right.valid;
+    if(!valid){
+        if(rollingPhase==RollingPhase::BeforeRetreat)rollingEntryGate.begin(now);
+        if(!rollingPauseMs)rollingPauseMs=now;
+        if(now-rollingPauseMs>2500)safeStop("curva: aguardando leituras novas antes/depois do arco por2500ms");
+        return true;
+    }
+    rollingPauseMs=0;
+    if(now-rollingPhaseMs<300)return true;
+    if(rollingPhase==RollingPhase::BeforeRetreat){
+        const auto exit=rollingDirection>0?l:rr;
+        const auto& rawExit=rollingDirection>0?frame.left:frame.right;
+        const bool geometryConfirmed=nav::missionCornerEligible(f.distanceCm,exit.distanceCm,mazeConfig.cellSizeMm) &&
+            nav::missionCornerEligible(frame.front.distanceCm,rawExit.distanceCm,mazeConfig.cellSizeMm);
+        rollingEntryGate.update(frame.sampledAtMs,geometryConfirmed,now);
+        if(!rollingEntryGate.ready(now)){
+            if(rollingEntryGate.expired(now))safeStop("curva: geometria persistentemente indefinida antes da suspensao");
+            return true;
+        }
+        // Compensar a posição inicial mais recuada (por exemplo frente=4,44 cm).
+        rollingPlannedRetreatMm=FrontApproach::cornerRetreatMm(f.distanceCm,ROLLING_RETREAT_MM);
+        if(rollingPlannedRetreatMm==0){safeStop("curva: geometria de recuo invalida");return true;}
+        rollingSonarGate.suspend(now);samplingEnabled.store(false);
+        rollingPhase=RollingPhase::WaitSonarPause;
+        Serial.printf("CURVA: suspender ultrassons; recuo %.1fmm; giro pela IMU e encoders\n",rollingPlannedRetreatMm);
+        return true;
+    }
+    if(rollingPhase==RollingPhase::ConfirmExit){
+        if(frame.sampledAtMs!=rollingExitStamp){
+            rollingExitStamp=frame.sampledAtMs;
+            rollingExitVotes=nav::guidedLeftOpening(f.distanceCm,mazeConfig.cellSizeMm)?rollingExitVotes+1:0;
+        }
+        if(rollingExitVotes>=2){
+            rollingPhase=RollingPhase::None;missionExitCreditMm=rollingExitProgressMm;
+            gridOdometry.resetAccumulator();finishMissionMotion(true,true);
+        }else if(now-rollingPhaseMs>2000)safeStop("curva: abertura frontal nao confirmada na saida");
+    }
+    return true;
+}
+
 void loop() {
     handleSerialCommands();
     handleRemoteCommands();
@@ -1160,7 +1314,7 @@ void loop() {
     }
     const uint32_t nowMs = millis();
     const auto ageFrame=getLateralSnapshot();
-    if(ageFrame.ready) {
+    if(ageFrame.ready && rollingSonarGate.accepts(ageFrame.sampledAtMs)) {
         const uint32_t age=nowMs-ageFrame.sampledAtMs;
         if(age>peakSensorAgeMs)peakSensorAgeMs=age;
     }
@@ -1186,6 +1340,8 @@ void loop() {
         safeStop("tempo máximo da tentativa excedido");
         return;
     }
+
+    if(updateRollingCorner()) {delayMicroseconds(500);return;}
 
     const LateralSnapshot sensorSnapshot = getLateralSnapshot();
     if (sensorSnapshot.ready && !missionCornerActive) {
@@ -1258,7 +1414,17 @@ void loop() {
                 motionResultPending = false;
                 return;
             }
-            if (guidedForward && guidedRecovery.phase != RecoveryPhase::Braking) {
+            const auto straightFeedback=automaticForward ? straightProximity.update(snapshot) : StraightProximityGuard::Feedback{};
+            if(automaticForward){
+                if(frontBlocked || straightFeedback.leftConfirmed || straightFeedback.rightConfirmed){
+                    char cause[128];snprintf(cause,sizeof(cause),"reta: proximidade confirmada F=%u E=%u D=%u; sem recuo automatico",
+                        frontBlocked,straightFeedback.leftConfirmed,straightFeedback.rightConfirmed);
+                    safeStop(cause);return;
+                }
+                const auto lateral=guidedLateralClearance.update(snapshot);
+                motion.setGuidedLateralSteering(lateral.slow,lateral.yawOffsetDeg);
+            }
+            if (guidedForward && cornerSequenceActive() && guidedRecovery.phase != RecoveryPhase::Braking) {
                 const auto lateral = guidedLateralClearance.update(snapshot);
                 const bool recovering = adjusting || guidedRecovery.phase == RecoveryPhase::Resuming;
                 float offsetWithReference = guidedRecovery.steeringOffset(leftCm, rightCm);
@@ -1326,14 +1492,14 @@ void loop() {
                 }
             }
             if ((motion.isMovingForward() || retreating) && guidedRecovery.phase != RecoveryPhase::Braking) {
-                const auto decision=frontEchoRecovery.update(!frontInvalid && !rightInvalidDuringShift && !retreatFrontInvalid,
+                const auto decision=frontEchoRecovery.update(!frontInvalid && !rightInvalidDuringShift && !retreatFrontInvalid && !straightFeedback.pause,
                     snapshot.sampledAtMs,millis(),
-                    motion.sensorPauseSettled());
+                    motion.sensorPauseSettled(),automaticForward);
                 if(decision==FrontEchoRecovery::Decision::Failed) {
                     mission.fail();
                     safeStop(retreating ? "recuperacao guiada: eco frontal invalido ou encurtando durante a re"
                              : shifting ? "curva: eco frontal ou direito instavel durante a diagonal"
-                                      : "eco frontal instavel: recuperacao excedeu 1200ms ou 3 pausas no trecho");
+                                      : "sonar instavel: confirmacao excedeu o limite de recuperacao; sem recuo na reta");
                     motionResultPending=false;return;
                 }
                 const bool hold=decision==FrontEchoRecovery::Decision::Hold;
@@ -1350,8 +1516,8 @@ void loop() {
                         : shifting
                         ? (hold ? "CURVA: freando e aguardando os ecos frontal e direito"
                                 : "CURVA: ecos frontal e direito validos; retomando a diagonal")
-                        : (hold ? "ECO FRONTAL: freando e aguardando novas leituras"
-                                : "ECO FRONTAL: duas leituras validas; retomando o restante do trecho"));
+                        : (hold ? "SONAR: freando e aguardando novas leituras; sem recuo na reta"
+                                : "SONAR: duas leituras validas; retomando o restante do avanco"));
                     publishRobotStatus(millis(),true);
                 }
             }
@@ -1397,7 +1563,7 @@ void loop() {
             motion.getDistanceTravelledMm(), motion.getTurnAngleDeg());
         const bool linear = motion.getMotionType() == MotionType::ForwardCell;
         const bool sequence = cornerSequenceActive();
-        const bool recoverableStop = status == MotionStatus::Failed && linear && (sequence || missionMovingForward) &&
+        const bool recoverableStop = status == MotionStatus::Failed && linear && sequence &&
             guidedLinearInterruption(motion.getFailureReason());
         if (recoverableStop && guidedRecovery.phase != RecoveryPhase::Braking &&
             guidedRecovery.phase != RecoveryPhase::Adjusting) {

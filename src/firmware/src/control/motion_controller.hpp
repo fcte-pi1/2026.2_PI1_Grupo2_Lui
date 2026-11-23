@@ -20,7 +20,9 @@ enum class MotionType : uint8_t {
     ForwardCell,
     TurnLeft90,
     TurnRight90,
-    TurnAround180
+    TurnAround180,
+    ArcLeft90,
+    ArcRight90
 };
 
 enum class MotionFailureReason : uint8_t {
@@ -131,6 +133,8 @@ public:
     void brakeForObstacle();
     // Positivo gira à esquerda, negativo gira à direita.
     bool startGuidedPivot(float degrees);
+    // Raio do ponto médio do eixo; positivo gira à esquerda.
+    bool startRollingArc90(float degrees, float radiusMm);
     bool startGuidedPivotReturn();
     bool startTurnLeft90();
     bool startTurnRight90();
@@ -155,6 +159,12 @@ public:
     float getDistanceTravelledMm() const;
     float getLinearTargetMm() const { return targetDistanceMm_; }
     float getTurnAngleDeg() const;
+    bool arcPathWarning() const { return arcPathWarning_; }
+    uint8_t arcHardLimit() const { return arcHardLimit_; }
+    float getArcPathErrorMm() const;
+    float getArcExitProgressMm() const;
+    float getLeftTargetMmS() const { return lastLeftTargetMmS_; }
+    float getRightTargetMmS() const { return lastRightTargetMmS_; }
     float getLeftSpeedMmS() const;
     float getRightSpeedMmS() const;
     float getPidErrorMmS() const;
@@ -165,6 +175,7 @@ private:
     void updateForward(float dtSeconds, int32_t leftCount,
                        int32_t rightCount, float leftSpeedMmS,
                        float rightSpeedMmS, uint32_t nowMs);
+    void updateArc(float dtSeconds, float leftSpeedMmS, float rightSpeedMmS, uint32_t nowMs);
     void updateTurn(float dtSeconds, float leftSpeedMmS,
                     float rightSpeedMmS, uint32_t nowMs);
     void applyWheelSpeedTargets(float leftTargetMmS,
@@ -217,6 +228,10 @@ private:
     uint32_t lastRightProgressMs_ = 0;
     uint8_t settledSamples_ = 0;
 
+    float arcRadiusMm_ = 0.0f;
+    Pose2D arcStartPose_{};
+    bool arcPathWarning_ = false;
+    uint8_t arcHardLimit_ = 0; // 1: ângulo; 2: percurso máximo de roda.
     float targetDistanceMm_ = 0.0f;
     float leftWallDistanceMm_ = 0.0f;
     float rightWallDistanceMm_ = 0.0f;

@@ -20,7 +20,14 @@ inline bool positionMatchesCell(float travelled,float cell){return std::isfinite
     std::fabs(travelled-cell)<=POSITION_TOLERANCE_MM;}
 inline bool confirmed(bool valid,float cm,float travelled,float cell){return valid&&std::isfinite(cm)&&
     std::fabs(cm-TARGET_CM)<=TOLERANCE_CM&&positionMatchesCell(travelled,cell);}
+inline float cornerRetreatMm(float frontCm,float nominalMm) {
+    if(!std::isfinite(frontCm) || !std::isfinite(nominalMm) || nominalMm<10 || nominalMm>40 ||
+       frontCm<TARGET_CM-TOLERANCE_CM || frontCm>5.0f)return 0.0f;
+    return std::fmax(10.0f,std::fmin(nominalMm,nominalMm-(frontCm-TARGET_CM)*10.0f));
+}
 inline bool arrivalConfirmed(bool usedFrontReference,bool valid,float cm,float travelled,float cell){
-    return positionMatchesCell(travelled,cell)&&(!usedFrontReference||confirmed(valid,cm,travelled,cell));
+    // Sonar orienta a aproximação, mas a divergência isolada não invalida a odometria.
+    (void)usedFrontReference;(void)valid;(void)cm;
+    return positionMatchesCell(travelled,cell);
 }
 }

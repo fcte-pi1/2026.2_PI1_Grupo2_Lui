@@ -74,6 +74,7 @@ bool MotionController::prepareMotion(MotionType type, uint32_t timeout) {
     motionTimeoutMs_ = timeout; wallAlignmentValid_ = false; braking_ = false; brakeFailure_ = MotionFailureReason::None;
     guidedSteering_ = false;
     guidedRetreat_ = guidedPivot_ = pivotTrimUsed_ = false;
+    arcPathWarning_=false;arcHardLimit_=0;
     distanceTravelledMm_ = turnAngleDeg_ = profiledLinearSpeedMmS_ = profiledAngularSpeedDegS_ = 0;
     leftIntegralPwm_ = rightIntegralPwm_ = 0;
     lastLeftMeasuredMmS_ = lastRightMeasuredMmS_ = 0;
@@ -112,6 +113,15 @@ bool MotionController::startGuidedPivot(float degrees) {
         fail(MotionFailureReason::SafetyLimit);
         return false;
     }
+    return true;
+}
+
+bool MotionController::startRollingArc90(float degrees, float radiusMm) {
+    // Mantém ambas as rodas em movimento; raio pequeno inclui ré na interna.
+    if (!isfinite(degrees) || fabsf(fabsf(degrees)-90.0f)>0.01f ||
+        !isfinite(radiusMm) || radiusMm<10.0f || radiusMm>40.0f) return false;
+    if (!startTurn(degrees, degrees>0 ? MotionType::ArcLeft90 : MotionType::ArcRight90)) return false;
+    arcRadiusMm_=radiusMm;arcStartPose_=odometry_.getPose();
     return true;
 }
 
@@ -257,6 +267,8 @@ void MotionController::update(float dt) {
         return;
     }
     if (motionType_ == MotionType::ForwardCell) updateForward(dt, l, r, lastLeftMeasuredMmS_, lastRightMeasuredMmS_, now);
+    else if (motionType_ == MotionType::ArcLeft90 || motionType_ == MotionType::ArcRight90)
+        updateArc(dt, lastLeftMeasuredMmS_, lastRightMeasuredMmS_, now);
     else updateTurn(dt, lastLeftMeasuredMmS_, lastRightMeasuredMmS_, now);
 }
 
@@ -305,6 +317,49 @@ void MotionController::updateForward(float dt, int32_t l, int32_t r, float ls, f
     const float leftTarget = dir * fmaxf(0, profiledLinearSpeedMmS_ + dir * correction);
     const float rightTarget = dir * fmaxf(0, profiledLinearSpeedMmS_ - dir * correction);
     applyWheelSpeedTargets(leftTarget, rightTarget, ls, rs, dt);
+}
+
+float MotionController::getArcPathErrorMm() const {
+    return arcRadiusMm_*fmaxf(0.0f,turnAngleDeg_*sign(targetAngleDeg_))*pi/180.0f-distanceTravelledMm_;
+}
+float MotionController::getArcExitProgressMm() const {
+    const auto pose=odometry_.getPose();
+    const float exitHeading=turnStartHeadingRad_+sign(targetAngleDeg_)*pi*0.5f;
+    return (pose.xMm-arcStartPose_.xMm)*cosf(exitHeading)+(pose.yMm-arcStartPose_.yMm)*sinf(exitHeading);
+}
+
+void MotionController::updateArc(float dt,float ls,float rs,uint32_t now) {
+    const float dir=sign(targetAngleDeg_), angle=turnAngleDeg_*dir;
+    const auto travel=getWheelTravel();
+    const float expectedCentre=arcRadiusMm_*fmaxf(0.0f,angle)*pi/180.0f;
+    const float leftSign=sign(arcRadiusMm_-dir*config_.wheelTrackMm*0.5f);
+    const float rightSign=sign(arcRadiusMm_+dir*config_.wheelTrackMm*0.5f);
+    if (travel.leftMm*leftSign < -4 || travel.rightMm*rightSign < -4) {
+        beginBrake(now,MotionFailureReason::WrongDirection);return;
+    }
+    // Diferença para o arco ideal é diagnóstico e realimentação, não colisão.
+    const float pathError=expectedCentre-distanceTravelledMm_;
+    if(fabsf(pathError)>12.0f)arcPathWarning_=true;
+    if(angle < -4 || angle>100){
+        arcHardLimit_=1;beginBrake(now,MotionFailureReason::SafetyLimit);return;
+    }
+    if(fabsf(travel.leftMm)>180 || fabsf(travel.rightMm)>180){
+        arcHardLimit_=2;beginBrake(now,MotionFailureReason::SafetyLimit);return;
+    }
+    if (angle>lastAngularProgress_+0.5f) {lastAngularProgress_=angle;lastAngularProgressMs_=now;}
+    if (now-lastAngularProgressMs_>=700) {beginBrake(now,MotionFailureReason::MotionTimeout);return;}
+    if (checkTimeoutAndStall(now,leftSign,rightSign)) return;
+    const float remaining=90.0f-angle;
+    if (remaining<=fmaxf(0.5f,fmaxf(0.0f,currentGyroDps_*dir)*0.035f)) {beginBrake(now);return;}
+    const float maxRate=fminf(16.0f,config_.maxAngularSpeedDegS);
+    const float rate=clamp(remaining*config_.turnKpDegPerSecPerDeg,6.0f,maxRate);
+    profiledAngularSpeedDegS_=fminf(rate,fmaxf(6.0f,profiledAngularSpeedDegS_+60.0f*dt));
+    const float omega=profiledAngularSpeedDegS_*pi/180.0f;
+    // Mais avanço por grau, principalmente se o eixo estiver atrasado no arco.
+    const float effectiveRadius=clamp(arcRadiusMm_+3.0f+0.6f*pathError,
+                                     fmaxf(10.0f,arcRadiusMm_-5.0f),fminf(45.0f,arcRadiusMm_+10.0f));
+    applyWheelSpeedTargets(omega*(effectiveRadius-dir*config_.wheelTrackMm*0.5f),
+                          omega*(effectiveRadius+dir*config_.wheelTrackMm*0.5f),ls,rs,dt);
 }
 
 void MotionController::updateTurn(float dt, float ls, float rs, uint32_t now) {
