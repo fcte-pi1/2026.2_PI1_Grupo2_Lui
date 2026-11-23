@@ -64,5 +64,24 @@ dados JSON via Wi-Fi TCP/IP atingiu latência média de 12 ms a 5 Hz.
 | RNF02 | Must Have | Tempo de resposta do loop < 10 ms | Loop executado em 5,7 ms | ✅ |
 | RNF09 | Must Have | Segurança de boot e alocação | GPIO 12 livre e ADC1 isolado | ✅ |
 
+## Fotos tiradas em bancada
+
+Apos indicaçao do professor trocamos a conecçao do wi-fi por Bluetooth.
+
+|  |
+| :---: |
+![medições das medianas](/docs/7.3%20-%20Testes%20de%20hardware/imagens/esp32/bluetoothTerminal.png)
+| Figura 1: Teste do Bluetooth. |
+
+|  |
+| :---: |
+![medições das medianas](/docs/7.3%20-%20Testes%20de%20hardware/imagens/esp32/bluetooth.png)
+| Figura 2: Bluetooth conectado. |
+
+|  |
+| :---: |
+![medições das medianas](/docs/7.3%20-%20Testes%20de%20hardware/imagens/esp32/terminal.png)
+| Figura 3: Teste da memoria. |
+
 ## CONCLUSÃO
 O microcontrolador ESP32 DevKit V1 operou com desempenho e estabilidade excelentes. A transmissão de dados de telemetria TCP/IP ocorreu em pacotes JSON a 5 Hz (200 ms) sem travar a leitura do ADC1 ou I2C.

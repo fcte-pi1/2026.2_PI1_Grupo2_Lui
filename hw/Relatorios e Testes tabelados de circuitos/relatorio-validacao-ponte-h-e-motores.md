@@ -77,6 +77,25 @@ calculando a resolução de odometria:
 | RNF02 | Must Have | Frequência PWM inaudível (20 kHz) | Ruído acústico eliminado | ✅ |
 | RNF09 | Must Have | Corte de emergência em < 5 ms | Desativação via EEP em 1,2 ms | ✅ |
 
+## Fotos tiradas em bancada
+
+Apos indicaçao do professor trocamos a conecçao do wi-fi por Bluetooth.
+
+|  |
+| :---: |
+![medições das medianas](/docs/7.3%20-%20Testes%20de%20hardware/imagens/ponte-h-motores/ponte-h.png)
+| Figura 1: Teste dos motores. |
+
+|  |
+| :---: |
+![medições das medianas](/docs/7.3%20-%20Testes%20de%20hardware/imagens/ponte-h-motores/rodando.png)
+| Figura 2: Funcionamento dos motores. |
+
+|  |
+| :---: |
+![medições das medianas](/docs/7.3%20-%20Testes%20de%20hardware/imagens/ponte-h-motores/terminal.png)
+| Figura 3: Verificação por meio do código. |
+
 ## CONCLUSÃO E RECOMENDAÇÕES TÉCNICAS
 A atuação e tração apresentaram funcionamento impecável. O uso do periférico PCNT garantiu zero perda de contagem nos encoders, resposta imediata de tração, resposta linear de velocidade e corte de emergência em menos de 10 ms.
 
