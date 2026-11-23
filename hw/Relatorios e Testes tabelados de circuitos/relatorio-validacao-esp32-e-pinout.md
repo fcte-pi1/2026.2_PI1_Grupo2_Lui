@@ -34,7 +34,7 @@ A placa ESP32 DevKit V1 de 30 pinos operou a 240 MHz. Os pinos GPI (D34, D35, D3
 
 |       |
 | :---: |
-![Latência do envio de dados Wi-Fi e divisão do tempo de CPU por tarefa no ESP32](/hw/Relatorios%20e%20Testes%20tabelados%20de%20circuitos/Latência%20do%20envio%20de%20dados%20Wi-Fi%20e%20divisão%20do%20tempo%20de%20CPU%20por%20tarefa%20no%20ESP32.png)
+![Latência do envio de dados Wi-Fi e divisão do tempo de CPU por tarefa no ESP32](/docs/7.3%20-%20Testes%20de%20hardware/imagens/esp32/imagem-01.jpg)
 | Figura 1: Latência do envio de dados Wi-Fi e divisão do tempo de CPU por tarefa no ESP32. |
 
 ## PREVENÇÃO DE BOOT LOOP E TESTE DE TELEMETRIA WI-FI

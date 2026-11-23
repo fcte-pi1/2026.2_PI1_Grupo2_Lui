@@ -39,6 +39,13 @@ de teste sob variação de carga do sistema:
 ![Curva de afundamento de tensão e elevação de corrente sob carga nos motores N20](/docs/7.3%20-%20Testes%20de%20hardware/imagens/ina226/imagem-01.jpg)
 | Figura 1: Curva de afundamento de tensão e elevação de corrente sob carga nos motores N20. |
 
+## Fotos das medições
+
+|  |
+| :---: |
+![Foto do teste da ina-226](/hw/Imagens%20PNG%20e%20JPEG%20de%20resultados%20práticos/ina226/Foto%20do%20teste%20da%20ina-226.png)
+![Foto de funcinamento inicial do codego da ina-226](/hw/Imagens%20PNG%20e%20JPEG%20de%20resultados%20práticos/ina226/Foto%20de%20funcinamento%20inicial%20do%20codego%20da%20ina-226.png)
+
 ## MATRIZ DE CONFORMIDADE E CONCLUSÃO
 **Conclusão do Ensaio:** O sensor INA226 apresentou exatidão superior a 99,7% na medição de tensão e corrente. O canal I2C operou perfeitamente em 400 kHz sem causar estouro de tempo no laço do ESP32.  
 **Status:** APROVADO PARA OPERAÇÃO.

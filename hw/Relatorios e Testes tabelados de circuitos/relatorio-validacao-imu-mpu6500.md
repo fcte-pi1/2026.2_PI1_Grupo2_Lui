@@ -46,7 +46,7 @@ Ao final do ensaio, o sistema apresentou um erro angular residual de −4,06°, 
 
 | Visualização Gráfica do Desempenho Inercial |
 | :---: |
-![Desempenho Inercial](/hw/Relatorios%20e%20Testes%20tabelados%20de%20circuitos/Desempenho%20Inercial.png)
+![Desempenho Inercial](/docs/7.3%20-%20Testes%20de%20hardware/imagens/imu-mpu6500/imagem-01.png)
 | Figura 1: Desempenho Inercial. |
 
 ## Avaliação da Deriva Estática (GyRO Drift)

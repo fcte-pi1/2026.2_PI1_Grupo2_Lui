@@ -22,7 +22,7 @@ A arquitetura de hardware e o sistema integra combina a placa ESP32 DevKit V1 (3
 
 |       |
 | :---: |
-![Status de conformidade dos subsistemas e distribuição do consumo de potência do robô](/hw/Relatorios%20e%20Testes%20tabelados%20de%20circuitos/Status%20de%20conformidade%20dos%20subsistemas%20e%20distribuição%20do%20consumo%20de%20potência%20do%20robô.png)
+![Status de conformidade dos subsistemas e distribuição do consumo de potência do robô](/hw/Imagens%20PNG%20e%20JPEG%20de%20resultados%20práticos/Relatorio%20Geral/Status%20de%20conformidade%20dos%20subsistemas%20e%20distribuição%20do%20consumo%20de%20potência%20do%20robô.png)
 | Figura 1: Status de conformidade dos subsistemas e distribuição do consumo de potência do robô. |
 
 ## 3. Matriz Consolidada de Resultados
