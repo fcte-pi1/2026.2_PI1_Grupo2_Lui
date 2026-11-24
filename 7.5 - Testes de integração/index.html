@@ -1,0 +1,4505 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://fcte-pi1.github.io/2026.2_PI1_Grupo2_Lui/7.5%20-%20Testes%20de%20integra%C3%A7%C3%A3o/">
+      
+      
+        <link rel="prev" href="../7.4%20-%20Testes%20de%20software/">
+      
+      
+        <link rel="next" href="../8%20-%20Avalia%C3%A7%C3%A3o%20de%20desempenho/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.2">
+    
+    
+      
+        <title>Integração - Projeto PI1 - Grupo 2 (Lui)</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#75-testes-de-integracao" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Projeto PI1 - Grupo 2 (Lui)" class="md-header__button md-logo" aria-label="Projeto PI1 - Grupo 2 (Lui)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Projeto PI1 - Grupo 2 (Lui)
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Integração
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green"  aria-label="Modo Noturno"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Modo Noturno" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="green" data-md-color-accent="green"  aria-label="Modo Claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Modo Claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    2026.2_PI1_Grupo2_Lui
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../1%20-%20TAP/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  1 - TAP
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../2%20-%20Requisitos/Requisitos/" class="md-tabs__link">
+          
+  
+  
+  2 - Requisitos
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../3%20-%20EAP/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  3 - EAP
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../4.1%20-%20Projeto%20conceitual%20de%20estruturas/" class="md-tabs__link">
+          
+  
+  
+  4 - Projetos Conceituais
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../5%20-%20Cronograma/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  5 - Cronograma
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../6%20-%20Or%C3%A7amento/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  6 - Orçamento
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../7.1%20-%20Testes%20de%20estrutura/" class="md-tabs__link">
+          
+  
+  
+  7 - Testes
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../8%20-%20Avalia%C3%A7%C3%A3o%20de%20desempenho/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  8 - Avaliação de Desempenho
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../9%20-%20Relat%C3%B3rio%20de%20encerramento%20do%20projeto/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  9 - Relatório de Encerramento
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Projeto PI1 - Grupo 2 (Lui)" class="md-nav__button md-logo" aria-label="Projeto PI1 - Grupo 2 (Lui)" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Projeto PI1 - Grupo 2 (Lui)
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/fcte-pi1/2026.2_PI1_Grupo2_Lui" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    2026.2_PI1_Grupo2_Lui
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../1%20-%20TAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 - TAP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 - Requisitos
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    2 - Requisitos
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2%20-%20Requisitos/Requisitos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Declaração de Requisitos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2%20-%20Requisitos/RF/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requisitos Funcionais
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2%20-%20Requisitos/RNF/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requisitos Não Funcionais
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2%20-%20Requisitos/MVP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MVP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2%20-%20Requisitos/Matriz%20de%20Rastreabilidade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Matriz de Rastrabilidade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3%20-%20EAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3 - EAP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4 - Projetos Conceituais
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    4 - Projetos Conceituais
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4.1%20-%20Projeto%20conceitual%20de%20estruturas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Estruturas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4.2%20-%20Projeto%20conceitual%20de%20energia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Energia
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4.3%20-%20Projeto%20conceitual%20de%20hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4.4%20-%20Projeto%20conceitual%20de%20software/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Software
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5%20-%20Cronograma/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 - Cronograma
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../6%20-%20Or%C3%A7amento/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 - Orçamento
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7 - Testes
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    7 - Testes
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7.1%20-%20Testes%20de%20estrutura/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Estrutura
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7.2%20-%20Testes%20de%20energia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Energia
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7.3%20-%20Testes%20de%20hardware/7.3%20-%20Testes%20de%20hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7.4%20-%20Testes%20de%20software/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Software
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integração
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integração
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#sumario" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sumário
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-objetivo-alcance-e-resultado-geral" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Objetivo, alcance e resultado geral
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Objetivo, alcance e resultado geral">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#como-ler-os-resultados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Como ler os resultados
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-matriz-consolidada-do-modelo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Matriz consolidada do modelo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-configuracao-instrumentos-e-condicoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Configuração, instrumentos e condições
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Configuração, instrumentos e condições">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-ambiente-e-identificacao-da-montagem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Ambiente e identificação da montagem
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-geometria-confirmada-e-hipoteses-descartadas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Geometria confirmada e hipóteses descartadas
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-evolucao-dos-testes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Evolução dos testes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-procedimentos-e-resultados-por-subsistema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Procedimentos e resultados por subsistema
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Procedimentos e resultados por subsistema">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#etapa-a-preparacao-e-movimento-em-bancada" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Etapa A — Preparação e movimento em bancada
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Etapa A — Preparação e movimento em bancada">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-ambiente-de-desenvolvimento-compilacao-e-gravacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 Ambiente de desenvolvimento, compilação e gravação
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-ponte-h-e-acionamento-dos-motores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 Ponte H e acionamento dos motores
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-encoders-sinais-voltas-e-fatores-provisorios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 Encoders: sinais, voltas e fatores provisórios
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#54-sobrepassagem-frenagem-ativa-e-estabilizacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4 Sobrepassagem, frenagem ativa e estabilização
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#55-imu-controle-independente-e-giros-em-area-aberta" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5 IMU, controle independente e giros em área aberta
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#56-avanco-linear-30-mm-e-uma-celula" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.6 Avanço linear: 30 mm e uma célula
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#57-encadeamento-supervisionado-e-ganho-de-velocidade" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.7 Encadeamento supervisionado e ganho de velocidade
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etapa-b-sensores-e-percepcao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Etapa B — Sensores e percepção
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Etapa B — Sensores e percepção">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#58-sensores-ultrassonicos-conexoes-e-calibracao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.8 Sensores ultrassônicos, conexões e calibração
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#59-aquisicao-percepcao-mediana-e-recuperacao-de-eco" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.9 Aquisição, percepção, mediana e recuperação de eco
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etapa-c-comunicacao-e-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Etapa C — Comunicação e interface
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Etapa C — Comunicação e interface">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#510-bluetooth-conexao-reconexao-e-dados-reais" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.10 Bluetooth: conexão, reconexão e dados reais
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#511-deriva-do-yaw-e-correcao-no-diagnostico" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.11 Deriva do yaw e correção no diagnóstico
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#512-dashboard-original-telemetria-e-controle-de-missao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.12 Dashboard original, telemetria e controle de missão
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etapa-d-integracao-no-labirinto-e-estrategias-de-curva" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Etapa D — Integração no labirinto e estratégias de curva
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Etapa D — Integração no labirinto e estratégias de curva">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#513-integracao-no-labirinto-44-e-evolucao-da-locomocao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.13 Integração no labirinto 4×4 e evolução da locomoção
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.13 Integração no labirinto 4×4 e evolução da locomoção">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#5131-registros-recentes-curva-e-operacao-sem-cabo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.13.1 Registros recentes: curva e operação sem cabo
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#514-curvas-em-etapas-45-30-e-avancos-intermediarios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.14 Curvas em etapas: 45°, 30° e avanços intermediários
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#515-mudanca-de-estrategia-recuo-e-curva-continua" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.15 Mudança de estratégia: recuo e curva contínua
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etapa-e-consolidacao-e-diagnostico" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Etapa E — Consolidação e diagnóstico
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Etapa E — Consolidação e diagnóstico">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#516-testes-automatizados-e-integracao-de-software" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.16 Testes automatizados e integração de software
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.16 Testes automatizados e integração de software">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#5161-catalogo-dos-principais-motivos-de-parada-do-recorte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.16.1 Catálogo dos principais motivos de parada do recorte
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-evidencias-em-video" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Evidências em vídeo
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../8%20-%20Avalia%C3%A7%C3%A3o%20de%20desempenho/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8 - Avaliação de Desempenho
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../9%20-%20Relat%C3%B3rio%20de%20encerramento%20do%20projeto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 - Relatório de Encerramento
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#sumario" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sumário
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-objetivo-alcance-e-resultado-geral" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Objetivo, alcance e resultado geral
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Objetivo, alcance e resultado geral">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#como-ler-os-resultados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Como ler os resultados
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-matriz-consolidada-do-modelo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Matriz consolidada do modelo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-configuracao-instrumentos-e-condicoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Configuração, instrumentos e condições
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Configuração, instrumentos e condições">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-ambiente-e-identificacao-da-montagem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Ambiente e identificação da montagem
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-geometria-confirmada-e-hipoteses-descartadas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Geometria confirmada e hipóteses descartadas
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-evolucao-dos-testes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Evolução dos testes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-procedimentos-e-resultados-por-subsistema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Procedimentos e resultados por subsistema
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Procedimentos e resultados por subsistema">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#etapa-a-preparacao-e-movimento-em-bancada" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Etapa A — Preparação e movimento em bancada
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Etapa A — Preparação e movimento em bancada">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-ambiente-de-desenvolvimento-compilacao-e-gravacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 Ambiente de desenvolvimento, compilação e gravação
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-ponte-h-e-acionamento-dos-motores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 Ponte H e acionamento dos motores
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-encoders-sinais-voltas-e-fatores-provisorios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 Encoders: sinais, voltas e fatores provisórios
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#54-sobrepassagem-frenagem-ativa-e-estabilizacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4 Sobrepassagem, frenagem ativa e estabilização
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#55-imu-controle-independente-e-giros-em-area-aberta" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5 IMU, controle independente e giros em área aberta
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#56-avanco-linear-30-mm-e-uma-celula" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.6 Avanço linear: 30 mm e uma célula
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#57-encadeamento-supervisionado-e-ganho-de-velocidade" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.7 Encadeamento supervisionado e ganho de velocidade
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etapa-b-sensores-e-percepcao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Etapa B — Sensores e percepção
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Etapa B — Sensores e percepção">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#58-sensores-ultrassonicos-conexoes-e-calibracao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.8 Sensores ultrassônicos, conexões e calibração
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#59-aquisicao-percepcao-mediana-e-recuperacao-de-eco" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.9 Aquisição, percepção, mediana e recuperação de eco
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etapa-c-comunicacao-e-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Etapa C — Comunicação e interface
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Etapa C — Comunicação e interface">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#510-bluetooth-conexao-reconexao-e-dados-reais" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.10 Bluetooth: conexão, reconexão e dados reais
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#511-deriva-do-yaw-e-correcao-no-diagnostico" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.11 Deriva do yaw e correção no diagnóstico
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#512-dashboard-original-telemetria-e-controle-de-missao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.12 Dashboard original, telemetria e controle de missão
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etapa-d-integracao-no-labirinto-e-estrategias-de-curva" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Etapa D — Integração no labirinto e estratégias de curva
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Etapa D — Integração no labirinto e estratégias de curva">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#513-integracao-no-labirinto-44-e-evolucao-da-locomocao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.13 Integração no labirinto 4×4 e evolução da locomoção
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.13 Integração no labirinto 4×4 e evolução da locomoção">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#5131-registros-recentes-curva-e-operacao-sem-cabo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.13.1 Registros recentes: curva e operação sem cabo
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#514-curvas-em-etapas-45-30-e-avancos-intermediarios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.14 Curvas em etapas: 45°, 30° e avanços intermediários
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#515-mudanca-de-estrategia-recuo-e-curva-continua" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.15 Mudança de estratégia: recuo e curva contínua
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etapa-e-consolidacao-e-diagnostico" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Etapa E — Consolidação e diagnóstico
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Etapa E — Consolidação e diagnóstico">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#516-testes-automatizados-e-integracao-de-software" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.16 Testes automatizados e integração de software
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.16 Testes automatizados e integração de software">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#5161-catalogo-dos-principais-motivos-de-parada-do-recorte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.16.1 Catálogo dos principais motivos de parada do recorte
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-evidencias-em-video" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Evidências em vídeo
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="75-testes-de-integracao">7.5 — Testes de integração<a class="headerlink" href="#75-testes-de-integracao" title="Permanent link">&para;</a></h1>
+<h2 id="sumario">Sumário<a class="headerlink" href="#sumario" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="#1-objetivo-alcance-e-resultado-geral">Objetivo, alcance e resultado geral</a></li>
+<li><a href="#2-matriz-consolidada-do-modelo">Matriz consolidada do modelo</a></li>
+<li><a href="#3-configuração-instrumentos-e-condições">Configuração, instrumentos e condições</a></li>
+<li><a href="#4-evolucao-dos-testes">Evolução dos testes</a></li>
+<li><a href="#5-procedimentos-e-resultados-por-subsistema">Procedimentos e resultados por subsistema</a></li>
+<li><a href="#6-evidencias-em-video">Evidências em vídeo</a></li>
+</ul>
+<p><a id="1-objetivo-alcance-e-resultado-geral"></a></p>
+<h2 id="1-objetivo-alcance-e-resultado-geral">1. Objetivo, alcance e resultado geral<a class="headerlink" href="#1-objetivo-alcance-e-resultado-geral" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Definição do relatório</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Objetivo</td>
+<td>Consolidar os testes de integração do MicroMouse — Projeto Integrador 1, Grupo 2, UnB</td>
+</tr>
+<tr>
+<td>Período</td>
+<td>Ensaios instrumentados de 12–18/11/2026 e atualização com vídeos identificados em 22–23/11; revisão em 23/11/2026</td>
+</tr>
+<tr>
+<td>Resultado geral</td>
+<td>Acionamento, frenagem, giros, avanços, Bluetooth e comandos pelo site demonstrados; registros recentes mostram curva no labirinto e locomoção sem cabo</td>
+</tr>
+<tr>
+<td>Evolução da montagem</td>
+<td>Motor travado substituído; bateria elevada com duas espumas para liberar o disco do encoder; peça mais alta do chassi em impressão</td>
+</tr>
+<tr>
+<td>Correção dos sensores</td>
+<td>Fiação dos sensores substituída e alimentação alterada de 3,3 V para 5 V, resolvendo o problema relatado pela equipe</td>
+</tr>
+<tr>
+<td>Alcance</td>
+<td>Curvas realizadas com repetibilidade ainda variável, conforme a equipe; travessia completa do labirinto não aferida neste conjunto de registros</td>
+</tr>
+<tr>
+<td>Responsáveis / aprovações</td>
+<td>A confirmar pela equipe e pelo orientador; êxito em um teste não equivale à aprovação formal</td>
+</tr>
+<tr>
+<td>Ordem de leitura</td>
+<td>Por dependência técnica; a seção 4 resume as etapas da campanha</td>
+</tr>
+</tbody>
+</table>
+<h3 id="como-ler-os-resultados">Como ler os resultados<a class="headerlink" href="#como-ler-os-resultados" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Tipo de registro</th>
+<th>O que informa</th>
+<th>Limite</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Instrumentado</td>
+<td>Encoder, IMU, pulso, ACK ou log</td>
+<td>Resolução numérica não equivale à exatidão física</td>
+</tr>
+<tr>
+<td>Observação do operador</td>
+<td>Contato, cabo preso e medida com régua</td>
+<td>Distâncias podem ser aproximadas</td>
+</tr>
+<tr>
+<td>Foto / vídeo</td>
+<td>Sentido, sequência e contato visível</td>
+<td>Câmera móvel, perspectiva e ausência de escala limitam medidas</td>
+</tr>
+<tr>
+<td>Estimativa / cálculo</td>
+<td>Contagens por volta, raio e posição nominal</td>
+<td>Depende das hipóteses indicadas</td>
+</tr>
+<tr>
+<td>Teste automatizado</td>
+<td>Software com entradas controladas</td>
+<td>Não substitui alimentação, aderência, montagem ou percurso real</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Convenção</th>
+<th>Significado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ângulos nas tabelas</td>
+<td>Sem sinal: magnitude do giro; D = direita e E = esquerda</td>
+</tr>
+<tr>
+<td>Yaw nos registros</td>
+<td>Mantém o sinal fornecido pelo firmware; valores negativos nas curvas à direita não são erro de transcrição</td>
+</tr>
+<tr>
+<td>Sensores F / E / D</td>
+<td>Frontal / esquerdo / direito; unidade indicada em cada tabela</td>
+</tr>
+<tr>
+<td>Flags F=1 / E=0 / D=1</td>
+<td>Validade das leituras, não presença/ausência de parede</td>
+</tr>
+<tr>
+<td>Velocidades dos perfis</td>
+<td>Máximos de referência comandados; não são medição independente da velocidade física de pico</td>
+</tr>
+<tr>
+<td>Duração</td>
+<td>Tempos do firmware incluem as parcelas informadas; tempo de vídeo em câmera lenta não é tempo real de movimento</td>
+</tr>
+</tbody>
+</table>
+<p><a id="2-matriz-consolidada-do-modelo"></a></p>
+<h2 id="2-matriz-consolidada-do-modelo">2. Matriz consolidada do modelo<a class="headerlink" href="#2-matriz-consolidada-do-modelo" title="Permanent link">&para;</a></h2>
+<p>As 16 famílias resumem a evolução dos ensaios, das dificuldades identificadas às correções e aos resultados alcançados. Os testes iniciais e os registros recentes são apresentados separadamente para mostrar o progresso do projeto.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;"><strong>ID</strong></th>
+<th><strong>Descrição</strong></th>
+<th><strong>Data de Início</strong></th>
+<th><strong>Situação do ensaio</strong></th>
+<th><strong>Sub-equipes</strong></th>
+<th><strong>Responsável</strong></th>
+<th><strong>Resultados Esperados</strong></th>
+<th><strong>Resultados Obtidos</strong></th>
+<th><strong>Aprovação Interna (S/N)</strong></th>
+<th><strong>Aprovação do Orientador (S/N)</strong></th>
+<th><strong>Observações</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><a href="#t51">5.1</a></td>
+<td>Ambiente, compilação e gravação</td>
+<td>12/11/2026</td>
+<td>Compilação, gravação e execução demonstradas</td>
+<td>Software / Eletrônica</td>
+<td>A confirmar</td>
+<td>Compilar no Mac ARM64 e executar a versão gravada</td>
+<td>Uploads verificados; ESP identificada e diagnósticos executados</td>
+<td>A confirmar</td>
+<td>A confirmar</td>
+<td>Ambiente VS Code/PlatformIO disponível e utilizado</td>
+</tr>
+<tr>
+<td style="text-align: center;"><a href="#t52">5.2</a></td>
+<td>ESP32, DRV8833 e motores</td>
+<td>12/11/2026</td>
+<td>Acionamento demonstrado após ajustes</td>
+<td>Eletrônica / Energia / Software</td>
+<td>A confirmar</td>
+<td>Acionar os motores e liberar sua rotação</td>
+<td>Motor travado substituído; bateria elevada, liberando o disco do encoder; rodas acionadas</td>
+<td>A confirmar</td>
+<td>A confirmar</td>
+<td>Duas espumas elevam a bateria enquanto a peça mais alta do chassi é impressa</td>
+</tr>
+<tr>
+<td style="text-align: center;"><a href="#t53">5.3</a></td>
+<td>Encoders e conversão para distância</td>
+<td>12/11/2026</td>
+<td>Sinais e fatores de conversão estabelecidos</td>
+<td>Eletrônica / Software</td>
+<td>A confirmar</td>
+<td>Relacionar contagens e deslocamento das rodas</td>
+<td>Sinal direito corrigido; fatores provisórios de 292 e 284 contagens/volta</td>
+<td>A confirmar</td>
+<td>A confirmar</td>
+<td>Calibração por marca preta; contato mecânico com a bateria corrigido na montagem</td>
+</tr>
+<tr>
+<td style="text-align: center;"><a href="#t54">5.4</a></td>
+<td>Frenagem e repouso</td>
+<td>12/11/2026</td>
+<td>Repouso registrado nos ensaios</td>
+<td>Software / Eletrônica / Energia</td>
+<td>A confirmar</td>
+<td>Reduzir sobrepassagem e confirmar parada</td>
+<td>Frenagem ativa, aproximação do alvo e espera de estabilização incorporadas</td>
+<td>A confirmar</td>
+<td>A confirmar</td>
+<td>Controle passou a distinguir desligamento, frenagem e repouso</td>
+</tr>
+<tr>
+<td style="text-align: center;"><a href="#t55">5.5</a></td>
+<td>Giros de bancada com IMU e encoders</td>
+<td>12/11/2026</td>
+<td>Giros de 30°, 90° e 180° demonstrados</td>
+<td>Software / Eletrônica / Estruturas</td>
+<td>A confirmar</td>
+<td>Girar próximo do alvo e equilibrar as rodas</td>
+<td>Controle individual melhorou o giro; alvo de 90° chegou a 89,61° pela IMU</td>
+<td>A confirmar</td>
+<td>A confirmar</td>
+<td>Área aberta de 30 cm; evolução no labirinto registrada em 5.13</td>
+</tr>
+<tr>
+<td style="text-align: center;"><a href="#t56">5.6</a></td>
+<td>Avanços de 30 e 180 mm</td>
+<td>12/11/2026</td>
+<td>Avanços controlados demonstrados</td>
+<td>Software / Eletrônica</td>
+<td>A confirmar</td>
+<td>Avançar e preservar rumo</td>
+<td>Alvos atingidos aproximadamente pelos encoders e pela conferência física</td>
+<td>A confirmar</td>
+<td>A confirmar</td>
+<td>Correção de rumo e sincronização das rodas ajustadas</td>
+</tr>
+<tr>
+<td style="text-align: center;"><a href="#t57">5.7</a></td>
+<td>Velocidade e movimentos encadeados</td>
+<td>13/11/2026</td>
+<td>Perfis mais rápidos comparados</td>
+<td>Software / Eletrônica / Estruturas</td>
+<td>A confirmar</td>
+<td>Reduzir o tempo dos movimentos</td>
+<td>Retas a até 100 mm/s e giros a até 55°/s; bloco V17 cerca de 9,4% mais rápido que a repetição V16</td>
+<td>A confirmar</td>
+<td>A confirmar</td>
+<td>Tempos de trechos; ensaio afetado pelo cabo excluído da comparação</td>
+</tr>
+<tr>
+<td style="text-align: center;"><a href="#t58">5.8</a></td>
+<td>Ultrassons, montagem e calibração</td>
+<td>16/11/2026</td>
+<td>Problema corrigido com revisão da fiação e alimentação</td>
+<td>Eletrônica / Software / Estruturas</td>
+<td>A confirmar</td>
+<td>Obter medidas coerentes nas referências de bancada</td>
+<td>Calibração inicial realizada; troca da fiação e mudança de 3,3 V para 5 V resolveram o problema dos sensores</td>
+<td>A confirmar</td>
+<td>A confirmar</td>
+<td>HC-SR04 passaram a ser alimentados em 5 V após a correção</td>
+</tr>
+<tr>
+<td style="text-align: center;"><a href="#t59">5.9</a></td>
+<td>Percepção, filtros e recuperação de eco</td>
+<td>16–17/11/2026</td>
+<td>Filtro e pausa/retomada exercitados</td>
+<td>Software / Eletrônica</td>
+<td>A confirmar</td>
+<td>Tratar leituras isoladas e recuperar aquisição</td>
+<td>Janela válida, mediana de três disparos e recuperação com quadros novos implementadas</td>
+<td>A confirmar</td>
+<td>A confirmar</td>
+<td>Proteções mantidas para leituras repetidamente inválidas</td>
+</tr>
+<tr>
+<td style="text-align: center;"><a href="#t510">5.10</a></td>
+<td>Bluetooth real no Mac</td>
+<td>17/11/2026</td>
+<td>Enlace e reconexões demonstrados</td>
+<td>Software / Eletrônica</td>
+<td>A confirmar</td>
+<td>Transmitir dados e reconectar</td>
+<td>Receptor RFCOMM recebeu 115 quadros válidos em três conexões</td>
+<td>A confirmar</td>
+<td>A confirmar</td>
+<td>Solução nativa restabeleceu a recepção após as dificuldades da porta virtual</td>
+</tr>
+<tr>
+<td style="text-align: center;"><a href="#t511">5.11</a></td>
+<td>Yaw e compensação de repouso</td>
+<td>17/11/2026</td>
+<td>Estabilidade em repouso demonstrada</td>
+<td>Software / Eletrônica</td>
+<td>A confirmar</td>
+<td>Reduzir deriva quando imóvel</td>
+<td>Ensaio de 30,06 s manteve yaw transmitido em 0,0161°</td>
+<td>A confirmar</td>
+<td>A confirmar</td>
+<td>Resultado do diagnóstico Bluetooth; orientação relativa</td>
+</tr>
+<tr>
+<td style="text-align: center;"><a href="#t512">5.12</a></td>
+<td>Site original, telemetria e comandos</td>
+<td>17/11/2026</td>
+<td>Telemetria e início/parada integrados</td>
+<td>Software / Eletrônica</td>
+<td>A confirmar</td>
+<td>Exibir dados reais e controlar a missão</td>
+<td>Dashboard original preservado; confirmações reais de START e STOP; estados acompanhados no painel</td>
+<td>A confirmar</td>
+<td>A confirmar</td>
+<td>Monitor ao vivo; banco histórico não configurado nessa campanha</td>
+</tr>
+<tr>
+<td style="text-align: center;"><a href="#t513">5.13</a></td>
+<td>Navegação e locomoção no 4×4</td>
+<td>16–23/11/2026</td>
+<td>Trechos e manobras demonstrados</td>
+<td>Todas as interfaces envolvidas</td>
+<td>A confirmar</td>
+<td>Integrar movimento, leitura e acompanhamento no labirinto</td>
+<td>Avanços e giros iniciais; vídeos recentes acrescentam curva e movimento sem cabo</td>
+<td>A confirmar</td>
+<td>A confirmar</td>
+<td>Curvas ainda variam entre repetições; sem travessia completa aferida</td>
+</tr>
+<tr>
+<td style="text-align: center;"><a href="#t514">5.14</a></td>
+<td>Comparação de curvas segmentadas</td>
+<td>17–18/11/2026</td>
+<td>Estratégias comparadas e reservas ajustadas</td>
+<td>Software / Eletrônica / Estruturas</td>
+<td>A confirmar</td>
+<td>Comparar giros de 45°/30° e pequenos avanços</td>
+<td>Etapas executadas e folgas medidas orientaram ajustes de trajetória</td>
+<td>A confirmar</td>
+<td>A confirmar</td>
+<td>Ensaios históricos; novo vídeo de curva analisado separadamente em 5.13</td>
+</tr>
+<tr>
+<td style="text-align: center;"><a href="#t515">5.15</a></td>
+<td>Perfil de arco contínuo e recuo</td>
+<td>18/11/2026</td>
+<td>Perfil implementado e simulado</td>
+<td>Software / Eletrônica / Estruturas</td>
+<td>A confirmar</td>
+<td>Preparar curva contínua após observar abertura</td>
+<td>Controle de arco integrado e cenários aprovados em software</td>
+<td>A confirmar</td>
+<td>A confirmar</td>
+<td>Na tentativa física arquivada dessa versão, recuo interrompido antes do arco</td>
+</tr>
+<tr>
+<td style="text-align: center;"><a href="#t516">5.16</a></td>
+<td>Testes automatizados e integração de software</td>
+<td>12–18/11/2026</td>
+<td>Suítes executadas nas revisões registradas</td>
+<td>Todas as sub-equipes</td>
+<td>A confirmar</td>
+<td>Verificar controlador, comunicação e interface</td>
+<td>Progressão até 207 testes de firmware no marco do perfil de arco</td>
+<td>A confirmar</td>
+<td>A confirmar</td>
+<td>Contagens históricas por versão, sem somar execuções de diferentes revisões</td>
+</tr>
+</tbody>
+</table>
+<p><a id="3-configuração-instrumentos-e-condições"></a></p>
+<h2 id="3-configuracao-instrumentos-e-condicoes">3. Configuração, instrumentos e condições<a class="headerlink" href="#3-configuracao-instrumentos-e-condicoes" title="Permanent link">&para;</a></h2>
+<h3 id="31-ambiente-e-identificacao-da-montagem">3.1 Ambiente e identificação da montagem<a class="headerlink" href="#31-ambiente-e-identificacao-da-montagem" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Elemento</th>
+<th>Registro desta campanha</th>
+<th>Limitação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Computador</td>
+<td>MacBook Air Apple Silicon, arquitetura ARM64; VS Code e PlatformIO</td>
+<td>Ambiente já estava disponível quando foi inspecionado, apesar da hipótese inicial de ambiente limpo</td>
+</tr>
+<tr>
+<td>Toolchain</td>
+<td>PlatformIO Core 6.2.1b2; pioarduino 55.03.312; Arduino-ESP32 3.3.12; ferramentas Apple de compilação</td>
+<td>Descreve versões verificadas nos registros históricos</td>
+</tr>
+<tr>
+<td>Placa</td>
+<td>ESP32-D0WD-V3, revisão 3.1, dois núcleos, flash de 4 MB</td>
+<td>Interface USB CP2102; porta observada <code>/dev/cu.usbserial-0001</code></td>
+</tr>
+<tr>
+<td>Atuação</td>
+<td>Dois motores N20 com encoders e ponte H DRV8833</td>
+<td>Alimentação USB da lógica não prova que os motores estejam alimentados</td>
+</tr>
+<tr>
+<td>IMU</td>
+<td>Módulo identificado como MPU6500; identificador lido 0x70</td>
+<td>Menções iniciais a MPU6050 não substituem essa identificação; yaw relativo</td>
+</tr>
+<tr>
+<td>Distância</td>
+<td>Três HC-SR04, frontal/esquerdo/direito, em TRIG/ECHO; alimentação de 5 V após revisão da fiação</td>
+<td>Montagem inicial usava 3,3 V; troca da fiação e da alimentação corrigiu o problema dos sensores</td>
+</tr>
+<tr>
+<td>Energia</td>
+<td>Bateria do robô e USB conforme a etapa; vídeo V13 mostra locomoção sem USB</td>
+<td>O cabo facilitava novas gravações durante os ajustes; o ensaio sem cabo demonstra operação alimentada pela bateria</td>
+</tr>
+<tr>
+<td>Folga motor–bateria</td>
+<td>Motor travado substituído; disco do encoder estava raspando na bateria</td>
+<td>Duas espumas elevam a bateria; nova peça do chassi, mais alta, em impressão</td>
+</tr>
+<tr>
+<td>Referências físicas</td>
+<td>Régua, medidas aproximadas do operador, marca preta nas rodas, quadrado de 30 cm e percurso improvisado de 30×50 cm</td>
+<td>Ausência de instrumentação metrológica para aferir erro milimétrico ou angular em todos os ensaios</td>
+</tr>
+<tr>
+<td>Comunicação e interface</td>
+<td>Bluetooth Classic SPP/RFCOMM, ponte nativa no Mac, backend local e React</td>
+<td>Monitor sem persistência PostgreSQL; capturas locais arquivadas como evidência, não como banco da aplicação</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Interface</th>
+<th>GPIOs / configuração</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Motor esquerdo / direito</td>
+<td>16–17 / 18–19; DRV8833</td>
+</tr>
+<tr>
+<td>Habilitação e PWM</td>
+<td>nSLEEP 5; 20 kHz / 8 bits</td>
+</tr>
+<tr>
+<td>Encoder esquerdo / direito</td>
+<td>32–33 / 25–26; direita invertida no software</td>
+</tr>
+<tr>
+<td>Sonar frontal / esquerdo / direito</td>
+<td>TRIG–ECHO: 4–35 / 14–36 / 27–39</td>
+</tr>
+<tr>
+<td>I2C</td>
+<td>SDA21/SCL22; endereço configurado da IMU 0x68</td>
+</tr>
+<tr>
+<td>Identificação da IMU</td>
+<td>WHO_AM_I 0x70 não é endereço I2C</td>
+</tr>
+<tr>
+<td>Limite da pinagem</td>
+<td>Software e pontos inspecionados; não é ensaio completo de continuidade</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Etapa</th>
+<th>Condição registrada</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Início</td>
+<td>Rodas suspensas; bateria/USB conforme o ensaio</td>
+</tr>
+<tr>
+<td>Bancada no piso</td>
+<td>Área aberta e percurso improvisado; cabo supervisionado</td>
+</tr>
+<tr>
+<td>Labirinto</td>
+<td>No chão; bateria ligada quando confirmada</td>
+</tr>
+<tr>
+<td>Montagem revista</td>
+<td>Segundo o operador, todos os vídeos, exceto os primeiros ensaios com problema nos motores, já usam as espumas; V12–V13 também usam o motor substituído</td>
+</tr>
+</tbody>
+</table>
+<h3 id="32-geometria-confirmada-e-hipoteses-descartadas">3.2 Geometria confirmada e hipóteses descartadas<a class="headerlink" href="#32-geometria-confirmada-e-hipoteses-descartadas" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Grandeza</th>
+<th style="text-align: right;">Valor adotado no recorte</th>
+<th>Origem/observação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Diâmetro da roda com pneu</td>
+<td style="text-align: right;">34 mm</td>
+<td>Medida informada pelo operador</td>
+</tr>
+<tr>
+<td>Bitola entre centros dos pneus</td>
+<td style="text-align: right;">Aproximadamente 120 mm</td>
+<td>Não é largura externa total</td>
+</tr>
+<tr>
+<td>Largura externa máxima</td>
+<td style="text-align: right;">Aproximadamente 125 mm</td>
+<td>Medida posterior do operador</td>
+</tr>
+<tr>
+<td>Vão livre entre faces das paredes</td>
+<td style="text-align: right;">170 mm</td>
+<td>Confirmado após dúvida sobre comprimento das peças</td>
+</tr>
+<tr>
+<td>Espessura adotada da parede</td>
+<td style="text-align: right;">10 mm</td>
+<td>Informação para o cálculo do passo; foto posterior anota 1,2 cm em um elemento de encaixe, que exige conciliação futura</td>
+</tr>
+<tr>
+<td>Passo entre centros das células</td>
+<td style="text-align: right;">180 mm = 170 + 10 mm</td>
+<td>Não usar 160 mm da peça como vão livre</td>
+</tr>
+<tr>
+<td>Eixo até extremidade frontal/traseira</td>
+<td style="text-align: right;">86/34 mm, aproximadamente</td>
+<td>Medidas anteriores; reconfirmar se a montagem mudar</td>
+</tr>
+<tr>
+<td>Avanço longitudinal do sensor lateral em relação ao eixo</td>
+<td style="text-align: right;">Aproximadamente 40 mm</td>
+<td>Foto anotada; <strong>não é distância do eixo à face do sensor frontal</strong></td>
+</tr>
+<tr>
+<td>Eixo até face do sensor frontal, no comprimento</td>
+<td style="text-align: right;">Não confirmado neste recorte</td>
+<td>Impede calcular de forma definitiva uma referência frontal de centro</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Cálculo / hipótese</th>
+<th>Resultado</th>
+<th>Interpretação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Passo entre centros</td>
+<td>170 + 10 = 180 mm; dois avanços 360 mm; três 540 mm</td>
+<td>Célula já ocupada não conta como avanço; <code>16+1+16+1+16</code> não define três passos</td>
+</tr>
+<tr>
+<td>Folga estática</td>
+<td>(170−125)/2 = 22,5 mm por lado</td>
+<td>Robô centralizado; não necessariamente leitura da face do sensor</td>
+</tr>
+<tr>
+<td>Quadrado ideal de 120 mm</td>
+<td>Diagonal ≈169,7 mm</td>
+<td>Quase todo o vão de 170 mm; eixo real deslocado e cabos alteram a envoltória</td>
+</tr>
+<tr>
+<td>Quina retangular hipotética</td>
+<td>√(86²+62,5²) ≈106,3 mm de raio</td>
+<td>Limite conservador; chassi arredondado e aberturas podem mudar o resultado</td>
+</tr>
+<tr>
+<td>Referência frontal de centro</td>
+<td>85 mm − projeção eixo–face do sensor frontal</td>
+<td>Projeção não confirmada; referência definitiva pendente</td>
+</tr>
+<tr>
+<td>Cálculo de 4,5 cm descartado</td>
+<td>Usava os 4 cm da foto lateral como se fossem frontais</td>
+<td>Não foi aplicado como referência de centro</td>
+</tr>
+<tr>
+<td>Limite de partida de 4,5 cm</td>
+<td>Usado depois para avanço de 1 cm com reserva de 3,5 cm</td>
+<td>Outro conceito; não é o cálculo geométrico descartado</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Dimensões anotadas pelo operador sobre foto da montagem" src="../figs/Testes/Integracao/medidas-chassi-labirinto.jpg" /></p>
+<p><em>Figura 1 — Foto IMG_4101: chassi indicado como 12×12 cm, peças de parede indicadas como 16 cm e detalhe de encaixe como 1,2 cm. As anotações não substituem a medição do vão livre de 17 cm nem confirmam o passo a partir da perspectiva.</em></p>
+<p><img alt="Foto do sensor lateral com anotações de 4 cm e 1 cm" src="../figs/Testes/Integracao/sensor-lateral-deslocamento.jpg" /></p>
+<p><em>Figura 2 — Deslocamento do sensor lateral à frente do eixo. A indicação de 1 cm é lateral junto à roda; não define a ponta frontal a 5 cm do eixo.</em></p>
+<p><a id="4-evolucao-dos-testes"></a></p>
+<h2 id="4-evolucao-dos-testes">4. Evolução dos testes<a class="headerlink" href="#4-evolucao-dos-testes" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Período</th>
+<th>Trabalho realizado</th>
+<th>Marco e limite</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>12/11</td>
+<td>Verificação do ambiente, USB, bancada de motores, encoders, frenagem, IMU, giros e primeiros avanços</td>
+<td>Movimentos observados; calibrações ainda provisórias</td>
+</tr>
+<tr>
+<td>13/11</td>
+<td>Encadeamento supervisionado, redução do desvio de rumo, evolução V9–V17 e perfis mais rápidos</td>
+<td>Melhoras de bancada; não equivalem a navegação autônoma</td>
+</tr>
+<tr>
+<td>16/11</td>
+<td>Integração do controle ao firmware principal, partida manual, medidas reais do labirinto e calibração dos ultrassons</td>
+<td>Vão de 17 cm esclarecido; sensores apresentaram discrepâncias</td>
+</tr>
+<tr>
+<td>17/11</td>
+<td>Bluetooth, correção do yaw diagnóstico, site original, comandos remotos, filtragem e missões no 4×4</td>
+<td>Enlace e comando demonstrados; paradas por leitura e colisões persistiram</td>
+</tr>
+<tr>
+<td>Noite de 17 para 18/11</td>
+<td>Comparação entre curvas segmentadas, conferência estática e proposta de arco</td>
+<td>Medidas e resultados das etapas orientaram a revisão da trajetória</td>
+</tr>
+<tr>
+<td>18/11</td>
+<td>Navegação experimental com arco e teste esquerdo isolado</td>
+<td>Missão parou por eco; teste isolado parou durante recuo</td>
+</tr>
+<tr>
+<td>Atualização recebida em 23/11</td>
+<td>Diagnóstico mecânico: motor travado e disco do encoder raspando na bateria</td>
+<td>Motor substituído; duas espumas elevam a bateria; peça mais alta do chassi em impressão</td>
+</tr>
+<tr>
+<td>Correção dos sensores, informada em 23/11</td>
+<td>Troca da fiação e alteração da alimentação de 3,3 V para 5 V</td>
+<td>Problema dos sensores resolvido pela equipe após a revisão elétrica</td>
+</tr>
+<tr>
+<td>Arquivos identificados em 22–23/11</td>
+<td>Novos vídeos de curva e deslocamento sem cabo</td>
+<td>Montagem corrigida; sem reposicionamento manual informado; repetibilidade da curva ainda variável</td>
+</tr>
+<tr>
+<td>23/11</td>
+<td>Consolidação dos resultados e vídeos no Drive</td>
+<td>Revisão documental; nenhuma nova execução de motores para elaborar o relatório</td>
+</tr>
+</tbody>
+</table>
+<p><a id="5-procedimentos-e-resultados-por-subsistema"></a></p>
+<h2 id="5-procedimentos-e-resultados-por-subsistema">5. Procedimentos e resultados por subsistema<a class="headerlink" href="#5-procedimentos-e-resultados-por-subsistema" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Etapa de leitura</th>
+<th>Famílias</th>
+<th>Dependência / objetivo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A — Preparação e bancada</td>
+<td><a href="#t51">5.1–5.7</a></td>
+<td>Identificar ambiente; acionar, medir, frear, girar, avançar e ajustar velocidade</td>
+</tr>
+<tr>
+<td>B — Sensores e percepção</td>
+<td><a href="#t58">5.8–5.9</a></td>
+<td>Comparar medidas e tratar validade, idade, outliers e recuperação</td>
+</tr>
+<tr>
+<td>C — Comunicação e interface</td>
+<td><a href="#t510">5.10–5.12</a></td>
+<td>Transmitir dados, estabilizar yaw diagnóstico e confirmar comandos pelo site</td>
+</tr>
+<tr>
+<td>D — Integração no percurso</td>
+<td><a href="#t513">5.13–5.15</a></td>
+<td>Observar paredes, analisar falhas e comparar curvas segmentadas com a proposta de arco</td>
+</tr>
+<tr>
+<td>E — Consolidação</td>
+<td><a href="#t516">5.16</a></td>
+<td>Separar testes automatizados, evidência física, motivos de parada e pendências</td>
+</tr>
+</tbody>
+</table>
+<p><a id="etapa-a"></a></p>
+<h3 id="etapa-a-preparacao-e-movimento-em-bancada">Etapa A — Preparação e movimento em bancada<a class="headerlink" href="#etapa-a-preparacao-e-movimento-em-bancada" title="Permanent link">&para;</a></h3>
+<p><a id="t51"></a></p>
+<h4 id="51-ambiente-de-desenvolvimento-compilacao-e-gravacao">5.1 Ambiente de desenvolvimento, compilação e gravação<a class="headerlink" href="#51-ambiente-de-desenvolvimento-compilacao-e-gravacao" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Procedimento / condição</th>
+<th>Resultado e limite</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Objetivo</td>
+<td>Identificar ESP, compilar no Mac ARM64 e gravar diagnóstico</td>
+<td>Compilação, gravação e execução serial demonstradas</td>
+</tr>
+<tr>
+<td>Ambiente</td>
+<td>VS Code, PlatformIO, toolchain e porta inspecionados</td>
+<td>Já estavam disponíveis; Core privado não exigiu inclusão no PATH</td>
+</tr>
+<tr>
+<td>USB</td>
+<td>CP2102 em <code>/dev/cu.usbserial-0001</code>; fechar monitores concorrentes</td>
+<td>ESP32-D0WD-V3 identificada; a posição da USB-C não define o nome serial</td>
+</tr>
+<tr>
+<td>Gravação</td>
+<td>Upload e verificação dos dados; conferir mensagem de inicialização</td>
+<td>Hashes verificados; gravar substitui a aplicação anterior da ESP</td>
+</tr>
+<tr>
+<td>Evolução</td>
+<td>Diagnóstico USB → motores/encoders → Bluetooth → missão</td>
+<td>A versão integrada passou a exigir partida explícita e espera de 5 s</td>
+</tr>
+<tr>
+<td>Ressalva</td>
+<td>Microbenchmark inicial sob cobertura falhou e passou isoladamente</td>
+<td>Não equivale a falha física; compilação também não valida a navegação</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Registro da gravação da ESP32" src="../figs/Testes/Integracao/terminal-compilacao-gravacao.png" /></p>
+<p><em>Figura 3 — Trecho do log de upload com identificação, verificação e conclusão. Fonte: <code>upload-partida.log</code>; não houve nova gravação para produzir o relatório.</em></p>
+<p><a id="t52"></a></p>
+<h4 id="52-ponte-h-e-acionamento-dos-motores">5.2 Ponte H e acionamento dos motores<a class="headerlink" href="#52-ponte-h-e-acionamento-dos-motores" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Etapa</th>
+<th>Diagnóstico / ação</th>
+<th>Resultado alcançado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Inspeção inicial</td>
+<td>Um motor estava travado</td>
+<td>Motor substituído por uma unidade nova</td>
+</tr>
+<tr>
+<td>Paradas intermitentes</td>
+<td>Disco traseiro do encoder raspava na bateria, dificultando a rotação</td>
+<td>Identificada a interferência mecânica responsável pela ocorrência relatada</td>
+</tr>
+<tr>
+<td>Solução provisória</td>
+<td>Duas espumas elevam a bateria e afastam-na do disco do encoder</td>
+<td>Rotação liberada para dar continuidade aos ensaios</td>
+</tr>
+<tr>
+<td>Solução estrutural</td>
+<td>Peça mais elevada do chassi em impressão</td>
+<td>Incorpora à geometria a folga obtida provisoriamente com as espumas</td>
+</tr>
+<tr>
+<td>Acionamento elétrico</td>
+<td>DRV8833; nSLEEP GPIO5; PWM 20 kHz/8 bits; espera de 10 ms; sketch de referência a 230/255</td>
+<td>Ambas as rodas acionadas e sentido de avanço confirmado</td>
+</tr>
+<tr>
+<td>Primeiro pulso fraco</td>
+<td>200 ms a 60/255, sem movimento visível</td>
+<td>O diagnóstico evoluiu do ajuste de comando para a inspeção e correção mecânica; esse pulso isolado não identifica a causa</td>
+</tr>
+<tr>
+<td>Reteste da montagem</td>
+<td>Operador confirmou motor substituído nos vídeos V12–V13 e uso das espumas nos vídeos posteriores aos ensaios iniciais problemáticos</td>
+<td>Registros recentes mostram deslocamento no piso e manobra no labirinto</td>
+</tr>
+</tbody>
+</table>
+<p>A revisão combinou ajustes de comando e correções mecânicas: substituição do motor travado e afastamento da bateria. Com o disco do encoder livre, a equipe deu continuidade aos ensaios de deslocamento e curva.</p>
+<p><img alt="Roda com a marca preta durante ensaio de bancada" src="../figs/Testes/Integracao/motor-roda-suspensa.jpg" /></p>
+<p><em>Figura 4 — Ensaio motor–encoder, extraído de V01 em 3,0 s: registro da roda e da montagem utilizada na bancada.</em></p>
+<p><a id="t53"></a></p>
+<h4 id="53-encoders-sinais-voltas-e-fatores-provisorios">5.3 Encoders: sinais, voltas e fatores provisórios<a class="headerlink" href="#53-encoders-sinais-voltas-e-fatores-provisorios" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Etapa</th>
+<th>Método</th>
+<th>Resultado / decisão</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sentido</td>
+<td>PCNT e comparação com avanço físico</td>
+<td>Esquerdo positivo; direito bruto negativo; configurada inversão do direito</td>
+</tr>
+<tr>
+<td>Liberdade mecânica</td>
+<td>Inspeção posterior identificou o disco raspando na bateria</td>
+<td>Elevação com duas espumas liberou sua rotação; folga incorporada à nova peça do chassi</td>
+</tr>
+<tr>
+<td>Referência visual</td>
+<td>Marca preta acompanhada nos vídeos; acionamento pelos motores</td>
+<td>Não girar as rodas à força; distinguir marca física de padrões repetidos dos raios</td>
+</tr>
+<tr>
+<td>Validade</td>
+<td>Contagem final após parar, comparada às voltas estimadas</td>
+<td>Perspectiva, sobrepassagem e escorregamento limitam a calibração</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Vídeo / roda</th>
+<th>Contagem final</th>
+<th>Voltas estimadas</th>
+<th>Contagens por volta</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V01 — esquerda, 1º vídeo</td>
+<td>797</td>
+<td>2,74</td>
+<td>≈291</td>
+</tr>
+<tr>
+<td>V02 — esquerda, alvo 290</td>
+<td>387</td>
+<td>1,32</td>
+<td>≈293–294</td>
+</tr>
+<tr>
+<td>V03 — direita, alvo 290</td>
+<td>402</td>
+<td>1,415–1,42</td>
+<td>≈284</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Referência adotada</th>
+<th>Cálculo / valor</th>
+<th>Limite</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Roda esquerda</td>
+<td>292 contagens/volta → 2,73372 contagens/mm</td>
+<td>Provisório</td>
+</tr>
+<tr>
+<td>Roda direita</td>
+<td>284 contagens/volta → 2,65882 contagens/mm</td>
+<td>Provisório</td>
+</tr>
+<tr>
+<td>Perímetro</td>
+<td>π × 34 mm ≈ 106,81 mm</td>
+<td>Diâmetro informado; efetivo sob carga ainda a conferir</td>
+</tr>
+<tr>
+<td>Hipótese descartada</td>
+<td>720 contagens/volta</td>
+<td>Incompatível com as voltas observadas nesse modo PCNT</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Marca da roda esquerda ao longo do primeiro vídeo" src="../figs/Testes/Integracao/encoder-esquerdo-ensaio-1.png" /></p>
+<p><em>Figura 5 — V01 — Conferência da marca preta; cerca de 2,74 voltas para 797 contagens finais.</em></p>
+<p><img alt="Segundo ensaio da roda esquerda" src="../figs/Testes/Integracao/encoder-esquerdo-ensaio-2.png" /></p>
+<p><em>Figura 6 — V02 — Alvo de 290 contagens, com leitura posterior de 387; o alvo não garante parada após uma volta.</em></p>
+<p><img alt="Marca da roda direita em posições sucessivas" src="../figs/Testes/Integracao/encoder-direito.png" /></p>
+<p><em>Figura 7 — V03 — Estimativa visual de aproximadamente 1,42 voltas para 402 contagens finais.</em></p>
+<p><strong>Vídeos:</strong> <a href="https://drive.google.com/file/d/1g3uV95nU0twike6R5Prvyv-zLltl7K9L/view?usp=drivesdk">V01</a> · <a href="https://drive.google.com/file/d/1Pcbvug-mPit7MYGtWEw2yyGuBOxlYoUc/view?usp=drivesdk">V02</a> · <a href="https://drive.google.com/file/d/1ffQdXgLyXSgeOBjFqEAIfD5uGMia3oBu/view?usp=drivesdk">V03</a>.</p>
+<p><a id="t54"></a></p>
+<h4 id="54-sobrepassagem-frenagem-ativa-e-estabilizacao">5.4 Sobrepassagem, frenagem ativa e estabilização<a class="headerlink" href="#54-sobrepassagem-frenagem-ativa-e-estabilizacao" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Condição</th>
+<th>Registro</th>
+<th>Conclusão do ensaio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sleep / roda livre</td>
+<td>Contagens continuavam crescendo após desligar</td>
+<td>Desligar a ponte não produz frenagem imediata</td>
+</tr>
+<tr>
+<td>Esquerda: alvo 290, frenagem de 80 ms</td>
+<td>351 após frear; 387 depois → +97 contagens</td>
+<td>Frenagem fixa ainda permitiu sobrepassagem relevante</td>
+</tr>
+<tr>
+<td>Direita: alvo 290, frear até repouso</td>
+<td>372 ao terminar; 372 nas consultas posteriores → +82 contagens</td>
+<td>Estabilidade observada, ainda com cerca de 31 mm de sobrepassagem de roda</td>
+</tr>
+<tr>
+<td>Nova condição de parada</td>
+<td>Pelo menos 200 ms de freio; 80 ms sem contagem; teto de 800 ms</td>
+<td>Melhora de assentamento em um reteste, não distância universal de frenagem</td>
+</tr>
+<tr>
+<td>Evolução do controle</td>
+<td>Redução de velocidade perto do alvo e antecipação da frenagem</td>
+<td>Passou a diferenciar parada comandada, freio aplicado e repouso confirmado</td>
+</tr>
+<tr>
+<td>Integração</td>
+<td>Falha caso o repouso não se confirme</td>
+<td>Uma proteção pode parar depois de ocorrer contato com a parede</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Contagens de dois ensaios de frenagem" src="../figs/Testes/Integracao/frenagem-contagens.png" /></p>
+<p><em>Figura 8 — Alvo, leitura após frear e estabilização nos ensaios registrados. Rodas/condições diferentes; não é comparação estatística pareada.</em></p>
+<p><a id="t55"></a></p>
+<h4 id="55-imu-controle-independente-e-giros-em-area-aberta">5.5 IMU, controle independente e giros em área aberta<a class="headerlink" href="#55-imu-controle-independente-e-giros-em-area-aberta" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Preparação</th>
+<th>Controle</th>
+<th>Condição de validação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Quadrado de 30×30 cm; eixo referenciado; IMU calibrada imóvel</td>
+<td>Yaw pela IMU e progresso individual por encoder</td>
+<td>Área aberta; não comprova giro no vão de 17 cm</td>
+</tr>
+<tr>
+<td>Correção individual por roda e frenagem da adiantada</td>
+<td>Substituiu o comando simétrico insuficiente</td>
+<td>Equilíbrio de arcos foi estimado pelos fatores provisórios</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Alvo / configuração</th>
+<th>Ângulo final</th>
+<th>Encoders / deslocamento</th>
+<th>Interpretação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>30° D, comando simétrico</td>
+<td>26,50°</td>
+<td>+8 / −143; recuo médio estimado ≈25 mm</td>
+<td>Uma roda quase não avançou</td>
+</tr>
+<tr>
+<td>30° D, controle individual</td>
+<td>28,50°</td>
+<td>+76 / −87; média ≈−2,5 mm</td>
+<td>Vídeo compatível com cerca de 29°; translação não aferida em mm</td>
+</tr>
+<tr>
+<td>Primeiro 90° D</td>
+<td>88,19°</td>
+<td>+262 / −252; arcos ≈95,8 / 94,8 mm</td>
+<td>Equilíbrio interno favorável neste ensaio</td>
+</tr>
+<tr>
+<td>Primeiro 90° E</td>
+<td>88,48°</td>
+<td>Sentido conferido no robô</td>
+<td>Vídeo próximo de um quarto de volta</td>
+</tr>
+<tr>
+<td>Primeiro 180° D</td>
+<td>178,47°</td>
+<td>+524 / −510; arcos ≈191,7 / 191,8 mm</td>
+<td>Meia-volta confirmada visualmente</td>
+</tr>
+<tr>
+<td>90° D, freio angular revisto</td>
+<td>89,61°</td>
+<td>Subgiro reduzido neste ensaio</td>
+<td>Requer repetição nas demais condições</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Ajuste / ressalva</th>
+<th>Registro</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Antecipação angular</td>
+<td>De <code>max(2°, taxa×0,07 s)</code> para <code>max(0,6°, taxa×0,04 s)</code></td>
+</tr>
+<tr>
+<td>Travessia −180°/+180°</td>
+<td>Acumulador validado em software; primeiro giro físico de 180° parou antes dessa travessia</td>
+</tr>
+<tr>
+<td>Exatidão</td>
+<td>Decimais são da IMU; vídeo verifica sentido e ordem de grandeza</td>
+</tr>
+<tr>
+<td>Beco sem saída</td>
+<td>Meia-volta de bancada não alterou automaticamente a ré de uma célula usada por determinada versão da missão</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Comparação do giro de 30 graus" src="../figs/Testes/Integracao/giro-30.png" /></p>
+<p><em>Figura 9 — Giro curto: controle individual reduziu a translação estimada; rodas parcialmente ocultas no vídeo.</em></p>
+<p><img alt="Comparação do giro de 90 graus à direita" src="../figs/Testes/Integracao/giro-90-direita.png" /></p>
+<p><em>Figura 10 — Primeiro giro próximo de 90° à direita na área de 30 cm.</em></p>
+<p><img alt="Comparação do giro à esquerda" src="../figs/Testes/Integracao/giro-90-esquerda.png" /></p>
+<p><em>Figura 11 — Giro à esquerda: sinal e direção conferidos fisicamente.</em></p>
+<p><img alt="Comparação da meia-volta" src="../figs/Testes/Integracao/giro-180.png" /></p>
+<p><em>Figura 12 — Meia-volta em área aberta; o movimento intermediário diferencia 180° de uma aresta apenas paralela.</em></p>
+<p><strong>Vídeos:</strong> <a href="https://drive.google.com/file/d/1XshExiNuJp6V0N8PnZQ97OnG-0I9o-sm/view?usp=drivesdk">V04 — 30°</a> · <a href="https://drive.google.com/file/d/1FvackZ1Vj3jki98nqpRXuJQKnRAk82ZR/view?usp=drivesdk">V05 — 90° D</a> · <a href="https://drive.google.com/file/d/1Su8u5aY7EkhU0Si4bGWjrIw2qeWo65KM/view?usp=drivesdk">V06 — 90° E</a> · <a href="https://drive.google.com/file/d/1RZpXxqMh529cs7Z3KZSX6IkRdbkfwpYL/view?usp=drivesdk">V07 — 180°</a>.</p>
+<p><a id="t56"></a></p>
+<h4 id="56-avanco-linear-30-mm-e-uma-celula">5.6 Avanço linear: 30 mm e uma célula<a class="headerlink" href="#56-avanco-linear-30-mm-e-uma-celula" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Objetivo</th>
+<th>Procedimento</th>
+<th>Referência</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Atingir deslocamento e preservar rumo</td>
+<td>Velocidade por roda, yaw, aproximação e frenagem</td>
+<td>Encoder + vídeo + régua aproximada; sonar não foi a única régua de calibração</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Ensaio</th>
+<th>Resultado instrumentado</th>
+<th>Conferência / limite</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Primeiro alvo de 30 mm</td>
+<td>Média 12,24 mm; yaw −0,30°; frente ≤5 cm</td>
+<td>Operador: avanço ≈1,5 cm e folga ≈5 cm; alvo não concluído</td>
+</tr>
+<tr>
+<td>30 mm após reposicionar</td>
+<td>Média 29,11 mm; yaw −0,32°</td>
+<td>Folga física aproximada de 10 para 7 cm, coerente com avanço de 3 cm</td>
+</tr>
+<tr>
+<td>Primeiros 180 mm</td>
+<td>Yaw −2,58° e −2,12°</td>
+<td>Viés recorrente; rever disputa entre sincronização e rumo</td>
+</tr>
+<tr>
+<td>V9, dois avanços de 180 mm</td>
+<td>Médias 179,16 / 179,15 mm; yaw −0,52° / −0,81°</td>
+<td>Resultado interno favorável; não é exatidão física milimétrica</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Correção</th>
+<th>Resultado / limitação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Reduzir ganho e saturação da sincronização por progresso</td>
+<td>Fatores dos encoders eram provisórios e podiam competir com a IMU</td>
+</tr>
+<tr>
+<td>Reforçar correção angular</td>
+<td>Preservados limites de tempo, deslocamento e falta de progresso</td>
+</tr>
+<tr>
+<td>Comparação com régua</td>
+<td>Medidas aproximadas não autorizam declarar erro &lt;1 mm no percurso</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Antes e depois do primeiro avanço curto" src="../figs/Testes/Integracao/primeiro-avanco.png" /></p>
+<p><em>Figura 13 — Primeiro avanço interrompido pela reserva frontal; sem escala para converter pixels em milímetros com precisão.</em></p>
+<p><strong>Vídeo:</strong> <a href="https://drive.google.com/file/d/1SgI7gGA2wv6gW7GtrynKYS6sn2KP1OHm/view?usp=drivesdk">V08 — repetição do avanço curto</a>.</p>
+<p><a id="t57"></a></p>
+<h4 id="57-encadeamento-supervisionado-e-ganho-de-velocidade">5.7 Encadeamento supervisionado e ganho de velocidade<a class="headerlink" href="#57-encadeamento-supervisionado-e-ganho-de-velocidade" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Registro / resultado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sequência inicial</td>
+<td>Avançar → parar → inspecionar → girar, por comandos separados; não era descoberta autônoma de curva</td>
+</tr>
+<tr>
+<td>Conflito identificado</td>
+<td>Freio por diferença de progresso podia contrariar a correção de rumo</td>
+</tr>
+<tr>
+<td>V13, dois ensaios válidos a até 60 mm/s</td>
+<td>Yaw +0,08° / −0,09°; tempos 4,084 / 4,069 s com repouso</td>
+</tr>
+<tr>
+<td>Ensaio com cabo preso</td>
+<td>Yaw −12,76° e interrupção; operador confirmou interferência. Excluído da comparação de desempenho, mantendo registro da ocorrência</td>
+</tr>
+<tr>
+<td>Condições</td>
+<td>Poucas repetições; bateria, piso e força do cabo não foram isolados estatisticamente</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Perfil de 180 mm</th>
+<th>Média pelos encoders</th>
+<th>Yaw final</th>
+<th>Tempo com repouso</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V13 — 60 mm/s</td>
+<td>179,18 mm</td>
+<td>−0,09°</td>
+<td>4,069 s</td>
+</tr>
+<tr>
+<td>V14 — 80 mm/s</td>
+<td>179,00 mm</td>
+<td>−0,08°</td>
+<td>3,475 s</td>
+</tr>
+<tr>
+<td>V15 — 80 mm/s em bloco</td>
+<td>178,99 mm</td>
+<td>−0,56°</td>
+<td>3,450 s</td>
+</tr>
+<tr>
+<td>V16 — 100 mm/s, filmado</td>
+<td>179,19 mm</td>
+<td>−0,02°</td>
+<td>3,233 s</td>
+</tr>
+<tr>
+<td>V16 — 100 mm/s, repetição</td>
+<td>179,19 mm</td>
+<td>−0,11°</td>
+<td>3,230 s</td>
+</tr>
+<tr>
+<td>V17 — 100 mm/s, novas rampas</td>
+<td>178,80 mm</td>
+<td>+0,06°</td>
+<td>2,872 s</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Bloco</th>
+<th>90° / duração</th>
+<th>180° / duração</th>
+<th>Tempo total e ressalva</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V16 filmado, até 55°/s</td>
+<td>89,60° / 2,905 s</td>
+<td>179,51° / 4,495 s</td>
+<td>10,633 s com avanço; corrige anotação inicial de 9,633 s</td>
+</tr>
+<tr>
+<td>V16 repetido</td>
+<td>89,63° / 2,935 s</td>
+<td>179,63° / 4,590 s</td>
+<td>10,755 s; exclui pausas externas de supervisão</td>
+</tr>
+<tr>
+<td>V17</td>
+<td>89,59° / 2,650 s</td>
+<td>179,41° / 4,220 s</td>
+<td>9,742 s; ≈9,4% menos que a repetição V16</td>
+</tr>
+<tr>
+<td>Ganho obtido</td>
+<td>V17 reduziu o bloco para 9,742 s</td>
+<td>Ajustes de rampas somaram-se ao aumento de velocidade</td>
+<td>Melhora de aproximadamente 9,4% em relação à repetição V16</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Duração dos avanços em diferentes perfis" src="../figs/Testes/Integracao/velocidade-duracao.png" /></p>
+<p><em>Figura 14 — Durações de ensaios individuais de 180 mm. V16 e V17 têm o mesmo máximo e rampas diferentes; não são tempos de missão.</em></p>
+<p><img alt="Robô durante o avanço no perfil de 80 milímetros por segundo" src="../figs/Testes/Integracao/avanco-80mms-quadro.jpg" /></p>
+<p><em>Figura 15 — V10, quadro de 1,6 s: registro do avanço; a velocidade vem dos logs, não da imagem isolada.</em></p>
+<p><img alt="Quadro do bloco de avanço e giros" src="../figs/Testes/Integracao/bloco-100mms-quadro.jpg" /></p>
+<p><em>Figura 16 — V11, quadro de 30 s. Operador relatou manejo do cabo sem tocar no chassi; ausência de força do cabo não foi medida.</em></p>
+<p><strong>Vídeos:</strong> <a href="https://drive.google.com/file/d/1-bfJdrKqS_yH2kUeqtWG9nm4tYjyY8Xu/view?usp=drivesdk">V09 — avanço/giro supervisionados</a> · <a href="https://drive.google.com/file/d/1snlR8IHzIljVjgEetfgyBiRSwTzJGpde/view?usp=drivesdk">V10 — 80 mm/s</a> · <a href="https://drive.google.com/file/d/13eiValY3BYbyxBiM53FouCKT6677217W/view?usp=drivesdk">V11 — bloco 100 mm/s e 55°/s</a>.</p>
+<p><a id="etapa-b"></a></p>
+<h3 id="etapa-b-sensores-e-percepcao">Etapa B — Sensores e percepção<a class="headerlink" href="#etapa-b-sensores-e-percepcao" title="Permanent link">&para;</a></h3>
+<p><a id="t58"></a></p>
+<h4 id="58-sensores-ultrassonicos-conexoes-e-calibracao">5.8 Sensores ultrassônicos, conexões e calibração<a class="headerlink" href="#58-sensores-ultrassonicos-conexoes-e-calibracao" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Verificação</th>
+<th>Procedimento / ocorrência</th>
+<th>Resultado e limite</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Modelo</td>
+<td>Operador identificou HC-SR04; nomes do código ainda citavam US-100</td>
+<td>Não atribuir modo UART de outro sensor ao módulo instalado</td>
+</tr>
+<tr>
+<td>Fiação inicial</td>
+<td>Inspeção identificou fios frontal e esquerdo desconectados em momentos diferentes</td>
+<td>Reconexões permitiram continuar os diagnósticos</td>
+</tr>
+<tr>
+<td>Correção elétrica</td>
+<td>Fiação dos sensores substituída; alimentação alterada de 3,3 V para 5 V</td>
+<td>Problema dos sensores resolvido após a revisão, conforme confirmação da equipe</td>
+</tr>
+<tr>
+<td>Ruído “tri tri”</td>
+<td>Aquisição pausada para isolar a ocorrência</td>
+<td>Ruído cessou; diagnóstico permitiu retomar a investigação dos sensores</td>
+</tr>
+<tr>
+<td>Comparação com régua</td>
+<td>Motores parados; tarefa pausada; dez leituras isoladas por sensor</td>
+<td>Referências aproximadas de 3/5/10 cm a partir da face metálica</td>
+</tr>
+<tr>
+<td>Fotos</td>
+<td>Localização dos fios e GPIOs na montagem inicial</td>
+<td>Registro visual usado para orientar a revisão das ligações</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Canal</th>
+<th>Offset dos ensaios iniciais</th>
+<th>Referências → leituras corrigidas</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Frente</td>
+<td>+0,82 cm</td>
+<td>3→3,130; 5→5,354; 10→9,872 cm</td>
+</tr>
+<tr>
+<td>Esquerda</td>
+<td>+0,50 cm, revisto de −0,21 cm</td>
+<td>3→3,138; 5→5,069; 10→9,940 cm</td>
+</tr>
+<tr>
+<td>Direita</td>
+<td>+0,65 cm</td>
+<td>Conferência estática próxima de 3 cm: 2,960 cm</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Divergência / alimentação</th>
+<th>Evidência</th>
+<th>Conclusão</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Frente em referência de 5 cm</td>
+<td>Uma posição: bruto/corrigido 5,500/6,320; outra: 4,534/5,354 cm</td>
+<td>Comparação identificou a sensibilidade à posição e orientou a conferência de montagem</td>
+</tr>
+<tr>
+<td>Esquerda em referência de 3 cm</td>
+<td>Houve leitura anterior equivalente a ≈1,68 cm brutos</td>
+<td>Calibração dependia da montagem/posição</td>
+</tr>
+<tr>
+<td>Offsets</td>
+<td>Pontos manuais aproximados; alguns usados no próprio ajuste</td>
+<td>Sem ganho de escala ou exatidão universal validada</td>
+</tr>
+<tr>
+<td>Alimentação inicial</td>
+<td>Sensores alimentados em 3,3 V antes da revisão</td>
+<td>Condição substituída pela nova fiação e alimentação de 5 V</td>
+</tr>
+<tr>
+<td>Alimentação após a correção</td>
+<td>HC-SR04 alimentados em 5 V</td>
+<td>Equipe confirmou a resolução do problema após a troca da fiação</td>
+</tr>
+<tr>
+<td>Especificação HC-SR04</td>
+<td>Alimentação nominal de 5 V e faixa nominal a partir de 2 cm</td>
+<td>Alimentação da montagem ajustada para 5 V</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Inspeção dos fios dos sensores" src="../figs/Testes/Integracao/ligacoes-sensores.jpg" /></p>
+<p><em>Figura 17 — IMG_4093 — Inspeção da fiação na montagem inicial. Posteriormente, a fiação foi substituída e os sensores passaram de 3,3 V para 5 V.</em></p>
+<p><img alt="Régua junto à face do sensor frontal" src="../figs/Testes/Integracao/medicao-frontal-labirinto.jpg" /></p>
+<p><em>Figura 18 — IMG_4085 — Referência física na face do sensor; foto parada, sem comprovar contato durante o movimento.</em></p>
+<p><img alt="Pulso bruto, distância corrigida e validade dos três sensores" src="../figs/Testes/Integracao/terminal-sensores-30graus.png" /></p>
+<p><em>Figura 19 — Diagnóstico parado após o giro de 30°: um quadro do registro. A mediana das 20 amostras é apresentada no teste 5.14.</em></p>
+<p><a id="t59"></a></p>
+<h4 id="59-aquisicao-percepcao-mediana-e-recuperacao-de-eco">5.9 Aquisição, percepção, mediana e recuperação de eco<a class="headerlink" href="#59-aquisicao-percepcao-mediana-e-recuperacao-de-eco" title="Permanent link">&para;</a></h4>
+<p>Os registros abaixo documentam os ajustes de aquisição durante a investigação inicial. A correção elétrica posterior foi a troca da fiação e da alimentação dos sensores para 5 V, descrita em 5.8; os filtros e mecanismos de recuperação complementam essa correção.</p>
+<table>
+<thead>
+<tr>
+<th>Problema / mecanismo</th>
+<th>Regra ensaiada</th>
+<th>Resultado / limite</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Idade do quadro</td>
+<td>3 × (timeout 20 ms + silêncio 25 ms) = orçamento de 135 ms</td>
+<td>Timestamp da medição mais antiga pode chegar a ≈245 ms antes do próximo quadro</td>
+</tr>
+<tr>
+<td>Vencimento indevido</td>
+<td>Limite de 150 para 270 ms; pico parado observado de 197 ms</td>
+<td>Evitou descartar por idade quadros compatíveis com a temporização real de aquisição</td>
+</tr>
+<tr>
+<td>Três disparos distintos</td>
+<td>3 válidos: mediana; 2: média; menos de 2: inválido</td>
+<td>Inclui falhas; sem inventar pulso ou filtrar repetidamente o mesmo snapshot</td>
+</tr>
+<tr>
+<td>Frontal curto</td>
+<td>Primeira suspeita freia/verifica; duas curtas em três quadros confirmam</td>
+<td>Tolera outlier isolado sem ignorar obstáculo persistente</td>
+</tr>
+<tr>
+<td>Recuperação de eco</td>
+<td>Frear; integrar encoders/IMU; manter alvo; retomar com quadros novos e assentamento</td>
+<td>Pausa mínima 200 ms; até 1.200 ms/episódio e três recuperações/trecho</td>
+</tr>
+<tr>
+<td>Observação de célula</td>
+<td>Quadros novos e coerentes no centro e após giro</td>
+<td>Prazo 1.500 ms; ausência de leitura não vira abertura</td>
+</tr>
+<tr>
+<td>Chegada</td>
+<td>Odômetro nas células comuns; referência frontal adicional quando usada no ajuste</td>
+<td>Corrigida regressão que exigia frente a 3 cm mesmo com parede a 21,11 cm</td>
+</tr>
+<tr>
+<td>Tempo de missão</td>
+<td>180 s inclui pausas</td>
+<td>Recuperação não pode suspender indefinidamente a missão</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Sessão do filtro: 65 quadros</th>
+<th>Frente</th>
+<th>Esquerda</th>
+<th>Direita</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Distâncias nulas</td>
+<td>0</td>
+<td>14</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Interpretação</td>
+<td>Sem nulos nessa captura</td>
+<td>21,5% dos quadros sem estimativa</td>
+<td>Sem nulos nessa captura</td>
+</tr>
+<tr>
+<td>Resultado do ensaio</td>
+<td>Pausa e retomada exercitadas; parada final com código 7</td>
+<td>Canal com maior perda identificado para diagnóstico</td>
+<td>Frente e direita sem distância nula nessa captura</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Quantidade de quadros sem distância por canal" src="../figs/Testes/Integracao/filtro-perdas-por-canal.png" /></p>
+<p><em>Figura 20 — Contagens da sessão do filtro: 14/65 nulos à esquerda. O percentual se refere a quadros, não ao erro métrico do sensor.</em></p>
+<p><img alt="Arquivo de métricas da sessão de filtro" src="../figs/Testes/Integracao/terminal-metricas-filtro.png" /></p>
+<p><em>Figura 21 — Valores arquivados, incluindo sessão, distâncias nulas e motivo final de parada.</em></p>
+<p><img alt="Painel durante tentativa com filtro" src="../figs/Testes/Integracao/missao-filtro-sonar.png" /></p>
+<p><em>Figura 22 — Captura do ensaio: a posição é estimada, e a distância final pode ser posterior ao evento de falha.</em></p>
+<p><a id="etapa-c"></a></p>
+<h3 id="etapa-c-comunicacao-e-interface">Etapa C — Comunicação e interface<a class="headerlink" href="#etapa-c-comunicacao-e-interface" title="Permanent link">&para;</a></h3>
+<p><a id="t510"></a></p>
+<h4 id="510-bluetooth-conexao-reconexao-e-dados-reais">5.10 Bluetooth: conexão, reconexão e dados reais<a class="headerlink" href="#510-bluetooth-conexao-reconexao-e-dados-reais" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Etapa</th>
+<th>Condição / método</th>
+<th>Resultado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bancada Bluetooth</td>
+<td>Somente USB; motores e disparos de sonar desativados</td>
+<td>Rádio <code>MicroMouse_BT_Test</code>; diagnóstico separado da missão</td>
+</tr>
+<tr>
+<td>Porta serial virtual</td>
+<td>Primeira captura</td>
+<td>42 quadros recebidos</td>
+</tr>
+<tr>
+<td>Reconexão virtual</td>
+<td>Porta abria, mas algumas tentativas não recebiam quadros</td>
+<td>Diagnóstico motivou a adoção do receptor RFCOMM nativo</td>
+</tr>
+<tr>
+<td>RFCOMM nativo</td>
+<td>IOBluetooth no Mac</td>
+<td>Recepção restabelecida; conexão de aplicação comprovada por dados</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Conexão nativa</th>
+<th>Quadros válidos</th>
+<th>Sequência</th>
+<th>Erros / gaps e PING/PONG</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>61</td>
+<td>1–61</td>
+<td>Sem erros/gaps reportados; PING/PONG confirmado</td>
+</tr>
+<tr>
+<td>2</td>
+<td>33</td>
+<td>62–94</td>
+<td>Sem erros/gaps reportados; PING/PONG confirmado</td>
+</tr>
+<tr>
+<td>3</td>
+<td>21</td>
+<td>95–115</td>
+<td>Sem erros/gaps reportados; PING/PONG confirmado</td>
+</tr>
+<tr>
+<td>Total</td>
+<td>115</td>
+<td>1–115</td>
+<td>Dados recebidos nas três conexões, com continuidade das sequências</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Dado / estado</th>
+<th>Interpretação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pacotes</td>
+<td>Sequência, uptime, memória e medidas da IMU; sem distância, tensão ou corrente reais nesse diagnóstico</td>
+</tr>
+<tr>
+<td>“Desconectado” após a captura</td>
+<td>O cliente fechava o canal ao terminar; não indica necessariamente falha da ESP</td>
+</tr>
+<tr>
+<td>Pareamento momentâneo</td>
+<td>Aparecer/conectar no Mac não comprova recepção de dados no aplicativo</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Recepção do canal Bluetooth e contagem dos quadros" src="../figs/Testes/Integracao/terminal-bluetooth.png" /></p>
+<p><em>Figura 23 — Trecho da primeira conexão RFCOMM nativa: sequência e resumo com 61 quadros válidos. Reconexões estão nos arquivos associados.</em></p>
+<p><a id="t511"></a></p>
+<h4 id="511-deriva-do-yaw-e-correcao-no-diagnostico">5.11 Deriva do yaw e correção no diagnóstico<a class="headerlink" href="#511-deriva-do-yaw-e-correcao-no-diagnostico" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Verificação</th>
+<th>Condição / resultado</th>
+<th>Interpretação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Antes da correção</td>
+<td>Trecho relatado: yaw ≈52,24° → 54,35° em ≈35 s, parado</td>
+<td>Integração acumulava bias residual; não era Norte absoluto</td>
+</tr>
+<tr>
+<td>Calibração</td>
+<td>Aquecimento 2 s; 1.000 amostras a cada 5 ms</td>
+<td>Robô imóvel; correção no firmware diagnóstico Bluetooth</td>
+</tr>
+<tr>
+<td>Compensação</td>
+<td>Detecção de repouso por 1 s; adaptação lenta do bias; mantém último ângulo</td>
+<td>Driver/navegação compartilhados não foram alterados nessa revisão</td>
+</tr>
+<tr>
+<td>Captura após correção</td>
+<td>121 quadros; sequência 74–194; 30,06 s</td>
+<td>Yaw inicial/final 0,0161°; amplitude zero na resolução transmitida</td>
+</tr>
+<tr>
+<td>Resíduo</td>
+<td>Giro Z final −0,0534°/s</td>
+<td>Zero de amplitude exibido não significa ruído físico eliminado</td>
+</tr>
+<tr>
+<td>Limite</td>
+<td>Rotação constante &lt;0,25°/s pode ser classificada como repouso</td>
+<td>Não homologa precisão angular dinâmica da missão</td>
+</tr>
+<tr>
+<td>Interface</td>
+<td>Recarregar/reconectar painel não é zerar IMU</td>
+<td>Operador relatou que o yaw deixou de crescer indefinidamente</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Yaw compensado exibido no dashboard" src="../figs/Testes/Integracao/dashboard-yaw.png" /></p>
+<p><em>Figura 24 — Diagnóstico parado: motores e sonares desativados. Valor do painel comparado ao pacote recebido.</em></p>
+<p><a id="t512"></a></p>
+<h4 id="512-dashboard-original-telemetria-e-controle-de-missao">5.12 Dashboard original, telemetria e controle de missão<a class="headerlink" href="#512-dashboard-original-telemetria-e-controle-de-missao" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Interface / fluxo</th>
+<th>Procedimento</th>
+<th>Resultado / limite</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Site existente</td>
+<td>Integração Bluetooth ao mapa e aos indicadores originais</td>
+<td>Interface original preservada e conectada aos dados reais da ESP</td>
+</tr>
+<tr>
+<td>Cadeia de dados</td>
+<td>ESP32 → RFCOMM → ponte nativa Mac → backend → WebSocket → React</td>
+<td>Sequência e valor bruto comparados ao navegador</td>
+</tr>
+<tr>
+<td>Formatos</td>
+<td>4×4, 8×4 e 12×4; canto e direção</td>
+<td>Disponíveis na configuração; isso não comprova percurso físico em todos</td>
+</tr>
+<tr>
+<td>Comandos</td>
+<td>ID, confirmação da ESP, boot/conexão e prazo</td>
+<td>Sem fila offline nem repetição automática de START</td>
+</tr>
+<tr>
+<td>Partida</td>
+<td>Calibração imóvel e espera de 5 s</td>
+<td>Selecionar tamanho, recarregar ou reconectar painel não inicia movimentos</td>
+</tr>
+<tr>
+<td>Mapa</td>
+<td>Segue mensagens/configuração confirmadas da ESP</td>
+<td>Posição é estimada; seleção preparatória não muda a corrida</td>
+</tr>
+<tr>
+<td>Parada</td>
+<td>STOP e parada em perda do Bluetooth durante missão remota</td>
+<td>Depende da comunicação; chave da bateria continua necessária</td>
+</tr>
+<tr>
+<td>Controle local</td>
+<td>API restrita ao computador local</td>
+<td>Não é controle público remoto</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Ensaio real</th>
+<th>Resposta</th>
+<th>O que foi demonstrado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Diagnóstico Bluetooth</td>
+<td>STOP confirmado; START bloqueado</td>
+<td>Comando real sem habilitar navegação nesse firmware</td>
+</tr>
+<tr>
+<td>Rodas suspensas / bateria dos motores desligada</td>
+<td>START aceito; STOP confirmado 0,933 s depois do ACK, antes dos 5 s</td>
+<td>Partida/cancelamento, não locomoção</td>
+</tr>
+<tr>
+<td>Missões posteriores no chão</td>
+<td>ACK de partida, running e error no painel</td>
+<td>Controle/telemetria funcionaram mesmo nas falhas físicas</td>
+</tr>
+<tr>
+<td>Tela de 390 px</td>
+<td>Sem rolagem horizontal naquela verificação</td>
+<td>Resultado daquele layout; não medição de latência</td>
+</tr>
+<tr>
+<td>Histórico PostgreSQL</td>
+<td>Monitor utilizado sem banco configurado</td>
+<td>Telemetria ao vivo e registros locais utilizados durante os ensaios</td>
+</tr>
+<tr>
+<td>Energia</td>
+<td>INA226 ausente/não calibrado em parte dos ensaios; campos sem leitura</td>
+<td>Nenhum valor sintético tratado como medição de bateria</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Dashboard original com dados reais" src="../figs/Testes/Integracao/dashboard-bluetooth.png" /></p>
+<p><em>Figura 25 — Mapa e indicadores da aplicação existente; a grade selecionada não comprova percurso físico daquele formato.</em></p>
+<p><img alt="Controles de início e parada da missão" src="../figs/Testes/Integracao/controle-missao.png" /></p>
+<p><em>Figura 26 — Controles no dashboard original: habilitação depende do firmware e da comunicação.</em></p>
+<p><img alt="Respostas registradas aos comandos de início e parada" src="../figs/Testes/Integracao/terminal-comandos-site.png" /></p>
+<p><em>Figura 27 — ACKs e estado final da partida/cancelamento com rodas suspensas; valores preservados no JSON.</em></p>
+<p><a id="etapa-d"></a></p>
+<h3 id="etapa-d-integracao-no-labirinto-e-estrategias-de-curva">Etapa D — Integração no labirinto e estratégias de curva<a class="headerlink" href="#etapa-d-integracao-no-labirinto-e-estrategias-de-curva" title="Permanent link">&para;</a></h3>
+<p><a id="t513"></a></p>
+<h4 id="513-integracao-no-labirinto-44-e-evolucao-da-locomocao">5.13 Integração no labirinto 4×4 e evolução da locomoção<a class="headerlink" href="#513-integracao-no-labirinto-44-e-evolucao-da-locomocao" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Condição do teste / limite</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Configuração predominante</td>
+<td>Inferior direito, Norte; destino no canto diagonalmente oposto; mapa novo</td>
+</tr>
+<tr>
+<td>Localização</td>
+<td>Célula/orientação estimadas pela ESP; sem medição externa contínua</td>
+</tr>
+<tr>
+<td>Problema físico</td>
+<td>Robô torto/descentralizado e contato em quinas; não apenas erro de distância linear</td>
+</tr>
+<tr>
+<td>Geometria</td>
+<td>Foi necessário distinguir peça de parede, vão livre, bitola, largura total e posição do eixo</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Tentativa</th>
+<th>Evolução relatada</th>
+<th>Motivo / medidas finais</th>
+<th>Resultado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Dois avanços; curva à esquerda; quina frontal tocou</td>
+<td>Código 8</td>
+<td>Colisão; falta de progresso direito</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Uma célula; reajustes; parada</td>
+<td>Eco frontal instável; recuperação excedida</td>
+<td>Interrupção por leitura</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Primeira célula; parada</td>
+<td>F=1/E=0/D=1 por 1.500 ms; F215/D35 mm finais</td>
+<td>Esquerda sem leitura</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Chegada à célula da curva; contato no giro</td>
+<td>Código 12</td>
+<td>Assentamento não confirmado; colisão relatada</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Segunda célula em direção à terceira</td>
+<td>Eco frontal instável; F119/E47/D39 mm finais</td>
+<td>Recuperação excedida</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Aprendizado dos cinco ensaios iniciais</th>
+<th>Ação / evolução</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Leitura frontal e lateral variava durante o percurso</td>
+<td>Reconexão, calibração, janela de três disparos, pausa e recuperação de eco</td>
+</tr>
+<tr>
+<td>Giro podia alcançar a quina antes de terminar</td>
+<td>Revisão da geometria e comparação de trajetórias segmentadas e contínuas</td>
+</tr>
+<tr>
+<td>Deslocamento no corredor já era executado</td>
+<td>Ajustes passaram a se concentrar em posicionamento e passagem da curva</td>
+</tr>
+<tr>
+<td>Falhas passaram a ter códigos e mensagens</td>
+<td>Painel permitiu diferenciar falta de eco, reserva frontal, progresso e assentamento</td>
+</tr>
+<tr>
+<td>Montagem recebeu correção mecânica</td>
+<td>Motor substituído e bateria elevada para deixar o encoder livre</td>
+</tr>
+</tbody>
+</table>
+<p>Essas cinco tentativas descrevem a fase inicial de ajustes. Os vídeos recentes abaixo mostram a evolução posterior; o conjunto não inclui uma travessia completa cronometrada.</p>
+<p><img alt="Robô na célula do labirinto real" src="../figs/Testes/Integracao/posicao-labirinto.jpg" /></p>
+<p><em>Figura 28 — IMG_4080 — Posição após tentativa relatada como desalinhada. A perspectiva não mede deslocamento do eixo.</em></p>
+<h5 id="5131-registros-recentes-curva-e-operacao-sem-cabo">5.13.1 Registros recentes: curva e operação sem cabo<a class="headerlink" href="#5131-registros-recentes-curva-e-operacao-sem-cabo" title="Permanent link">&para;</a></h5>
+<table>
+<thead>
+<tr>
+<th>Registro</th>
+<th>O que foi observado / confirmado</th>
+<th>Resultado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V12 — curva no labirinto</td>
+<td>Aproximação e mudança de orientação junto à abertura; operador confirmou ausência de reposicionamento manual</td>
+<td>A equipe relata que a curva passou a funcionar, embora com resultado variável entre repetições</td>
+</tr>
+<tr>
+<td>V13 — locomoção sem cabo</td>
+<td>USB da ESP desconectada; robô avança no corredor e realiza manobra junto à abertura</td>
+<td>Movimento do robô alimentado pela bateria, sem depender do cabo USB para locomoção</td>
+</tr>
+<tr>
+<td>Montagem dos dois vídeos</td>
+<td>Motor já substituído e bateria elevada pelas espumas, conforme confirmação do operador</td>
+<td>Correções mecânicas incorporadas às novas demonstrações</td>
+</tr>
+<tr>
+<td>Uso do cabo nos ensaios anteriores</td>
+<td>Mantido conectado para facilitar compilações e gravações sucessivas</td>
+<td>Conveniência de desenvolvimento; a operação sem cabo está documentada em V13</td>
+</tr>
+<tr>
+<td>Repetibilidade da curva</td>
+<td>Número total de repetições e taxa de acerto não informados</td>
+<td>Curvas realizadas; repetibilidade em ajuste, sem série estatística registrada</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Sequência recente da curva no labirinto" src="../figs/Testes/Integracao/curva-labirinto-nov22.jpg" /></p>
+<p><em>Figura 28A — V12, quadros em 3, 18, 30 e 42 s do arquivo. A câmera muda de posição durante a gravação; os quadros não são usados para medir ângulo ou deslocamento. Não houve reposicionamento manual do robô, segundo o operador.</em></p>
+<p><img alt="Robô se movimentando sem o cabo USB" src="../figs/Testes/Integracao/locomocao-sem-cabo-nov23.jpg" /></p>
+<p><em>Figura 28B — V13, quadros em 6, 18, 26 e 46 s. A conexão USB está livre durante o deslocamento; motor substituído e bateria elevada já fazem parte desta montagem.</em></p>
+<p><strong>Vídeos:</strong> <a href="https://drive.google.com/file/d/1xUHx79K4jnHy3fMGFbF1V3P_j2Rg8uib/view?usp=drivesdk">V12 — curva no labirinto</a> · <a href="https://drive.google.com/file/d/18Eb0SE0ibbNGY7Gi4-5HUqn2CCV7Ww3g/view?usp=drivesdk">V13 — locomoção sem cabo</a>.</p>
+<p><a id="t514"></a></p>
+<h4 id="514-curvas-em-etapas-45-30-e-avancos-intermediarios">5.14 Curvas em etapas: 45°, 30° e avanços intermediários<a class="headerlink" href="#514-curvas-em-etapas-45-30-e-avancos-intermediarios" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Condição</th>
+<th>Regra da campanha</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tipo de teste</td>
+<td>Manobras isoladas programadas, diferentes da descoberta autônoma de paredes</td>
+</tr>
+<tr>
+<td>Partida</td>
+<td>Posição e abertura à direita confirmadas; calibração imóvel; espera de 5 s</td>
+</tr>
+<tr>
+<td>Entre etapas</td>
+<td>Pausa de 1 s; sem repetição automática depois de movimento</td>
+</tr>
+<tr>
+<td>Avanço de 10 mm</td>
+<td>Até 20 mm/s; reserva ajustada: início &gt;4,5 cm e parada por proximidade em 3,5 cm</td>
+</tr>
+<tr>
+<td>Avanço de 20 mm</td>
+<td>Mesma reserva de 3,5 cm → exige &gt;5,5 cm antes de iniciar</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Ensaio</th>
+<th>Sequência pretendida</th>
+<th>Resultado registrado</th>
+<th>Contato / conclusão</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>45° — primeiro</td>
+<td>45° D → 10 mm → 45° D</td>
+<td>44,51°; 9,09 mm; segundo giro 42,62°, código 6</td>
+<td>Contato confirmado; total angular não comprova passagem</td>
+</tr>
+<tr>
+<td>45° — repetição</td>
+<td>Mesma sequência</td>
+<td>44,59°; 8,72 mm; segundo giro 21,10°, código 8</td>
+<td>Parte inferior direita suspeita; ponto exato não confirmado</td>
+</tr>
+<tr>
+<td>30° — reserva inicial</td>
+<td>30° → 10 mm → 30° → 10 mm → 30°</td>
+<td>29,50°; avanço bloqueado por exigência &gt;6 cm</td>
+<td>Primeiro giro sem contato, segundo o operador</td>
+</tr>
+<tr>
+<td>Diagnóstico nos 30°</td>
+<td>20 leituras por canal, parado</td>
+<td>Medianas F5,35/E6,66/D34,70 cm; 20/20 válidas</td>
+<td>Operador confirmou frente; bloqueio por reserva, não por perda de eco</td>
+</tr>
+<tr>
+<td>30° — reserva ajustada</td>
+<td>Mesma sequência de 10 mm</td>
+<td>29,35°; 8,91 mm; segundo giro 26,02°, código 7</td>
+<td>Operador confirmou toque na parede</td>
+</tr>
+<tr>
+<td>30° — avanços de 20 mm</td>
+<td>30° → 20 mm → 30° → 20 mm → 30°</td>
+<td>29,67°; F5,35 cm ≤5,50 cm exigidos</td>
+<td>Nenhum avanço de 20 mm começou</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Interpretação</th>
+<th>Limite</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Código 6</td>
+<td>Prazo de movimento ou falta de progresso angular; registro isolado não distingue o temporizador</td>
+</tr>
+<tr>
+<td>Códigos 7/8</td>
+<td>Falta de progresso esquerdo/direito; contato depende de observação adicional</td>
+</tr>
+<tr>
+<td>Contribuição dos ensaios</td>
+<td>Identificaram o efeito do avanço intermediário e das reservas frontais, orientando a evolução da curva mostrada em 5.13</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Primeira sequência de curva em dois giros de 45 graus" src="../figs/Testes/Integracao/terminal-curva-45-1.png" /></p>
+<p><em>Figura 29 — Primeira tentativa de 45°: etapas executadas e interrupção registrada na etapa 3.</em></p>
+<p><img alt="Repetição da sequência de 45 graus" src="../figs/Testes/Integracao/terminal-curva-45-2.png" /></p>
+<p><em>Figura 30 — Repetição: avanço de 8,72 mm e segundo giro interrompido com código 8.</em></p>
+<p><img alt="Sequência de 30 graus bloqueada antes de avançar" src="../figs/Testes/Integracao/terminal-curva-30-bloqueada.png" /></p>
+<p><em>Figura 31 — Reserva inicial: somente o primeiro giro foi concluído; o avanço de 10 mm não começou.</em></p>
+<p><img alt="Diagnóstico dos sensores após giro de 30 graus" src="../figs/Testes/Integracao/terminal-sensores-30graus.png" /></p>
+<p><em>Figura 32 — Diagnóstico parado no ponto da primeira curva de 30°; o conjunto das 20 leituras foi válido.</em></p>
+<p><img alt="Sequência de 30 graus com reserva frontal ajustada" src="../figs/Testes/Integracao/terminal-curva-30-ajustada.png" /></p>
+<p><em>Figura 33 — Reserva revista para avanço de 10 mm; o segundo giro foi interrompido por falta de progresso esquerdo.</em></p>
+<p><img alt="Sequência com avanços de 20 milímetros bloqueada pela reserva" src="../figs/Testes/Integracao/terminal-curva-30-2cm.png" /></p>
+<p><em>Figura 34 — Avanço de 20 mm bloqueado: frente válida de 5,35 cm, abaixo dos &gt;5,50 cm exigidos.</em></p>
+<p><a id="t515"></a></p>
+<h4 id="515-mudanca-de-estrategia-recuo-e-curva-continua">5.15 Mudança de estratégia: recuo e curva contínua<a class="headerlink" href="#515-mudanca-de-estrategia-recuo-e-curva-continua" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Estratégia / modelo</th>
+<th>Valor ou comportamento</th>
+<th>Situação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Modelo diferencial; bitola 120 mm</td>
+<td>Rodas opostas e iguais: raio 0; uma parada: 60 mm; interna recua a ⅓ da externa: 30 mm</td>
+<td>Velocidades reais, não razões de PWM; depende de aderência</td>
+</tr>
+<tr>
+<td>Perfil <code>esp32dev_arc_test</code></td>
+<td>Observação/planejador existentes, sem cadastrar a curva informada pelo operador</td>
+<td>Implementado; perfil normal manteve giro parado</td>
+</tr>
+<tr>
+<td>Manobra prevista</td>
+<td>Recuar 30 mm por passagem traseira confirmada; arco de 90° com raio 30 mm</td>
+<td>Não há sensor traseiro; passagem percorrida era referência na missão</td>
+</tr>
+<tr>
+<td>Velocidades do perfil</td>
+<td>Máximo 20°/s no arco; 40 mm/s nas retas</td>
+<td>Progresso, prazo, eco frontal e STOP preservados</td>
+</tr>
+<tr>
+<td>Saída do arco</td>
+<td>Crédito nominal 30 mm; próximo trecho reto 150 mm, total 180 mm</td>
+<td>Modelo simulado; posição real ainda dependia de ensaio físico</td>
+</tr>
+<tr>
+<td>Comando isolado posterior</td>
+<td>Comandar ré de 30 mm → arco 90° E → parar, sem avanço adicional</td>
+<td>Folga atrás confirmada pelo operador; o log não aferiu a distância física final da ré</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Verificação / tentativa histórica</th>
+<th>Resultado</th>
+<th>Contexto</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Software</td>
+<td>72 controlador + 135 nativos = 207 aprovados no marco</td>
+<td>Modelo e cenários do controlador verificados em software</td>
+</tr>
+<tr>
+<td>Cenários de controle</td>
+<td>Arcos esquerdo/direito, translação, pausa/retomada, parâmetros inválidos e crédito</td>
+<td>Cobertura da lógica antes dos testes físicos</td>
+</tr>
+<tr>
+<td>Descoberta de esquerda</td>
+<td>Decisão após observar a célula alcançada, sem roteiro pré-carregado</td>
+<td>Perfil preparado para decidir pela percepção de paredes</td>
+</tr>
+<tr>
+<td>Primeira partida</td>
+<td>Recusada: conferir três sensores</td>
+<td>Nenhum movimento</td>
+</tr>
+<tr>
+<td>Direito no diagnóstico</td>
+<td>20/20 perto demais; bruto ≈1,67 cm, corrigido ≈2,32 cm</td>
+<td>Não normalizou imediatamente após pequeno reposicionamento</td>
+</tr>
+<tr>
+<td>Depois de reiniciar</td>
+<td>20/20 válidas por canal; medianas F19,84/E3,47/D3,27 cm</td>
+<td>Validade estática não garantiu estabilidade durante avanço</td>
+</tr>
+<tr>
+<td>Missão única 4×4, inferior direito/Norte</td>
+<td>Três pausas/retomadas; recuperação de eco excedida antes de confirmar a primeira célula</td>
+<td>Arco não chegou a iniciar</td>
+</tr>
+<tr>
+<td>Teste isolado esquerdo</td>
+<td>Comando de recuo interrompido: código 7, yaw −0,13°</td>
+<td>Arco não iniciou; sem distância final registrada para afirmar quanto recuou fisicamente</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Registro de pausas e retomadas durante a missão experimental" src="../figs/Testes/Integracao/terminal-recuperacao-eco.png" /></p>
+<p><em>Figura 35 — Missão após reinício: três recuperações e parada por eco; não há início de arco nesse trecho.</em></p>
+<p><img alt="Painel da missão interrompida antes do arco" src="../figs/Testes/Integracao/missao-arco-interrompida.png" /></p>
+<p><em>Figura 36 — Recepção do estado e motivo de falha; o mapa não comprova chegada física à célula seguinte.</em></p>
+<p><img alt="Registro do comando de arco isolado interrompido no recuo" src="../figs/Testes/Integracao/terminal-arco-isolado.png" /></p>
+<p><em>Figura 37 — Teste isolado: abertura aceita, recuo comandado e interrompido com código 7; não comprova a distância recuada nem curva executada.</em></p>
+<p><a id="etapa-e"></a></p>
+<h3 id="etapa-e-consolidacao-e-diagnostico">Etapa E — Consolidação e diagnóstico<a class="headerlink" href="#etapa-e-consolidacao-e-diagnostico" title="Permanent link">&para;</a></h3>
+<p><a id="t516"></a></p>
+<h4 id="516-testes-automatizados-e-integracao-de-software">5.16 Testes automatizados e integração de software<a class="headerlink" href="#516-testes-automatizados-e-integracao-de-software" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Marco histórico</th>
+<th>Resultados registrados</th>
+<th>Evolução verificada</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ambiente inicial</td>
+<td>117 bem-sucedidos; microbenchmark passou em execução isolada após falhar sob cobertura</td>
+<td>Ambiente e suíte inicial exercitados; sensibilidade do benchmark à carga identificada</td>
+</tr>
+<tr>
+<td>Integração inicial ao site</td>
+<td>92 backend; 11 E2E; 1 PostgreSQL não executado</td>
+<td>Fluxo entre dados recebidos e interface verificado</td>
+</tr>
+<tr>
+<td>Controle inicial pelo site</td>
+<td>98 backend; 167 firmware; 14 navegador; 1 PostgreSQL ignorado</td>
+<td>Comandos e estados de missão verificados antes do ensaio no chão</td>
+</tr>
+<tr>
+<td>Recuperação de eco</td>
+<td>177 firmware; 99 backend; 15 navegador; 1 PostgreSQL ignorado</td>
+<td>Pausa, recuperação e comunicação dos estados cobertas por testes</td>
+</tr>
+<tr>
+<td>Filtro robusto</td>
+<td>197 firmware</td>
+<td>Regras de aquisição, validade e filtragem verificadas</td>
+</tr>
+<tr>
+<td>Perfil de arco</td>
+<td>72 controlador + 135 nativos = 207 firmware</td>
+<td>Modelo de curva, progresso e transições verificados em software</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Regra de leitura</th>
+<th>Aplicação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Contagens por versão</td>
+<td>Não somar como testes distintos; não são resultado da versão atual de 23/11</td>
+</tr>
+<tr>
+<td>Execução desta revisão documental</td>
+<td>Não houve nova bateria de testes físicos ou automatizados do robô</td>
+</tr>
+<tr>
+<td>Warnings/lint</td>
+<td>Avisos de depreciação e problemas anteriores registrados; não foi afirmada ausência de todo aviso</td>
+</tr>
+<tr>
+<td>Condições controladas</td>
+<td>Cenários e labirintos gerados validam software; alimentação, tração e folga dependem do conjunto físico</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Resumo dos testes automatizados do firmware" src="../figs/Testes/Integracao/terminal-testes-automatizados.png" /></p>
+<p><em>Figura 38 — Marco do filtro robusto: 197 casos aprovados no log preservado. O marco posterior de 207 está descrito nos registros do perfil de arco.</em></p>
+<h5 id="5161-catalogo-dos-principais-motivos-de-parada-do-recorte">5.16.1 Catálogo dos principais motivos de parada do recorte<a class="headerlink" href="#5161-catalogo-dos-principais-motivos-de-parada-do-recorte" title="Permanent link">&para;</a></h5>
+<table>
+<thead>
+<tr>
+<th>Código/mensagem</th>
+<th>Significado na revisão ensaiada</th>
+<th>Interpretação permitida</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3/4</td>
+<td>Falha de leitura de encoder/IMU</td>
+<td>Falha reportada pela interface; investigar conexão/dados</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Prazo do movimento ou falta de progresso angular</td>
+<td>O código isolado não identifica qual hipótese física causou a parada</td>
+</tr>
+<tr>
+<td>7/8</td>
+<td>Roda esquerda/direita sem progresso</td>
+<td>Pode decorrer de contato, cabo, alimentação, motor, encoder ou controle; precisa evidência adicional</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Cancelamento</td>
+<td>Movimento interrompido por comando/fluxo de parada</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Limite de segurança de movimento</td>
+<td>Excesso de erro/deslocamento/sentido conforme revisão</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Frenagem sem assentamento confirmado</td>
+<td>Não equivale automaticamente a falha elétrica de motor</td>
+</tr>
+<tr>
+<td><code>frente invalida: pulso=0us</code></td>
+<td>Ausência de eco no evento</td>
+<td>Diferente de distância curta válida</td>
+</tr>
+<tr>
+<td><code>reserva frontal...</code></td>
+<td>Distância confirmada dentro do limite ativo</td>
+<td>O painel posterior pode mostrar outra amostra</td>
+</tr>
+<tr>
+<td><code>eco frontal instavel...</code></td>
+<td>Recuperação excedeu prazo/quantidade permitida</td>
+<td>Não houve autorização para seguir indefinidamente sem medição</td>
+</tr>
+<tr>
+<td><code>paredes instaveis por1500ms...</code></td>
+<td>Não reuniu observações suficientes no prazo</td>
+<td>Canal sem leitura não foi interpretado como abertura</td>
+</tr>
+<tr>
+<td><code>frente...exige&gt;...para avancar...</code></td>
+<td>Condição anterior à etapa não satisfeita</td>
+<td>A etapa pode ter sido bloqueada sem começar</td>
+</tr>
+</tbody>
+</table>
+<p>Esses códigos devem ser associados ao commit/perfil do ensaio: o enum pode evoluir em revisões posteriores.</p>
+<p><a id="6-evidencias-em-video"></a></p>
+<h2 id="6-evidencias-em-video">6. Evidências em vídeo<a class="headerlink" href="#6-evidencias-em-video" title="Permanent link">&para;</a></h2>
+<p>Os vídeos estão na pasta <a href="https://drive.google.com/drive/folders/1HWXcRZtt__XsECcJWotzuqxjYwnBdWcZ">PI1 Grupo 2 — Vídeos dos testes de integração</a>, no Google Drive, com acesso de leitura para qualquer pessoa com o link. As imagens selecionadas permanecem neste relatório.</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Original</th>
+<th>Intervalo disponibilizado no derivado</th>
+<th>Evidência e interpretação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V01</td>
+<td>WhatsApp Video 2026-11-12 at 15.10.56.mp4</td>
+<td>0–8,27 s</td>
+<td><a href="https://drive.google.com/file/d/1g3uV95nU0twike6R5Prvyv-zLltl7K9L/view?usp=drivesdk">Encoder esquerdo 1</a>; marca preta e estimativa de voltas</td>
+</tr>
+<tr>
+<td>V02</td>
+<td>WhatsApp Video 2026-11-12 at 15.25.37.mp4</td>
+<td>8–11,85 s</td>
+<td><a href="https://drive.google.com/file/d/1Pcbvug-mPit7MYGtWEw2yyGuBOxlYoUc/view?usp=drivesdk">Encoder esquerdo 2</a>; movimento no final do original</td>
+</tr>
+<tr>
+<td>V03</td>
+<td>WhatsApp Video 2026-11-12 at 15.33.49.mp4</td>
+<td>0–5,71 s</td>
+<td><a href="https://drive.google.com/file/d/1ffQdXgLyXSgeOBjFqEAIfD5uGMia3oBu/view?usp=drivesdk">Encoder direito</a></td>
+</tr>
+<tr>
+<td>V04</td>
+<td>IMG_1878.MOV</td>
+<td>52–68 s</td>
+<td><a href="https://drive.google.com/file/d/1XshExiNuJp6V0N8PnZQ97OnG-0I9o-sm/view?usp=drivesdk">Giro de 30°</a>; preparação extensa omitida</td>
+</tr>
+<tr>
+<td>V05</td>
+<td>IMG_4029.mov</td>
+<td>0–47,76 s</td>
+<td><a href="https://drive.google.com/file/d/1FvackZ1Vj3jki98nqpRXuJQKnRAk82ZR/view?usp=drivesdk">Giro de 90° à direita</a>; registro em câmera lenta</td>
+</tr>
+<tr>
+<td>V06</td>
+<td>IMG_4031.mov</td>
+<td>0–8,64 s</td>
+<td><a href="https://drive.google.com/file/d/1Su8u5aY7EkhU0Si4bGWjrIw2qeWo65KM/view?usp=drivesdk">Giro à esquerda</a></td>
+</tr>
+<tr>
+<td>V07</td>
+<td>IMG_4034.mov</td>
+<td>0–6,49 s</td>
+<td><a href="https://drive.google.com/file/d/1RZpXxqMh529cs7Z3KZSX6IkRdbkfwpYL/view?usp=drivesdk">Meia-volta</a></td>
+</tr>
+<tr>
+<td>V08</td>
+<td>IMG_4037.mov</td>
+<td>0–23,30 s</td>
+<td><a href="https://drive.google.com/file/d/1SgI7gGA2wv6gW7GtrynKYS6sn2KP1OHm/view?usp=drivesdk">Avanço curto</a></td>
+</tr>
+<tr>
+<td>V09</td>
+<td>IMG_4056.mov</td>
+<td>0–30,18 s</td>
+<td><a href="https://drive.google.com/file/d/1-bfJdrKqS_yH2kUeqtWG9nm4tYjyY8Xu/view?usp=drivesdk">Avanço e giro supervisionados</a></td>
+</tr>
+<tr>
+<td>V10</td>
+<td>IMG_4069.mov</td>
+<td>0–3,44 s</td>
+<td><a href="https://drive.google.com/file/d/1snlR8IHzIljVjgEetfgyBiRSwTzJGpde/view?usp=drivesdk">Avanço a até 80 mm/s</a></td>
+</tr>
+<tr>
+<td>V11</td>
+<td>IMG_4072.mov</td>
+<td>0–64,40 s</td>
+<td><a href="https://drive.google.com/file/d/13eiValY3BYbyxBiM53FouCKT6677217W/view?usp=drivesdk">Bloco a até 100 mm/s e 55°/s</a>; manejo do cabo relatado</td>
+</tr>
+<tr>
+<td>V12</td>
+<td>WhatsApp Video 2026-11-22 at 19.10.47.mp4</td>
+<td>Integral, aproximadamente 61,23 s</td>
+<td><a href="https://drive.google.com/file/d/1xUHx79K4jnHy3fMGFbF1V3P_j2Rg8uib/view?usp=drivesdk">Curva no labirinto</a>; montagem com motor substituído e bateria elevada; sem reposicionamento manual</td>
+</tr>
+<tr>
+<td>V13</td>
+<td>WhatsApp Video 2026-11-23 at 09.51.03.mp4</td>
+<td>Integral, aproximadamente 51,97 s</td>
+<td><a href="https://drive.google.com/file/d/18Eb0SE0ibbNGY7Gi4-5HUqn2CCV7Ww3g/view?usp=drivesdk">Locomoção sem cabo</a>; avanço e manobra no labirinto com USB desconectada</td>
+</tr>
+</tbody>
+</table>
+<p>V01–V11 são trechos selecionados, comprimidos e sem áudio; V12–V13 são os arquivos integrais recebidos nesta atualização. Os intervalos indicam o tempo do arquivo original, inclusive nos registros em câmera lenta.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tabs", "navigation.top", "search.suggest", "search.highlight"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.a5f9d56c.min.js"></script>
+      
+    
+  </body>
+</html>
