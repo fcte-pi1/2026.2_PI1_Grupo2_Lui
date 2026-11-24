@@ -1,4 +1,5 @@
 .pio
+build/
 .cache
 .dummy
 .vscode/.browse.c_cpp.db*

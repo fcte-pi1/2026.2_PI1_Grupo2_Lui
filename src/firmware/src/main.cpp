@@ -162,7 +162,39 @@ bool hardwareReady = false;
 bool attemptUsed = false;
 bool guidedRouteActive = false;
 bool missionCornerActive = false;
-enum class RollingPhase { None, BeforeRetreat, Retreat, BeforeArc, Arc, ConfirmExit, WaitSonarPause };
+enum class RollingPhase { None, BeforeRetreat, Retreat, BeforeArc, Arc, ConfirmExit, WaitSonarPause, RecoverRetreat };
+// Curva da missão em arco aberto (mesmos parâmetros do teste 'a'/'A').
+uint8_t rollingRecoveries=0;
+// Recuperação da reta da missão (ré curta e retomada).
+uint8_t missionStraightRetries=0;
+bool missionRetreatPending=false;
+// Posição do eixo em relação ao centro da célula ao chegar (negativo = ficou antes,
+// ex.: parede na frente impede chegar ao centro). A ré seguinte desconta isso para
+// voltar ao centro da célula anterior em vez de passar do ponto.
+float missionArrivalOffsetMm=0.0f;
+// Os sensores laterais ficam na frente do robô, ~85 mm à frente do eixo (labirinto, 23/11):
+// com o eixo no centro da célula eles olham a divisa com a próxima. As paredes laterais
+// de cada célula são medidas na reta, quando esses sensores passam pelo centro dela.
+constexpr float SIDE_SENSOR_AHEAD_MM=85.0f;
+constexpr uint8_t SIDE_SAMPLES_MAX=24;
+uint16_t sideSamplesLeft[SIDE_SAMPLES_MAX], sideSamplesRight[SIDE_SAMPLES_MAX];
+uint8_t sideSampleCount=0, sideValidLeft=0, sideValidRight=0;
+uint32_t lastSideSampleStamp=0;
+float missionBackCompMm=0.0f;
+// Antes da ré: alinhar o rumo com o corredor e só então recuar.
+bool missionAlignPending=false;
+// Recuperação geral: falhas durante a missão não encerram a tentativa.
+uint8_t missionResumeCount=0;
+// Depois de um arco o lado de dentro termina junto da ponta da parede interna (invisível
+// aos sonares, que ficam na frente): a reta seguinte começa inclinada para longe dela.
+float postAvoidYawDeg=0.0f;
+constexpr float POST_AVOID_DEG=8.0f;
+constexpr float POST_AVOID_MM=40.0f;
+constexpr uint8_t MISSION_RESUME_MAX=10;
+bool resumeInProgress=false;
+float missionPendingBackMm=0.0f;
+float rollingDoneDeg=0.0f;
+Pose2D rollingArcStartPose{};
 RollingPhase rollingPhase=RollingPhase::None;
 constexpr float ROLLING_RETREAT_MM=30.0f;
 float rollingRadiusMm=30.0f;
@@ -203,6 +235,40 @@ struct PivotDiagnostic {
 
     bool active() const { return targetDeg != 0.0f; }
 } pivotDiagnostic;
+// Teste de curva em arco aberto (comandos 'a'/'A'). Geometria simulada:
+// com eixo a 86 mm da frente e 125 mm de largura, arco de 100 mm iniciado
+// com o eixo 110 mm antes do centro da célula passa com ~11 mm de folga.
+namespace ArcTest {
+constexpr float RADIUS_MM = 100.0f;
+// Leitura do sonar frontal no início do arco: (85 + 110) mm - eixo→sensor (~85 mm).
+constexpr float FRONT_TRIGGER_CM = 11.0f;
+// A 11 cm o sensor lateral fica na quina da abertura e a leitura oscila (labirinto, 23/11):
+// a abertura é conferida antes, com a frente a 8 cm, e só então o robô recua até 11 cm.
+constexpr float SIDE_CHECK_FRONT_CM = 8.0f;
+constexpr float FRONT_TOLERANCE_CM = 0.6f; // ajuste fino do motor passa 4–10 mm do alvo
+// Lado da curva precisa estar livre. O sensor lateral fica ~40 mm à frente do eixo,
+// perto da ponta da parede; o feixe largo pode pegar a quina, então o limite é baixo.
+constexpr float SIDE_OPEN_MIN_CM = 8.0f;
+constexpr uint8_t MAX_CORRECTIONS = 3;
+constexpr uint32_t SETTLE_MS = 400;
+constexpr uint32_t LOG_PERIOD_MS = 50;
+// Contato no arco (roda travada): recua e completa o ângulo que falta.
+constexpr uint8_t MAX_RECOVERIES = 5;
+constexpr float RECOVERY_RETREAT_MM = 15.0f;
+}
+struct ArcDiagnostic {
+    enum class Phase : uint8_t { None, Delay, Measure, Approach, Settle, Arc, Recover, Exit };
+    Phase phase = Phase::None;
+    int dir = 0;              // +1 esquerda, -1 direita
+    uint8_t corrections = 0;
+    uint8_t recoveries = 0;   // recuos depois de contato durante o arco
+    bool sideConfirmed = false; // abertura conferida perto da parede (frente ~8 cm)
+    float doneDeg = 0.0f;     // ângulo já girado em trechos anteriores do arco
+    uint32_t startedMs = 0;
+    uint32_t phaseMs = 0;
+    uint32_t lastLogMs = 0;
+    bool active() const { return phase != Phase::None; }
+} arcDiagnostic;
 bool motionResultPending = false;
 uint32_t attemptStartedMs = 0;
 uint32_t lastControlUpdateUs = 0;
@@ -294,7 +360,9 @@ void restoreRollingSonar() {
     }
 }
 
+bool tryResumeMission(const char* reason, bool clearMap);
 void safeStop(const char *reason, mm::EndReason endReason = mm::EndReason::Error) {
+    if (endReason == mm::EndReason::Error && tryResumeMission(reason, false)) return;
     restoreRollingSonar();
     snprintf(lastStopReason,sizeof(lastStopReason),"%s",reason);
     terminalTelemetryPublished = false;
@@ -309,6 +377,15 @@ void safeStop(const char *reason, mm::EndReason endReason = mm::EndReason::Error
     missionExitCreditMm = 0.0f;
     startDelay.cancel();
     pivotDiagnostic = {};
+    arcDiagnostic = {};
+    missionRetreatPending = false;
+    missionStraightRetries = 0;
+    missionArrivalOffsetMm = 0.0f;
+    missionBackCompMm = 0.0f;
+    missionAlignPending = false;
+    postAvoidYawDeg = 0.0f;
+    hardwareWallSensor.clearSideOverride();
+    sideSampleCount = sideValidLeft = sideValidRight = 0;
     guidedRecovery = {};
     guidedPivotRecovery = {};
     frontEchoRecovery.reset();frontProximity.reset();
@@ -317,6 +394,76 @@ void safeStop(const char *reason, mm::EndReason endReason = mm::EndReason::Error
     motors.setEnabled(false);
     finishRoute(endReason);
     Serial.printf("Tentativa interrompida: %s\n", reason);
+}
+
+// Em vez de encerrar a missão: freia, recua 15 mm mantendo o rumo, desarma o que estava
+// em andamento e volta a observar a célula confirmada (o mapa é mantido). Só a parada
+// manual, o limite de tempo e a perda do Bluetooth encerram de fato.
+bool tryResumeMission(const char* reason, bool clearMap) {
+    if (!ready || guidedRouteActive || resumeInProgress || pivotDiagnostic.active() || arcDiagnostic.active())
+        return false;
+    if (strstr(reason, "tempo") || strstr(reason, "Bluetooth") || strstr(reason, "parada")) return false;
+    if (missionResumeCount >= MISSION_RESUME_MAX) {
+        Serial.printf("RECUPERACAO GERAL esgotada (%u tentativas)\n", static_cast<unsigned>(missionResumeCount));
+        return false;
+    }
+    resumeInProgress = true;
+    ++missionResumeCount;
+    Serial.printf("RECUPERACAO GERAL %u/%u: %s; recuando 15mm e reobservando a celula (%u,%u)\n",
+                  static_cast<unsigned>(missionResumeCount), static_cast<unsigned>(MISSION_RESUME_MAX),
+                  reason, mission.x(), mission.y());
+    restoreRollingSonar();
+    samplingEnabled.store(true);
+    missionCornerActive = false;
+    rollingPhase = RollingPhase::None;
+    missionMovingForward = false;
+    missionExitCreditMm = missionLinearProgressMm = 0.0f;
+    missionRetreatPending = missionAlignPending = false;
+    missionStraightRetries = 0;
+    missionArrivalOffsetMm = missionBackCompMm = 0.0f;
+    hardwareWallSensor.clearSideOverride();
+    sideSampleCount = sideValidLeft = sideValidRight = 0;
+    guidedRecovery = {};
+    guidedPivotRecovery = {};
+    frontEchoRecovery.reset(); frontProximity.reset(); straightProximity.reset();
+    motionResultPending = false;
+    motion.stop();
+    motors.brake();
+    delay(300);
+    motors.setEnabled(true);
+    if (motion.startGuidedRetreat(15.0f)) {
+        uint32_t lastUs = micros();
+        const uint32_t startedMs = millis();
+        while (motion.getStatus() == MotionStatus::Running && millis() - startedMs < 2500) {
+            const uint32_t nowUs = micros();
+            if (nowUs - lastUs >= CONTROL_PERIOD_US) { motion.update((nowUs - lastUs) / 1000000.0f); lastUs = nowUs; }
+            delay(1);
+        }
+        motion.stop();
+    }
+    // Curva incompleta deixa o robô torto: volta ao rumo do corredor antes de reobservar.
+    motors.setEnabled(true);
+    if (motion.startAlignToReference(3.0f, 100.0f)) {
+        Serial.println("RECUPERACAO GERAL: girando de volta ao rumo do corredor");
+        uint32_t lastUs = micros();
+        const uint32_t startedMs = millis();
+        while (motion.getStatus() == MotionStatus::Running && millis() - startedMs < 5000) {
+            const uint32_t nowUs = micros();
+            if (nowUs - lastUs >= CONTROL_PERIOD_US) { motion.update((nowUs - lastUs) / 1000000.0f); lastUs = nowUs; }
+            delay(1);
+        }
+        motion.stop();
+    }
+    motors.brake();
+    motors.setEnabled(false);
+    if (clearMap) {
+        mazeMap.init(mazeMap.width(), mazeMap.height());
+        Serial.println("RECUPERACAO GERAL: mapa limpo para reexplorar");
+    }
+    (void)mission.resumeAtCurrentCell();
+    cellObservation.begin(millis());
+    resumeInProgress = false;
+    return true;
 }
 
 void trackStartedMotion() {
@@ -393,9 +540,17 @@ bool handleGuidedRecoveryResult(MotionStatus status) {
     return false;
 }
 
+uint16_t medianMm(uint16_t* values, uint8_t count) {
+    for (uint8_t a = 0; a < count; ++a)
+        for (uint8_t b = a + 1; b < count; ++b)
+            if (values[b] < values[a]) { const uint16_t v = values[a]; values[a] = values[b]; values[b] = v; }
+    return values[count / 2];
+}
+
 void handleMissionUpdate(const nav::MissionUpdate &update) {
     using Action = nav::MissionAction;
     const auto action = update.action;
+    if (action != Action::None) hardwareWallSensor.clearSideOverride();
     if (update.turnTowardNextCell && (action==Action::TurnLeft90 || action==Action::TurnRight90)) {
         const auto frame=getLateralSnapshot();const auto front=frame.frontEstimate(millis());
         const auto exit=action==Action::TurnLeft90 ? frame.leftEstimate(millis()) : frame.rightEstimate(millis());
@@ -411,7 +566,8 @@ void handleMissionUpdate(const nav::MissionUpdate &update) {
             const int dy=back==Direction::South?1:back==Direction::North?-1:0;
             const auto* previous=mazeMap.get(int(mission.x())+dx,int(mission.y())+dy);
             if (!cell || !cell->isKnown(back) || cell->hasWall(back) || !previous || !previous->visited) {
-                safeStop("curva com recuo: retaguarda ainda nao percorrida/confirmada");return;
+                // Depois de limpar o mapa a célula de trás pode não estar marcada; o recuo é curto.
+                Serial.println("CURVA COM RECUO: retaguarda nao confirmada no mapa; seguindo assim mesmo");
             }
             rollingDirection=action==Action::TurnLeft90?1:-1;
             rollingPhase=RollingPhase::BeforeRetreat;rollingPhaseMs=millis();rollingPauseMs=0;
@@ -454,8 +610,10 @@ void handleMissionUpdate(const nav::MissionUpdate &update) {
         missionLinearProgressMm = missionMovingForward ? missionExitCreditMm : 0.0f;
         missionExitCreditMm = 0.0f;
         guidedFrontApproach = false;
-        if (action == Action::TurnLeft90 || action == Action::TurnRight90 || action == Action::TurnAround180)
+        if (action == Action::TurnLeft90 || action == Action::TurnRight90 || action == Action::TurnAround180) {
             guidedLateralClearance.reset();
+            missionArrivalOffsetMm = 0.0f; // depois do giro o desvio vira lateral
+        }
         motors.setEnabled(true);
     }
     switch (action) {
@@ -463,10 +621,29 @@ void handleMissionUpdate(const nav::MissionUpdate &update) {
             return;
         case nav::MissionAction::MoveForwardOneCell:
             straightProximity.reset();
+            missionStraightRetries = 0;
+            missionRetreatPending = false;
+            sideSampleCount = sideValidLeft = sideValidRight = 0;
             started = motion.startMoveLinear(mazeConfig.cellSizeMm - missionLinearProgressMm);
             break;
         case nav::MissionAction::MoveBackwardOneCell:
-            started = motion.startMoveBackwardOneCell();
+        {
+            // Se a chegada ficou antes do centro (parede na frente), a ré volta só o que avançou.
+            const float cell = static_cast<float>(mazeConfig.cellSizeMm);
+            const float back = fmaxf(cell - 60.0f, fminf(cell, cell + missionArrivalOffsetMm));
+            missionBackCompMm = back - cell;
+            missionArrivalOffsetMm = 0.0f;
+            if (motion.startAlignToReference(1.5f)) {
+                missionAlignPending = true;
+                missionPendingBackMm = back;
+                started = true;
+                Serial.println("ALINHANDO com o corredor antes da re");
+            } else {
+                started = motion.startMoveLinear(-back);
+            }
+            Serial.printf("RE DE UMA CELULA: %.1fmm (compensa chegada %.1fmm antes do centro)\n",
+                          back, -missionBackCompMm);
+        }
             break;
         case nav::MissionAction::TurnLeft90:
             started = motion.startGuidedPivot(90.0f);
@@ -478,6 +655,9 @@ void handleMissionUpdate(const nav::MissionUpdate &update) {
             started = motion.startTurnAround180();
             break;
         case nav::MissionAction::Brake:
+            if (update.state != nav::MissionState::Completed &&
+                tryResumeMission("falha de navegacao", update.navigationStatus == nav::NavigationStatus::NoPath))
+                return;
             ready = false;
             remoteMissionActive = false;
             remoteState = update.state == nav::MissionState::Completed ? "completed" : "error";
@@ -843,6 +1023,252 @@ void updatePivotDiagnostic() {
     }
 }
 
+// Mediana de 5 disparos de um sonar, com a amostragem de fundo pausada (motores parados).
+bool measureIsolatedCm(UltrasonicUS100& sensor, float& cm) {
+    float values[5]{};
+    int count = 0;
+    for (int i = 0; i < 5; ++i) {
+        delay(30);
+        const auto reading = sensor.measure();
+        if (reading.valid) values[count++] = reading.distanceCm;
+    }
+    if (count < 3) { cm = NAN; return false; }
+    for (int a = 0; a < count; ++a)
+        for (int b = a + 1; b < count; ++b)
+            if (values[b] < values[a]) { const float v = values[a]; values[a] = values[b]; values[b] = v; }
+    cm = values[count / 2];
+    return true;
+}
+
+bool measureAllIsolated(float& front, float& left, float& right) {
+    samplingEnabled.store(false);
+    const uint32_t requestedAt = millis();
+    while (!samplingPaused.load() && millis() - requestedAt < 200) delay(1);
+    if (!samplingPaused.load()) { samplingEnabled.store(true); return false; }
+    measureIsolatedCm(sensorFront, front);
+    measureIsolatedCm(sensorLeft, left);
+    measureIsolatedCm(sensorRight, right);
+    samplingEnabled.store(true);
+    return true;
+}
+
+const char* arcPhaseName(ArcDiagnostic::Phase phase) {
+    switch (phase) {
+        case ArcDiagnostic::Phase::Delay: return "ESPERA";
+        case ArcDiagnostic::Phase::Measure: return "MEDIR";
+        case ArcDiagnostic::Phase::Approach: return "APROXIMAR";
+        case ArcDiagnostic::Phase::Settle: return "ASSENTAR";
+        case ArcDiagnostic::Phase::Arc: return "ARCO";
+        case ArcDiagnostic::Phase::Recover: return "RECUO";
+        case ArcDiagnostic::Phase::Exit: return "SAIDA";
+        default: return "-";
+    }
+}
+
+// Linha de debug completa: fase, sonares filtrados, encoders, velocidades, IMU e pose.
+void logArcDebug(uint32_t nowMs, bool force = false) {
+    if (!force && nowMs - arcDiagnostic.lastLogMs < ArcTest::LOG_PERIOD_MS) return;
+    arcDiagnostic.lastLogMs = nowMs;
+    const auto frame = getLateralSnapshot();
+    const auto f = frame.frontEstimate(nowMs), l = frame.leftEstimate(nowMs), r = frame.rightEstimate(nowMs);
+    const auto travel = motion.getWheelTravel();
+    const auto pose = motion.getPose();
+    Serial.printf("DBG t=%lu fase=%s F=%.1f L=%.1f R=%.1f encE=%.1f encD=%.1f "
+                  "velE=%.0f/%.0f velD=%.0f/%.0f ang=%.2f x=%.1f y=%.1f arcoErro=%.1f st=%u mot=%u\n",
+                  static_cast<unsigned long>(nowMs - arcDiagnostic.startedMs), arcPhaseName(arcDiagnostic.phase),
+                  f.valid ? f.distanceCm : -1.0f, l.valid ? l.distanceCm : -1.0f, r.valid ? r.distanceCm : -1.0f,
+                  travel.leftMm, travel.rightMm,
+                  motion.getLeftSpeedMmS(), motion.getLeftTargetMmS(),
+                  motion.getRightSpeedMmS(), motion.getRightTargetMmS(),
+                  motion.getTurnAngleDeg(), pose.xMm, pose.yMm,
+                  arcDiagnostic.phase == ArcDiagnostic::Phase::Arc ? motion.getArcPathErrorMm() : 0.0f,
+                  static_cast<unsigned>(motion.getStatus()), static_cast<unsigned>(motion.getFailureReason()));
+}
+
+void armArcDiagnostic(int dir) {
+    if (!hardwareReady || !samplingEnabled.load() || ready || startDelay.pending() ||
+        pivotDiagnostic.active() || arcDiagnostic.active()) {
+        Serial.println("ARCO TESTE RECUSADO: robo ocupado, sensores pausados ou hardware indisponivel.");
+        return;
+    }
+    motors.setEnabled(false);
+    Serial.println("ARCO TESTE: calibrando IMU; mantenha o robo imovel, alinhado no corredor e de frente para a parede.");
+    if (!imu.calibrateGyroZ()) { safeStop("falha na calibracao da IMU para o arco"); return; }
+    arcDiagnostic = {};
+    arcDiagnostic.dir = dir;
+    arcDiagnostic.phase = ArcDiagnostic::Phase::Delay;
+    arcDiagnostic.startedMs = millis();
+    startDelay.arm(millis(), RunConfig::START_DELAY_MS);
+    Serial.printf("ARCO TESTE ARMADO: curva a %s, raio %.0fmm, inicio com frente=%.1fcm; partida em 5s; x cancela.\n",
+                  dir > 0 ? "esquerda" : "direita", ArcTest::RADIUS_MM, ArcTest::FRONT_TRIGGER_CM);
+}
+
+void finishArcDiagnostic(const char* outcome) {
+    motion.stop();
+    motors.brake();
+    motors.setEnabled(false);
+    delay(300);
+    float f = NAN, l = NAN, r = NAN;
+    measureAllIsolated(f, l, r);
+    const auto pose = motion.getPose();
+    const float lastSegmentDeg = motion.getTurnAngleDeg() * static_cast<float>(arcDiagnostic.dir);
+    Serial.printf("ARCO RESULTADO %s: angulo_total=%.2fgraus recuos=%u eixo=(%+.1f,%+.1f)mm limite=%u aviso_trajeto=%u\n",
+                  outcome, arcDiagnostic.doneDeg + lastSegmentDeg, static_cast<unsigned>(arcDiagnostic.recoveries),
+                  pose.xMm, pose.yMm,
+                  static_cast<unsigned>(motion.arcHardLimit()), static_cast<unsigned>(motion.arcPathWarning()));
+    Serial.printf("ARCO SENSORES FINAIS (parado) F=%.2f L=%.2f R=%.2f cm\n", f, l, r);
+    arcDiagnostic = {};
+}
+
+void updateArcDiagnostic() {
+    using Phase = ArcDiagnostic::Phase;
+    const uint32_t nowMs = millis();
+    const float turnSide = static_cast<float>(arcDiagnostic.dir);
+
+    if (arcDiagnostic.phase == Phase::Delay) {
+        if (!startDelay.consumeIfDue(nowMs)) return;
+        imu.resetYaw();
+        if (!motion.begin(guidedMotionConfig(), {0.0f, 0.0f, 0.0f})) {
+            safeStop("arco teste: falha ao iniciar encoders ou IMU");
+            return;
+        }
+        arcDiagnostic.phase = Phase::Measure;
+        arcDiagnostic.phaseMs = nowMs;
+    }
+
+    if (arcDiagnostic.phase == Phase::Measure) {
+        float f = NAN, l = NAN, r = NAN;
+        if (!measureAllIsolated(f, l, r)) { safeStop("arco teste: sonares nao pausaram"); return; }
+        Serial.printf("ARCO MEDIDA (parado) F=%.2f L=%.2f R=%.2f cm; alvo F=%.1f\n", f, l, r, ArcTest::FRONT_TRIGGER_CM);
+        if (!isfinite(f)) { safeStop("arco teste: sem parede na frente"); return; }
+        const float targetCm = arcDiagnostic.sideConfirmed ? ArcTest::FRONT_TRIGGER_CM : ArcTest::SIDE_CHECK_FRONT_CM;
+        const float errorCm = f - targetCm;
+        if (!arcDiagnostic.sideConfirmed && fabsf(errorCm) <= ArcTest::FRONT_TOLERANCE_CM) {
+            const float side = arcDiagnostic.dir > 0 ? l : r;
+            if (isfinite(side) && side < ArcTest::SIDE_OPEN_MIN_CM) {
+                safeStop("arco teste: lado da curva fechado");
+                return;
+            }
+            arcDiagnostic.sideConfirmed = true;
+            arcDiagnostic.corrections = 0;
+            Serial.printf("ARCO LADO ABERTO confirmado (%.2fcm com frente=%.2fcm); recuando ate %.1fcm\n",
+                          side, f, ArcTest::FRONT_TRIGGER_CM);
+            return; // próxima medida mira o ponto de início do arco
+        }
+        if (arcDiagnostic.sideConfirmed && fabsf(errorCm) <= ArcTest::FRONT_TOLERANCE_CM) {
+            motors.setEnabled(true);
+            if (!motion.startRollingArc90(90.0f * turnSide, ArcTest::RADIUS_MM)) {
+                safeStop("arco teste: falha ao iniciar o arco");
+                return;
+            }
+            Serial.printf("ARCO INICIO: frente %.2fcm (erro %+.2fcm), raio %.0fmm\n", f, errorCm, ArcTest::RADIUS_MM);
+            arcDiagnostic.phase = Phase::Arc;
+            arcDiagnostic.phaseMs = nowMs;
+            lastControlUpdateUs = micros();
+            return;
+        }
+        if (++arcDiagnostic.corrections > ArcTest::MAX_CORRECTIONS + 4) {
+            safeStop("arco teste: nao convergiu para a distancia de inicio");
+            return;
+        }
+        const float moveMm = fmaxf(-150.0f, fminf(150.0f, errorCm * 10.0f));
+        motors.setEnabled(true);
+        if (!motion.startMoveLinear(moveMm)) { safeStop("arco teste: falha ao iniciar a aproximacao"); return; }
+        Serial.printf("ARCO APROXIMAR: %+.1fmm (erro %+.2fcm)\n", moveMm, errorCm);
+        arcDiagnostic.phase = Phase::Approach;
+        arcDiagnostic.phaseMs = nowMs;
+        lastControlUpdateUs = micros();
+        return;
+    }
+
+    if (arcDiagnostic.phase == Phase::Settle) {
+        logArcDebug(nowMs);
+        if (nowMs - arcDiagnostic.phaseMs >= ArcTest::SETTLE_MS) {
+            arcDiagnostic.phase = Phase::Measure;
+            arcDiagnostic.phaseMs = nowMs;
+        }
+        return;
+    }
+
+    // Approach ou Arc: laço de controle a cada CONTROL_PERIOD_US.
+    if (arcDiagnostic.phase == Phase::Approach && motion.isMovingForward()) {
+        const auto front = getLateralSnapshot().frontEstimate(nowMs);
+        const float approachTargetCm = arcDiagnostic.sideConfirmed ? ArcTest::FRONT_TRIGGER_CM : ArcTest::SIDE_CHECK_FRONT_CM;
+        if (front.valid && front.distanceCm < approachTargetCm - 1.5f) motion.brakeForObstacle();
+    }
+    if (arcDiagnostic.phase == Phase::Exit)
+        motion.setGuidedLateralSteering(true, motion.getDistanceTravelledMm() < POST_AVOID_MM ? postAvoidYawDeg : 0.0f);
+    const uint32_t nowUs = micros();
+    const uint32_t elapsedUs = nowUs - lastControlUpdateUs;
+    if (elapsedUs < CONTROL_PERIOD_US) return;
+    lastControlUpdateUs = nowUs;
+    motion.update(static_cast<float>(elapsedUs) / 1000000.0f);
+    logArcDebug(nowMs);
+
+    const auto status = motion.getStatus();
+    if (status == MotionStatus::Running) return;
+    logArcDebug(nowMs, true);
+    const auto reason = motion.getFailureReason();
+    const bool contact = reason == MotionFailureReason::LeftWheelStalled ||
+        reason == MotionFailureReason::RightWheelStalled || reason == MotionFailureReason::MotionTimeout;
+    if (arcDiagnostic.phase == Phase::Arc && status != MotionStatus::Succeeded && contact &&
+        arcDiagnostic.recoveries < ArcTest::MAX_RECOVERIES) {
+        // Contato: guarda o ângulo já feito, recua um pouco e depois completa a curva.
+        arcDiagnostic.doneDeg += motion.getTurnAngleDeg() * turnSide;
+        ++arcDiagnostic.recoveries;
+        motors.setEnabled(true);
+        // Ré guiada: mantém o rumo atual (diagonal), até 18 mm/s.
+        if (!motion.startGuidedRetreat(ArcTest::RECOVERY_RETREAT_MM)) {
+            finishArcDiagnostic("FALHOU ao iniciar o recuo apos contato");
+            return;
+        }
+        Serial.printf("ARCO CONTATO (motivo=%u) com %.1fgraus feitos: recuo %.0fmm, tentativa %u/%u\n",
+                      static_cast<unsigned>(reason), arcDiagnostic.doneDeg, ArcTest::RECOVERY_RETREAT_MM,
+                      static_cast<unsigned>(arcDiagnostic.recoveries), static_cast<unsigned>(ArcTest::MAX_RECOVERIES));
+        arcDiagnostic.phase = Phase::Recover;
+        arcDiagnostic.phaseMs = nowMs;
+        lastControlUpdateUs = micros();
+        return;
+    }
+    if (arcDiagnostic.phase == Phase::Recover && status == MotionStatus::Succeeded) {
+        arcDiagnostic.doneDeg += motion.getTurnAngleDeg() * turnSide;
+        const float remainingDeg = 90.0f - arcDiagnostic.doneDeg;
+        if (remainingDeg < 5.0f) { finishArcDiagnostic("OK apos recuo"); return; }
+        motors.setEnabled(true);
+        if (!motion.startRollingArc90(remainingDeg * turnSide, ArcTest::RADIUS_MM)) {
+            finishArcDiagnostic("FALHOU ao retomar o arco");
+            return;
+        }
+        Serial.printf("ARCO RETOMADO: faltam %.1fgraus\n", remainingDeg);
+        arcDiagnostic.phase = Phase::Arc;
+        arcDiagnostic.phaseMs = nowMs;
+        lastControlUpdateUs = micros();
+        return;
+    }
+    if (status != MotionStatus::Succeeded) {
+        char reason[64];
+        snprintf(reason, sizeof(reason), "FALHOU na fase %s, motivo=%u",
+                 arcPhaseName(arcDiagnostic.phase), static_cast<unsigned>(motion.getFailureReason()));
+        finishArcDiagnostic(reason);
+        return;
+    }
+    if (arcDiagnostic.phase == Phase::Exit) { postAvoidYawDeg = 0.0f; finishArcDiagnostic("OK (arco e saida de 10cm)"); return; }
+    if (arcDiagnostic.phase == Phase::Arc) {
+        // Igual à missão: reta de saída inclinada para longe da quina interna nos primeiros 40 mm.
+        motion.shiftStraightReference(90.0f * turnSide);
+        postAvoidYawDeg = -POST_AVOID_DEG * turnSide;
+        motors.setEnabled(true);
+        if (!motion.startMoveLinear(100.0f)) { finishArcDiagnostic("FALHOU ao iniciar a saida"); return; }
+        Serial.printf("ARCO SAIDA: avancando 100mm, primeiros %.0fmm inclinado %+.0fgraus\n", POST_AVOID_MM, postAvoidYawDeg);
+        arcDiagnostic.phase = Phase::Exit;
+        arcDiagnostic.phaseMs = nowMs;
+        lastControlUpdateUs = micros();
+        return;
+    }
+    arcDiagnostic.phase = Phase::Settle;
+    arcDiagnostic.phaseMs = nowMs;
+}
+
 void publishCurrentMapCell() {
     if (!telemetryClientReady || guidedRouteActive) return;
     char packet[400];
@@ -852,6 +1278,10 @@ void publishCurrentMapCell() {
 }
 
 void finishMissionMotion(bool succeeded, bool frontExitConfirmed = false) {
+    // Ré encurtada: logicamente ainda é uma célula inteira.
+    if (succeeded && !missionMovingForward && missionBackCompMm != 0.0f)
+        missionLinearProgressMm += missionBackCompMm;
+    missionBackCompMm = 0.0f;
     if (succeeded && mission.state() == nav::MissionState::Moving) {
         const auto frame = getLateralSnapshot();
         const uint32_t now = millis();
@@ -860,8 +1290,10 @@ void finishMissionMotion(bool succeeded, bool frontExitConfirmed = false) {
         const float travelledMm = fabsf(missionLinearProgressMm);
         if ((missionMovingForward && missionLinearProgressMm <= 0.0f) ||
             (!missionMovingForward && missionLinearProgressMm >= 0.0f) ||
-            !FrontApproach::arrivalConfirmed(automaticFrontReferenceUsed, fresh && front.valid,
-                                              front.distanceCm, travelledMm, mazeConfig.cellSizeMm)) {
+            !(FrontApproach::arrivalConfirmed(automaticFrontReferenceUsed, fresh && front.valid,
+                                              front.distanceCm, travelledMm, mazeConfig.cellSizeMm) ||
+              (missionMovingForward && automaticFrontReferenceUsed && travelledMm >= 0.5f*mazeConfig.cellSizeMm &&
+               travelledMm <= mazeConfig.cellSizeMm + 20.0f))) {
             char cause[128];
             snprintf(cause, sizeof(cause), "chegada nao confirmada: percurso=%+.1fmm frente=%.2fcm celula=%umm",
                      missionLinearProgressMm, frame.front.distanceCm, mazeConfig.cellSizeMm);
@@ -872,6 +1304,29 @@ void finishMissionMotion(bool succeeded, bool frontExitConfirmed = false) {
             Serial.printf("CHEGADA AVISO: percurso=%+.1fmm aceito pela odometria; frente=%.2fcm divergente\n",
                 missionLinearProgressMm,front.distanceCm);
         gridOdometry.reportArrival(missionLinearProgressMm);
+        postAvoidYawDeg = 0.0f;
+        if (missionMovingForward && sideSampleCount >= 2) {
+            const bool leftOk = sideValidLeft >= 3, rightOk = sideValidRight >= 3;
+            const uint16_t leftMm = leftOk ? medianMm(sideSamplesLeft, sideValidLeft) : 0;
+            const uint16_t rightMm = rightOk ? medianMm(sideSamplesRight, sideValidRight) : 0;
+            hardwareWallSensor.setSideOverride(leftOk, leftMm, rightOk, rightMm);
+            Serial.printf("PAREDES LATERAIS medidas no centro da celula: E=%umm(%u validas) D=%umm(%u validas)%s\n",
+                          static_cast<unsigned>(leftMm), static_cast<unsigned>(sideValidLeft),
+                          static_cast<unsigned>(rightMm), static_cast<unsigned>(sideValidRight),
+                          leftOk && rightOk ? "" : "; lado sem medida usa leitura ao vivo");
+        }
+        sideSampleCount = sideValidLeft = sideValidRight = 0;
+        missionArrivalOffsetMm = missionMovingForward
+            ? missionLinearProgressMm - static_cast<float>(mazeConfig.cellSizeMm) : 0.0f;
+        // Com parede na frente, o sonar é mais confiável que o encoder (que conta o
+        // escorregamento ao raspar a parede): sensor ~85 mm à frente do eixo e parede a
+        // 85 mm do centro, então o eixo fica exatamente "frente" mm antes do centro.
+        if (missionMovingForward && fresh && front.valid && isfinite(front.distanceCm) && front.distanceCm < 10.0f) {
+            missionArrivalOffsetMm = -front.distanceCm * 10.0f;
+            Serial.printf("CHEGADA PELA PAREDE: eixo %.1fmm antes do centro (frente=%.2fcm; encoder dizia %+.1fmm)\n",
+                          -missionArrivalOffsetMm, front.distanceCm,
+                          missionLinearProgressMm - static_cast<float>(mazeConfig.cellSizeMm));
+        }
         Serial.printf("CELULA CONFIRMADA: percurso=%+.1fmm; aguardando observacao\n", missionLinearProgressMm);
     }
     // A grade recebe uma confirmação por movimento lógico, após o repouso.
@@ -883,6 +1338,20 @@ void finishMissionMotion(bool succeeded, bool frontExitConfirmed = false) {
         snprintf(lastStopReason, sizeof(lastStopReason), "movimento falhou: codigo=%u",
                  static_cast<unsigned>(motion.getFailureReason()));
     const auto update = mission.onMotionFinished(succeeded, frontExitConfirmed);
+    // Depois de ré ou curva os sensores laterais (na frente do robô) olham a divisa com a
+    // célula vizinha: se os lados desta célula já foram medidos, a observação usa o mapa.
+    if (succeeded && !hardwareWallSensor.sideOverrideActive()) {
+        const auto* cell = mazeMap.get(mission.x(), mission.y());
+        const auto leftDir = mm::MazeMap::relToAbs(mission.heading(), mm::Rel::Left);
+        const auto rightDir = mm::MazeMap::relToAbs(mission.heading(), mm::Rel::Right);
+        if (cell && cell->isKnown(leftDir) && cell->isKnown(rightDir)) {
+            const uint16_t leftMm = cell->hasWall(leftDir) ? 30 : 2000;
+            const uint16_t rightMm = cell->hasWall(rightDir) ? 30 : 2000;
+            hardwareWallSensor.setSideOverride(true, leftMm, true, rightMm);
+            Serial.printf("PAREDES LATERAIS do mapa em (%u,%u): E=%s D=%s\n", mission.x(), mission.y(),
+                          leftMm < 100 ? "parede" : "aberto", rightMm < 100 ? "parede" : "aberto");
+        }
+    }
     publishCurrentMapCell();
     handleMissionUpdate(update);
     if (update.state == nav::MissionState::AwaitingObservation) cellObservation.begin(millis());
@@ -984,8 +1453,11 @@ void handleSerialCommands() {
         if (command == 'h' || command == '?') {
             Serial.println("g=missao autonoma em5s; t=2F/aproximar/esquerda/F; c=aproximar/esquerda/F do ponto atual; x=parar; s=sensores; d=ecos brutos; p=pausar ultrassons; r=retomar sensores; i=teste isolado. Para outra tentativa, reinicie e reposicione.");
             Serial.println("v=teste de giro 90 graus a esquerda; V=90 graus a direita; 5s de espera; piso livre; x cancela.");
+            Serial.println("a=teste de curva em arco (raio 100mm) a esquerda; A=a direita; de frente para a parede; 5s de espera; x cancela.");
         } else if (command == 'v' || command == 'V') {
             armPivotDiagnostic(command == 'v' ? 90.0f : -90.0f);
+        } else if (command == 'a' || command == 'A') {
+            armArcDiagnostic(command == 'a' ? 1 : -1);
         } else if (command == 'p') {
             safeStop("diagnostico: pausar ultrassons");
             samplingEnabled.store(false);
@@ -1221,18 +1693,47 @@ bool updateRollingCorner() {
     if(rollingPhase==RollingPhase::BeforeArc){
         if(now-rollingPhaseMs<300)return true;
         motors.setEnabled(true);rollingPathWarningSent=false;rollingExitProgressMm=0;
+        rollingRecoveries=0;rollingDoneDeg=0.0f;rollingArcStartPose=motion.getPose();
         if(!motion.startRollingArc90(90.0f*rollingDirection,rollingRadiusMm)){
             safeStop("curva: falha ao iniciar arco");return true;
         }
         rollingPhase=RollingPhase::Arc;lastControlUpdateUs=micros();return true;
     }
-    if(rollingPhase==RollingPhase::Retreat || rollingPhase==RollingPhase::Arc){
+    if(rollingPhase==RollingPhase::Retreat || rollingPhase==RollingPhase::Arc ||
+       rollingPhase==RollingPhase::RecoverRetreat){
         // Nenhum snapshot ultrassônico é consultado durante estes movimentos.
         const auto us=micros(),elapsed=us-lastControlUpdateUs;
         if(elapsed>=CONTROL_PERIOD_US){motion.update(elapsed/1000000.0f);lastControlUpdateUs=us;}
         if(rollingPhase==RollingPhase::Arc && motion.arcPathWarning() && !rollingPathWarningSent){
             rollingPathWarningSent=true;
             Serial.printf("ARCO AVISO: desvio do modelo %.1fmm; continuando pela IMU\n",motion.getArcPathErrorMm());
+        }
+        const float dirF=static_cast<float>(rollingDirection);
+        const auto reason=motion.getFailureReason();
+        const bool contact=reason==MotionFailureReason::LeftWheelStalled ||
+            reason==MotionFailureReason::RightWheelStalled || reason==MotionFailureReason::MotionTimeout;
+        if(motion.getStatus()==MotionStatus::Failed && rollingPhase==RollingPhase::Arc && contact &&
+           rollingRecoveries<ArcTest::MAX_RECOVERIES){
+            // Contato no arco: guarda o ângulo feito, recua mantendo o rumo e completa a curva.
+            rollingDoneDeg+=motion.getTurnAngleDeg()*dirF;++rollingRecoveries;
+            motors.setEnabled(true);
+            if(!motion.startGuidedRetreat(ArcTest::RECOVERY_RETREAT_MM)){safeStop("curva: falha no recuo apos contato");return true;}
+            Serial.printf("CURVA CONTATO (motivo=%u) com %.1fgraus: recuo %.0fmm, tentativa %u/%u\n",unsigned(reason),
+                rollingDoneDeg,ArcTest::RECOVERY_RETREAT_MM,unsigned(rollingRecoveries),unsigned(ArcTest::MAX_RECOVERIES));
+            rollingPhase=RollingPhase::RecoverRetreat;lastControlUpdateUs=micros();rollingPhaseMs=now;return true;
+        }
+        if(motion.getStatus()==MotionStatus::Succeeded && rollingPhase==RollingPhase::RecoverRetreat){
+            rollingDoneDeg+=motion.getTurnAngleDeg()*dirF;
+            const float remainingDeg=90.0f-rollingDoneDeg;
+            if(remainingDeg>=5.0f){
+                motors.setEnabled(true);
+                // Contato costuma ser a quina interna: cada nova tentativa abre o arco 15 mm.
+                const float retryRadiusMm=fminf(130.0f,rollingRadiusMm+15.0f*rollingRecoveries);
+                if(!motion.startRollingArc90(remainingDeg*dirF,retryRadiusMm)){safeStop("curva: falha ao retomar arco");return true;}
+                Serial.printf("CURVA RETOMADA: faltam %.1fgraus; raio %.0fmm\n",remainingDeg,retryRadiusMm);
+                rollingPhase=RollingPhase::Arc;lastControlUpdateUs=micros();rollingPhaseMs=now;return true;
+            }
+            rollingPhase=RollingPhase::Arc; // ângulo já completo: segue para a conferência da saída
         }
         if(motion.getStatus()==MotionStatus::Failed){
             char cause[128];snprintf(cause,sizeof(cause),"curva: etapa=%u codigo=%u limite=%u giro=%.1f avanco=%.1f desvio=%.1fmm",
@@ -1243,17 +1744,23 @@ bool updateRollingCorner() {
         if(motion.getStatus()!=MotionStatus::Succeeded)return true;
         if(rollingPhase==RollingPhase::Retreat){
             const float actual=motion.getDistanceTravelledMm();
-            if(actual>=0 || fabsf(actual+rollingPlannedRetreatMm)>3){safeStop("curva: recuo fora da tolerancia");return true;}
-            rollingRadiusMm=ROLLING_RETREAT_MM;
+            if(actual>=0 || fabsf(actual+rollingPlannedRetreatMm)>6){safeStop("curva: recuo fora da tolerancia");return true;}
+            rollingRadiusMm=ArcTest::RADIUS_MM;
             rollingPhase=RollingPhase::BeforeArc;
             Serial.printf("CURVA: recuo confirmado %.1fmm; arco sem sonar, raio %.1fmm\n",-actual,rollingRadiusMm);
         }else{
-            rollingExitProgressMm=motion.getArcExitProgressMm();
-            if(!isfinite(rollingExitProgressMm) || rollingExitProgressMm<0 || rollingExitProgressMm>80){
+            // Avanço na nova direção desde o início do primeiro trecho do arco (vale com recuos).
+            const auto pose=motion.getPose();
+            const float exitHeading=rollingArcStartPose.headingRad+dirF*MechanicalSettings::kPi*0.5f;
+            rollingExitProgressMm=(pose.xMm-rollingArcStartPose.xMm)*cosf(exitHeading)+
+                                  (pose.yMm-rollingArcStartPose.yMm)*sinf(exitHeading);
+            if(!isfinite(rollingExitProgressMm) || rollingExitProgressMm<0 || rollingExitProgressMm>160){
                 safeStop("arco: deslocamento de saida fora da faixa");return true;
             }
-            Serial.printf("ARCO CONCLUIDO: giro=%.1f; avanco na nova direcao=%.1fmm\n",
-                motion.getTurnAngleDeg(),rollingExitProgressMm);
+            motion.shiftStraightReference(90.0f*dirF);
+            postAvoidYawDeg=-POST_AVOID_DEG*dirF;
+            Serial.printf("ARCO CONCLUIDO: giro=%.1f; recuos=%u; avanco na nova direcao=%.1fmm\n",
+                rollingDoneDeg+motion.getTurnAngleDeg()*dirF,unsigned(rollingRecoveries),rollingExitProgressMm);
             restoreRollingSonar();
             rollingPhase=RollingPhase::ConfirmExit;rollingExitVotes=0;rollingExitStamp=0;
         }
@@ -1283,9 +1790,11 @@ bool updateRollingCorner() {
             if(rollingEntryGate.expired(now))safeStop("curva: geometria persistentemente indefinida antes da suspensao");
             return true;
         }
-        // Compensar a posição inicial mais recuada (por exemplo frente=4,44 cm).
-        rollingPlannedRetreatMm=FrontApproach::cornerRetreatMm(f.distanceCm,ROLLING_RETREAT_MM);
-        if(rollingPlannedRetreatMm==0){safeStop("curva: geometria de recuo invalida");return true;}
+        // Recua até a frente ler o ponto de início do arco aberto (~11 cm).
+        rollingPlannedRetreatMm=(ArcTest::FRONT_TRIGGER_CM-f.distanceCm)*10.0f;
+        if(!isfinite(rollingPlannedRetreatMm) || rollingPlannedRetreatMm<40.0f || rollingPlannedRetreatMm>100.0f){
+            safeStop("curva: geometria de recuo invalida");return true;
+        }
         rollingSonarGate.suspend(now);samplingEnabled.store(false);
         rollingPhase=RollingPhase::WaitSonarPause;
         Serial.printf("CURVA: suspender ultrassons; recuo %.1fmm; giro pela IMU e encoders\n",rollingPlannedRetreatMm);
@@ -1294,7 +1803,9 @@ bool updateRollingCorner() {
     if(rollingPhase==RollingPhase::ConfirmExit){
         if(frame.sampledAtMs!=rollingExitStamp){
             rollingExitStamp=frame.sampledAtMs;
-            rollingExitVotes=nav::guidedLeftOpening(f.distanceCm,mazeConfig.cellSizeMm)?rollingExitVotes+1:0;
+            // Depois do arco aberto o eixo já está ~10 mm dentro da célula seguinte: se ela
+            // for um beco de uma célula a frente lê ~8 cm. Basta não estar diante da parede antiga.
+            rollingExitVotes=isfinite(f.distanceCm) && f.distanceCm>5.0f?rollingExitVotes+1:0;
         }
         if(rollingExitVotes>=2){
             rollingPhase=RollingPhase::None;missionExitCreditMm=rollingExitProgressMm;
@@ -1309,6 +1820,11 @@ void loop() {
     handleRemoteCommands();
     if (pivotDiagnostic.active()) {
         updatePivotDiagnostic();
+        delayMicroseconds(500);
+        return;
+    }
+    if (arcDiagnostic.active()) {
+        updateArcDiagnostic();
         delayMicroseconds(500);
         return;
     }
@@ -1328,6 +1844,10 @@ void loop() {
         ready = true;
         remoteState = "running";
         Serial.println("TENTATIVA INICIADA; limite180s a partir de agora; x interrompe.");
+        // Crédito negativo: o primeiro avanço (se for o primeiro movimento) anda a mais.
+        missionExitCreditMm = -RunConfig::START_BEHIND_CENTER_MM;
+        Serial.printf("LARGADA: eixo %.0fmm atras do centro; primeiro avanco compensa\n", RunConfig::START_BEHIND_CENTER_MM);
+        missionResumeCount = 0;
     }
     if (!ready) {
         delay(2);
@@ -1341,6 +1861,27 @@ void loop() {
         return;
     }
 
+    {
+        // Debug da missão a 10 Hz: célula, fase da curva, sonares, encoders, IMU e status.
+        static uint32_t lastMissionDebugMs = 0;
+        if (nowMs - lastMissionDebugMs >= 100) {
+            lastMissionDebugMs = nowMs;
+            const auto frame = getLateralSnapshot();
+            const auto f = frame.frontEstimate(nowMs), l = frame.leftEstimate(nowMs), r = frame.rightEstimate(nowMs);
+            const auto travel = motion.getWheelTravel();
+            const auto pose = motion.getPose();
+            Serial.printf("MDBG t=%lu cel=(%u,%u) rumo=%u est=%u curva=%u F=%.1f L=%.1f R=%.1f "
+                          "encE=%.1f encD=%.1f velE=%.0f/%.0f velD=%.0f/%.0f ang=%.2f x=%.1f y=%.1f st=%u mot=%u\n",
+                          static_cast<unsigned long>(nowMs - attemptStartedMs), mission.x(), mission.y(),
+                          static_cast<unsigned>(mission.heading()), static_cast<unsigned>(mission.state()),
+                          static_cast<unsigned>(rollingPhase),
+                          f.valid ? f.distanceCm : -1.0f, l.valid ? l.distanceCm : -1.0f, r.valid ? r.distanceCm : -1.0f,
+                          travel.leftMm, travel.rightMm, motion.getLeftSpeedMmS(), motion.getLeftTargetMmS(),
+                          motion.getRightSpeedMmS(), motion.getRightTargetMmS(), motion.getTurnAngleDeg(),
+                          pose.xMm, pose.yMm, static_cast<unsigned>(motion.getStatus()),
+                          static_cast<unsigned>(motion.getFailureReason()));
+        }
+    }
     if(updateRollingCorner()) {delayMicroseconds(500);return;}
 
     const LateralSnapshot sensorSnapshot = getLateralSnapshot();
@@ -1370,6 +1911,19 @@ void loop() {
                !motion.isFrontApproachMode()) {
                 motion.setFrontApproachMode(true);
                 Serial.printf("APROXIMACAO AUTONOMA: frente=%.2fcm; velocidade limitada a20mm/s\n",snapshot.front.distanceCm);
+            }
+            if (automaticForward && !stale && snapshot.sampledAtMs != lastSideSampleStamp &&
+                sideSampleCount < SIDE_SAMPLES_MAX) {
+                const float axleMm = missionLinearProgressMm + motion.getDistanceTravelledMm();
+                const float sensorAtCentreMm = mazeConfig.cellSizeMm - SIDE_SENSOR_AHEAD_MM;
+                if (fabsf(axleMm - sensorAtCentreMm) <= 20.0f) {
+                    lastSideSampleStamp = snapshot.sampledAtMs;
+                    const auto sl = snapshot.leftEstimate(sensorNowMs), sr = snapshot.rightEstimate(sensorNowMs);
+                    // Só leituras válidas: sem eco não prova abertura (labirinto, 23/11).
+                    if (sl.valid) sideSamplesLeft[sideValidLeft++] = static_cast<uint16_t>(sl.distanceCm * 10.0f);
+                    if (sr.valid) sideSamplesRight[sideValidRight++] = static_cast<uint16_t>(sr.distanceCm * 10.0f);
+                    ++sideSampleCount;
+                }
             }
             const bool automaticSlow=automaticForward && motion.isFrontApproachMode() &&
                 FrontApproach::slowEnough(motion.getLeftSpeedMmS(),motion.getRightSpeedMmS());
@@ -1416,13 +1970,29 @@ void loop() {
             }
             const auto straightFeedback=automaticForward ? straightProximity.update(snapshot) : StraightProximityGuard::Feedback{};
             if(automaticForward){
-                if(frontBlocked || straightFeedback.leftConfirmed || straightFeedback.rightConfirmed){
+                if(frontBlocked){
                     char cause[128];snprintf(cause,sizeof(cause),"reta: proximidade confirmada F=%u E=%u D=%u; sem recuo automatico",
                         frontBlocked,straightFeedback.leftConfirmed,straightFeedback.rightConfirmed);
                     safeStop(cause);return;
                 }
                 const auto lateral=guidedLateralClearance.update(snapshot);
-                motion.setGuidedLateralSteering(lateral.slow,lateral.yawOffsetDeg);
+                if(straightFeedback.leftConfirmed || straightFeedback.rightConfirmed){
+                    // Parede lateral perto demais: em vez de parar, segue devagar com o
+                    // desvio máximo para o lado oposto (positivo = esquerda).
+                    const float away=straightFeedback.rightConfirmed && !straightFeedback.leftConfirmed ? 10.0f :
+                                     straightFeedback.leftConfirmed && !straightFeedback.rightConfirmed ? -10.0f : 0.0f;
+                    motion.setGuidedLateralSteering(true,away);
+                    static uint32_t lastLateralNoticeMs=0;
+                    if(millis()-lastLateralNoticeMs>1000){
+                        lastLateralNoticeMs=millis();
+                        Serial.printf("DESVIO LATERAL: E=%.2f D=%.2fcm; desviando %+.0fgraus e seguindo devagar\n",
+                                      snapshot.left.distanceCm,snapshot.right.distanceCm,away);
+                    }
+                } else if (postAvoidYawDeg != 0.0f && motion.getDistanceTravelledMm() < POST_AVOID_MM) {
+                    motion.setGuidedLateralSteering(true,postAvoidYawDeg);
+                } else {
+                    motion.setGuidedLateralSteering(lateral.slow,lateral.yawOffsetDeg);
+                }
             }
             if (guidedForward && cornerSequenceActive() && guidedRecovery.phase != RecoveryPhase::Braking) {
                 const auto lateral = guidedLateralClearance.update(snapshot);
@@ -1531,7 +2101,9 @@ void loop() {
             if(automaticForward && motion.isFrontApproachMode() && !motion.isSensorPaused() &&
                FrontApproach::atTarget(filteredFront.valid,filteredFront.distanceCm)) {
                 const float advanceMm = missionLinearProgressMm + motion.getDistanceTravelledMm();
-                if(!FrontApproach::positionMatchesCell(advanceMm,mazeConfig.cellSizeMm)) {
+                // Com parede na frente o eixo não alcança o centro: depois de meia célula,
+                // a própria parede é a referência de chegada (o atraso vai para a próxima ré).
+                if(advanceMm < 0.5f*mazeConfig.cellSizeMm) {
                     char cause[128];
                     snprintf(cause,sizeof(cause),"parede antes do centro: eixo avancou %.1fmm; celula=%umm; frente=%.2fcm",
                         advanceMm,mazeConfig.cellSizeMm,filteredFront.distanceCm);
@@ -1563,6 +2135,65 @@ void loop() {
             motion.getDistanceTravelledMm(), motion.getTurnAngleDeg());
         const bool linear = motion.getMotionType() == MotionType::ForwardCell;
         const bool sequence = cornerSequenceActive();
+        if (missionAlignPending) {
+            // Alinhamento antes da ré concluído (ou não): segue com a ré planejada.
+            missionAlignPending = false;
+            Serial.printf("ALINHADO (status=%u, giro=%.2fgraus); re de %.1fmm\n",
+                          static_cast<unsigned>(status), motion.getTurnAngleDeg(), missionPendingBackMm);
+            motors.setEnabled(true);
+            if (!motion.startMoveLinear(-missionPendingBackMm)) { safeStop("falha ao iniciar a re apos alinhar"); return; }
+            trackStartedMotion();
+            return;
+        }
+        if (!sequence && linear && missionMovingForward) {
+            // Recuperação da reta da missão: contato ou roda presa -> ré curta e retoma o resto.
+            const auto reason = motion.getFailureReason();
+            const float travelledMm = motion.getDistanceTravelledMm();
+            if (missionRetreatPending) {
+                missionRetreatPending = false;
+                missionLinearProgressMm += travelledMm;
+                if (status != MotionStatus::Succeeded) { safeStop("reta: re de recuperacao falhou"); return; }
+                // A ré pode deixar o eixo atrás do início da célula: um avanço aceita no máximo uma célula.
+                const float remainingMm = fminf(static_cast<float>(mazeConfig.cellSizeMm),
+                    static_cast<float>(mazeConfig.cellSizeMm) - missionLinearProgressMm);
+                if (remainingMm < 10.0f) { finishMissionMotion(true); return; }
+                motors.setEnabled(true);
+                straightProximity.reset();
+                motion.setFrontApproachMode(false);
+                if (!motion.startMoveLinear(remainingMm)) { safeStop("reta: falha ao retomar o avanco"); return; }
+                Serial.printf("RETA RETOMADA: faltam %.1fmm da celula\n", remainingMm);
+                trackStartedMotion();
+                return;
+            }
+            const bool recoverable = status == MotionStatus::Failed &&
+                (reason == MotionFailureReason::LeftWheelStalled || reason == MotionFailureReason::RightWheelStalled ||
+                 reason == MotionFailureReason::Obstacle || reason == MotionFailureReason::MotionTimeout ||
+                 reason == MotionFailureReason::SafetyLimit);
+            if (recoverable && missionStraightRetries < 3) {
+                ++missionStraightRetries;
+                missionLinearProgressMm += travelledMm;
+                if (missionLinearProgressMm < 20.0f) {
+                    // Junto da parede de largada não há espaço para ré: tenta de novo para frente.
+                    const float remainingMm = fminf(static_cast<float>(mazeConfig.cellSizeMm) + 60.0f,
+                        static_cast<float>(mazeConfig.cellSizeMm) - missionLinearProgressMm);
+                    motors.setEnabled(true);
+                    straightProximity.reset();
+                    if (!motion.startMoveLinear(remainingMm)) { safeStop("reta: falha ao repetir o avanco"); return; }
+                    Serial.printf("RETA TRAVOU (motivo=%u) junto da largada: tenta de novo sem re (%u/3)\n",
+                                  static_cast<unsigned>(reason), static_cast<unsigned>(missionStraightRetries));
+                    trackStartedMotion();
+                    return;
+                }
+                motors.setEnabled(true);
+                if (!motion.startGuidedRetreat(15.0f)) { safeStop("reta: falha ao iniciar re de recuperacao"); return; }
+                missionRetreatPending = true;
+                Serial.printf("RETA TRAVOU (motivo=%u) apos %.1fmm: re 15mm e retoma; tentativa %u/3\n",
+                              static_cast<unsigned>(reason), missionLinearProgressMm,
+                              static_cast<unsigned>(missionStraightRetries));
+                trackStartedMotion();
+                return;
+            }
+        }
         const bool recoverableStop = status == MotionStatus::Failed && linear && sequence &&
             guidedLinearInterruption(motion.getFailureReason());
         if (recoverableStop && guidedRecovery.phase != RecoveryPhase::Braking &&

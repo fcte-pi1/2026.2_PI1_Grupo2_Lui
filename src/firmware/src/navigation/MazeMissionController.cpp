@@ -186,6 +186,13 @@ MissionUpdate MazeMissionController::onMotionFinished(bool succeeded, bool front
     return update(MissionAction::None);
 }
 
+MissionUpdate MazeMissionController::resumeAtCurrentCell() {
+    if (state_ == MissionState::NotStarted || state_ == MissionState::Completed) return update(MissionAction::None);
+    state_ = MissionState::AwaitingObservation;
+    turnTowardNextCell_ = false;
+    return update(MissionAction::None);
+}
+
 MissionUpdate MazeMissionController::fail() {
     return failWith(NavigationStatus::InvalidObservation);
 }

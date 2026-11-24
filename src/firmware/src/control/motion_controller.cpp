@@ -88,7 +88,8 @@ bool MotionController::startMoveForwardOneCell() { return startMoveLinear(config
 bool MotionController::startMoveBackwardOneCell() { return startMoveLinear(-config_.cellSizeMm); }
 bool MotionController::startMoveLinear(float mm) {
     if (status_ == MotionStatus::Running) return false;
-    if (!isfinite(mm) || fabsf(mm) < 0.5f || fabsf(mm) > config_.cellSizeMm) {
+    // Até uma célula e 60 mm: o primeiro avanço compensa a largada atrás do centro.
+    if (!isfinite(mm) || fabsf(mm) < 0.5f || fabsf(mm) > config_.cellSizeMm + 60.0f) {
         fail(MotionFailureReason::InvalidDistance); return false;
     }
     const uint32_t timeout=frontApproachMode_ && config_.forwardTimeoutMs<FrontApproach::TIMEOUT_MS
@@ -101,6 +102,17 @@ bool MotionController::startTurn(float angle, MotionType type) {
     targetAngleDeg_ = angle; return true;
 }
 bool MotionController::startTurnLeft90() { return startTurn(90, MotionType::TurnLeft90); }
+bool MotionController::startAlignToReference(float minErrorDeg, float maxErrorDeg) {
+    if (status_ == MotionStatus::Running || !initialized_) return false;
+    MPU6500Reading reading{};
+    if (!imu_.read(reading) || !isfinite(reading.yawDegrees)) return false;
+    const float error = wrap(straightReferenceYawDeg_ - reading.yawDegrees * config_.imuYawSign);
+    if (fabsf(error) < minErrorDeg || fabsf(error) > maxErrorDeg) return false;
+    if (!startTurn(error, error > 0.0f ? MotionType::TurnLeft90 : MotionType::TurnRight90)) return false;
+    guidedPivot_ = true;
+    guidedPivotHeadingStepDeg_ = 0.0f; // a referência não muda: só corrige o rumo
+    return true;
+}
 bool MotionController::startGuidedPivot(float degrees) {
     const float magnitude = fabsf(degrees);
     if (!isfinite(degrees) || magnitude < 10.0f || magnitude > 90.0f ||
@@ -118,8 +130,13 @@ bool MotionController::startGuidedPivot(float degrees) {
 
 bool MotionController::startRollingArc90(float degrees, float radiusMm) {
     // Mantém ambas as rodas em movimento; raio pequeno inclui ré na interna.
-    if (!isfinite(degrees) || fabsf(fabsf(degrees)-90.0f)>0.01f ||
-        !isfinite(radiusMm) || radiusMm<10.0f || radiusMm>40.0f) return false;
+    // Arco aberto (raio > 40 mm) aceita fração de 90° para completar uma curva
+    // depois de recuar de um contato; o arco curto antigo continua exigindo 90°.
+    const float magnitude=fabsf(degrees);
+    const bool partialAllowed=radiusMm>40.0f;
+    if (!isfinite(degrees) ||
+        (partialAllowed ? (magnitude<5.0f || magnitude>90.01f) : fabsf(magnitude-90.0f)>0.01f) ||
+        !isfinite(radiusMm) || radiusMm<10.0f || radiusMm>130.0f) return false;
     if (!startTurn(degrees, degrees>0 ? MotionType::ArcLeft90 : MotionType::ArcRight90)) return false;
     arcRadiusMm_=radiusMm;arcStartPose_=odometry_.getPose();
     return true;
@@ -179,7 +196,8 @@ void MotionController::setWallAlignmentFeedback(float l, float r, bool valid) {
 void MotionController::setGuidedLateralSteering(bool slow, float yawOffsetDeg) {
     guidedSteering_ = true;
     guidedLateralSlow_ = slow;
-    guidedYawOffsetDeg_ = isfinite(yawOffsetDeg) ? clamp(yawOffsetDeg, -6.0f, 6.0f) : 0.0f;
+    // Até 10°: com 6° o robô seguia raspando a parede no labirinto (23/11).
+    guidedYawOffsetDeg_ = isfinite(yawOffsetDeg) ? clamp(yawOffsetDeg, -10.0f, 10.0f) : 0.0f;
 }
 
 void MotionController::beginBrake(uint32_t now, MotionFailureReason reason) {
@@ -281,7 +299,7 @@ void MotionController::updateForward(float dt, int32_t l, int32_t r, float ls, f
         beginBrake(now, MotionFailureReason::WrongDirection); return;
     }
     if (lt > target + 20 || rt > target + 20 ||
-        fabsf(rt - lt) > 20 || fabsf(turnAngleDeg_) > (guidedRetreat_ ? 5.0f : 15.0f)) {
+        fabsf(rt - lt) > (guidedSteering_ ? 35.0f : 20.0f) || fabsf(turnAngleDeg_) > (guidedRetreat_ ? 5.0f : (guidedSteering_ ? 20.0f : 15.0f))) {
         beginBrake(now, MotionFailureReason::SafetyLimit); return;
     }
     if (checkTimeoutAndStall(now, 1, 1)) return;
@@ -340,26 +358,45 @@ void MotionController::updateArc(float dt,float ls,float rs,uint32_t now) {
     // Diferença para o arco ideal é diagnóstico e realimentação, não colisão.
     const float pathError=expectedCentre-distanceTravelledMm_;
     if(fabsf(pathError)>12.0f)arcPathWarning_=true;
-    if(angle < -4 || angle>100){
+    const float arcTarget=fabsf(targetAngleDeg_);
+    if(angle < -4 || angle>arcTarget+10.0f){
         arcHardLimit_=1;beginBrake(now,MotionFailureReason::SafetyLimit);return;
     }
-    if(fabsf(travel.leftMm)>180 || fabsf(travel.rightMm)>180){
+    // Arcos abertos (raio > 40 mm) percorrem mais que 180 mm na roda externa.
+    const bool wideArc=arcRadiusMm_>40.0f;
+    const float wheelTravelLimit=wideArc
+        ? (arcRadiusMm_+config_.wheelTrackMm*0.5f)*pi*0.5f*1.3f+20.0f : 180.0f;
+    if(fabsf(travel.leftMm)>wheelTravelLimit || fabsf(travel.rightMm)>wheelTravelLimit){
         arcHardLimit_=2;beginBrake(now,MotionFailureReason::SafetyLimit);return;
     }
-    if (angle>lastAngularProgress_+0.5f) {lastAngularProgress_=angle;lastAngularProgressMs_=now;}
+    if (angle>lastAngularProgress_+0.5f) {
+        lastAngularProgress_=angle;lastAngularProgressMs_=now;
+        // Arco aberto: a roda interna anda a ~10 mm/s e o N20 vai aos trancos. Se o robô
+        // continua girando ele não está preso; contato real aparece como falta de progresso angular.
+        if(wideArc) lastLeftProgressMs_=lastRightProgressMs_=now;
+    }
     if (now-lastAngularProgressMs_>=700) {beginBrake(now,MotionFailureReason::MotionTimeout);return;}
     if (checkTimeoutAndStall(now,leftSign,rightSign)) return;
-    const float remaining=90.0f-angle;
+    const float remaining=arcTarget-angle;
     if (remaining<=fmaxf(0.5f,fmaxf(0.0f,currentGyroDps_*dir)*0.035f)) {beginBrake(now);return;}
-    const float maxRate=fminf(16.0f,config_.maxAngularSpeedDegS);
+    // Em arco aberto, limita pela velocidade da roda externa (no máximo a linear).
+    const float maxRate=wideArc
+        ? fminf(config_.maxAngularSpeedDegS,
+                config_.maxLinearSpeedMmS/(arcRadiusMm_+config_.wheelTrackMm*0.61f)*180.0f/pi)
+        : fminf(16.0f,config_.maxAngularSpeedDegS);
     const float rate=clamp(remaining*config_.turnKpDegPerSecPerDeg,6.0f,maxRate);
     profiledAngularSpeedDegS_=fminf(rate,fmaxf(6.0f,profiledAngularSpeedDegS_+60.0f*dt));
     const float omega=profiledAngularSpeedDegS_*pi/180.0f;
     // Mais avanço por grau, principalmente se o eixo estiver atrasado no arco.
+    // Em arco aberto, o pneu escorrega de lado e o robô gira menos que a diferença
+    // das rodas indica: bitola efetiva ~1,22x a medida (teste no labirinto em 23/11:
+    // 57,7° no IMU contra 70° pelos encoders). A realimentação também ganha mais faixa.
     const float effectiveRadius=clamp(arcRadiusMm_+3.0f+0.6f*pathError,
-                                     fmaxf(10.0f,arcRadiusMm_-5.0f),fminf(45.0f,arcRadiusMm_+10.0f));
-    applyWheelSpeedTargets(omega*(effectiveRadius-dir*config_.wheelTrackMm*0.5f),
-                          omega*(effectiveRadius+dir*config_.wheelTrackMm*0.5f),ls,rs,dt);
+                                     fmaxf(10.0f,arcRadiusMm_-(wideArc?30.0f:5.0f)),
+                                     wideArc?arcRadiusMm_+10.0f:fminf(45.0f,arcRadiusMm_+10.0f));
+    const float halfTrack=config_.wheelTrackMm*0.5f*(wideArc?1.22f:1.0f);
+    applyWheelSpeedTargets(omega*(effectiveRadius-dir*halfTrack),
+                          omega*(effectiveRadius+dir*halfTrack),ls,rs,dt);
 }
 
 void MotionController::updateTurn(float dt, float ls, float rs, uint32_t now) {
@@ -466,13 +503,19 @@ void MotionController::succeed() {
     sensorPaused_=false;
     if (guidedPivot_)
         straightReferenceYawDeg_ = wrap(straightReferenceYawDeg_ + guidedPivotHeadingStepDeg_);
-    else if (motionType_ != MotionType::ForwardCell)
+    // Arcos não redefinem o rumo de referência: quem conclui a curva inteira
+    // (inclusive com recuos) gira a referência em exatamente 90° (shiftStraightReference).
+    else if (motionType_ != MotionType::ForwardCell &&
+             motionType_ != MotionType::ArcLeft90 && motionType_ != MotionType::ArcRight90)
         straightReferenceYawDeg_ = lastImuYawDeg_ * config_.imuYawSign;
     motors_.setEnabled(false); status_ = MotionStatus::Succeeded; failureReason_ = MotionFailureReason::None; braking_ = false;
     lastLeftTargetMmS_ = lastRightTargetMmS_ = 0;
     leftPid_.reset(); rightPid_.reset();
 }
 void MotionController::stop() { fail(MotionFailureReason::Cancelled); }
+void MotionController::shiftStraightReference(float degrees) {
+    if (isfinite(degrees)) straightReferenceYawDeg_ = wrap(straightReferenceYawDeg_ + degrees);
+}
 MotionStatus MotionController::getStatus() const { return status_; }
 MotionType MotionController::getMotionType() const { return motionType_; }
 MotionFailureReason MotionController::getFailureReason() const { return failureReason_; }

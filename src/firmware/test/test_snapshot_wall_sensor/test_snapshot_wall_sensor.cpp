@@ -29,12 +29,29 @@ void test_physical_no_echo_is_unknown_in_actual_wall_perception(){
  TEST_ASSERT_TRUE(walls.currentState().frontValid);
  TEST_ASSERT_TRUE(walls.currentState().rightValid);
 }
-void test_invalid_raw_pulse_cannot_be_rescued_by_calibrated_distance(){
+void test_too_close_pulse_is_a_touching_wall_not_unknown(){
+ // Encostado na parede o sonar fica abaixo do alcance mínimo (teste no labirinto, 23/11).
  source.front={false,2.5f,80,true};
  SnapshotWallSensor adapter(capture,clockNow);
  perception::WallPerception walls(adapter);walls.update();
- TEST_ASSERT_FALSE(walls.currentState().frontValid);
- TEST_ASSERT_FALSE(walls.currentState().wallFront);
+ TEST_ASSERT_TRUE(walls.currentState().frontValid);
+ TEST_ASSERT_TRUE(walls.currentState().wallFront);
+ TEST_ASSERT_EQUAL(20,walls.currentState().distFrontMm);
+}
+void test_echo_lost_right_after_short_reading_is_still_a_wall(){
+ SnapshotWallSensor adapter(capture,clockNow);
+ source.right={true,2.4f,140};
+ TEST_ASSERT_TRUE(adapter.read(Direction::Front).valid);
+ adapter.read(Direction::Left);
+ TEST_ASSERT_EQUAL(24,adapter.read(Direction::Right).rawDistanceMm);
+ source.right={false,NAN,0};source.sampledAtMs=clockMs=300;
+ adapter.read(Direction::Front);adapter.read(Direction::Left);
+ const auto held=adapter.read(Direction::Right);
+ TEST_ASSERT_TRUE(held.valid);TEST_ASSERT_EQUAL(24,held.rawDistanceMm);
+ // Depois de 1 s sem nova leitura curta, volta a ser desconhecido.
+ source.sampledAtMs=clockMs=1301;
+ adapter.read(Direction::Front);adapter.read(Direction::Left);
+ TEST_ASSERT_FALSE(adapter.read(Direction::Right).valid);
 }
 void test_stale_or_unready_frame_is_never_an_observed_opening(){
  clockMs=source.sampledAtMs+SonarSampling::MAX_SAMPLE_AGE_MS+1;
@@ -120,7 +137,8 @@ int main(){UNITY_BEGIN();
  RUN_TEST(test_first_wall_after_sensor_failure_does_not_reuse_old_open_readings);
  RUN_TEST(test_all_directions_use_one_coherent_hardware_frame);
  RUN_TEST(test_physical_no_echo_is_unknown_in_actual_wall_perception);
- RUN_TEST(test_invalid_raw_pulse_cannot_be_rescued_by_calibrated_distance);
+ RUN_TEST(test_too_close_pulse_is_a_touching_wall_not_unknown);
+ RUN_TEST(test_echo_lost_right_after_short_reading_is_still_a_wall);
  RUN_TEST(test_stale_or_unready_frame_is_never_an_observed_opening);
  RUN_TEST(test_frame_freshness_handles_clock_wrap);
  return UNITY_END();}

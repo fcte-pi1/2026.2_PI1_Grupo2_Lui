@@ -35,7 +35,13 @@ function App() {
     void getSessions().then(dados=>{
       if(!active)return;
       setSessoes(dados);setVersaoSessoes(value=>value+1);
-    }).catch(erro=>{if(active)setErroSessoes(mensagemErro(erro));})
+    }).catch(erro=>{
+      if(!active)return;
+      const mensagem=mensagemErro(erro);
+      // Backend em monitor ao vivo (sem banco) responde 503: não é falha, só não há histórico.
+      if(mensagem.includes("(503)")){setSessoes([]);setVersaoSessoes(value=>value+1);return;}
+      setErroSessoes(mensagem);
+    })
       .finally(()=>{if(active)setCarregandoSessoes(false);});
     return()=>{active=false;};
   },[diagnosticOnly,pedidoSessoes]);

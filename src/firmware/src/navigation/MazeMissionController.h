@@ -51,6 +51,8 @@ public:
     // Só autoriza a saída direta de uma curva planejada após uma nova leitura frontal livre.
     MissionUpdate onMotionFinished(bool succeeded, bool frontExitConfirmed = false);
     MissionUpdate fail();
+    // Recuperação: volta a observar a célula atual (pose confirmada) depois de uma falha.
+    MissionUpdate resumeAtCurrentCell();
 
     MissionState state() const { return state_; }
     uint8_t x() const;

@@ -13,4 +13,8 @@ constexpr MazeFormat FORMAT = MM_MAZE_WIDTH == 4 ? MazeFormat::Maze4x4 :
 constexpr MazeCorner START = static_cast<MazeCorner>(MM_START_CORNER);
 constexpr Direction HEADING = static_cast<Direction>(MM_INITIAL_HEADING);
 constexpr uint32_t START_DELAY_MS = 5000;
+// O robô é posicionado com a traseira encostada na parede do canto: o eixo fica
+// ~44 mm atrás do centro da célula de largada (medido pelo sonar frontal no labirinto,
+// 23/11). O primeiro avanço soma essa distância para as observações saírem do centro.
+constexpr float START_BEHIND_CENTER_MM = 44.0f;
 } // namespace RunConfig

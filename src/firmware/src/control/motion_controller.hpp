@@ -133,6 +133,9 @@ public:
     void brakeForObstacle();
     // Positivo gira à esquerda, negativo gira à direita.
     bool startGuidedPivot(float degrees);
+    // Gira no lugar até o rumo de referência das retas (ex.: antes da ré no beco).
+    // Retorna false sem mover se o erro for menor que minErrorDeg ou maior que maxErrorDeg.
+    bool startAlignToReference(float minErrorDeg, float maxErrorDeg = 30.0f);
     // Raio do ponto médio do eixo; positivo gira à esquerda.
     bool startRollingArc90(float degrees, float radiusMm);
     bool startGuidedPivotReturn();
@@ -149,6 +152,8 @@ public:
 
     // Interrompe o movimento. Status passa a Failed com motivo Cancelled.
     void stop();
+    // Gira o rumo de referência das retas (ex.: +90 depois de uma curva em arco completa).
+    void shiftStraightReference(float degrees);
 
     bool isMovingForward() const { return motionType_ == MotionType::ForwardCell && targetDistanceMm_ > 0; }
     MotionStatus getStatus() const;
