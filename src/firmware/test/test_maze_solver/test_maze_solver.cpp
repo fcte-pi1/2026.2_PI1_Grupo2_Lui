@@ -189,9 +189,24 @@ void test_exploracao_converge_ate_o_objetivo(void)
     TEST_ASSERT_TRUE(steps < 100);
 }
 
+
+void test_bfs_queue_visits_all_256_cells_without_overflow() {
+ mm::MazeMap map;TEST_ASSERT_TRUE(map.init(16,16));nav::MazeSolver solver(map);
+ TEST_ASSERT_TRUE(solver.setGoal(15,15));TEST_ASSERT_TRUE(solver.recompute());
+ for(int y=0;y<16;++y)for(int x=0;x<16;++x)
+  TEST_ASSERT_EQUAL(30-x-y,solver.distance(x,y));
+}
+void test_bfs_rejects_old_goal_after_map_resize() {
+ mm::MazeMap map;map.init(16,16);nav::MazeSolver solver(map);solver.setGoal(15,15);
+ TEST_ASSERT_TRUE(solver.recompute());map.init(4,4);TEST_ASSERT_FALSE(solver.recompute());
+ TEST_ASSERT_TRUE(solver.setGoal(3,3));TEST_ASSERT_TRUE(solver.recompute());TEST_ASSERT_EQUAL(6,solver.distance(0,0));
+}
+
 int main(int, char **)
 {
     UNITY_BEGIN();
+    RUN_TEST(test_bfs_queue_visits_all_256_cells_without_overflow);
+    RUN_TEST(test_bfs_rejects_old_goal_after_map_resize);
     RUN_TEST(test_set_goal_valida_limites);
     RUN_TEST(test_recompute_sem_objetivo_falha);
     RUN_TEST(test_distancia_labirinto_aberto);

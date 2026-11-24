@@ -24,6 +24,7 @@ public:
     void setLeftSpeed(int16_t speed);
     void setRightSpeed(int16_t speed);
     void setSpeeds(int16_t leftSpeed, int16_t rightSpeed);
+    void setControlledSpeeds(int16_t leftSpeed, int16_t rightSpeed, bool brakeLeft, bool brakeRight);
 
     // stop() deixa ambas as entradas em LOW (coast). brake() leva ambas
     // as entradas a HIGH (brake elétrico), quando o driver está habilitado.
@@ -31,7 +32,6 @@ public:
     void brake();
 
 private:
-    void configurePwmPin(uint8_t pin);
     void writeMotor(uint8_t in1Pin, uint8_t in2Pin,
                     int16_t speed, bool invertDirection);
 
@@ -47,4 +47,5 @@ private:
     bool _invertRight = false;
     bool _initialized = false;
     bool _enabled = false;
+    bool _leftAttached = false, _rightAttached = false;
 };

@@ -1,4 +1,4 @@
-#include "navigation/MazeSolver.h"
+#include "MazeSolver.h"
 
 namespace nav {
 
@@ -53,31 +53,29 @@ bool MazeSolver::passable(int x, int y, mm::Dir d) const
 
 bool MazeSolver::recompute()
 {
-    if (!hasGoal_) {
+    if (!hasGoal_ || map_.get(goalX_, goalY_) == nullptr) {
         return false;
     }
     const uint8_t w = map_.width();
     const uint8_t h = map_.height();
-    for (uint8_t y = 0; y < mm::MazeMap::kMaxH; y++) {
-        for (uint8_t x = 0; x < mm::MazeMap::kMaxW; x++) {
+    for (uint8_t y = 0; y < h; y++) {
+        for (uint8_t x = 0; x < w; x++) {
             dist_[y][x] = kUnreachable;
         }
     }
 
     /* BFS a partir do objetivo. A fila nunca passa de w*h <= 256 entradas. */
-    uint8_t queueX[mm::MazeMap::kMaxW * mm::MazeMap::kMaxH];
-    uint8_t queueY[mm::MazeMap::kMaxW * mm::MazeMap::kMaxH];
+    uint8_t queue[mm::MazeMap::kMaxW * mm::MazeMap::kMaxH];
     uint16_t head = 0;
     uint16_t tail = 0;
 
     dist_[goalY_][goalX_] = 0;
-    queueX[tail] = goalX_;
-    queueY[tail] = goalY_;
+    queue[tail] = static_cast<uint8_t>(goalY_ * w + goalX_);
     tail++;
 
     while (head < tail) {
-        const uint8_t cx = queueX[head];
-        const uint8_t cy = queueY[head];
+        const uint8_t cx = queue[head] % w;
+        const uint8_t cy = queue[head] / w;
         head++;
         for (uint8_t i = 0; i < 4; i++) {
             const mm::Dir d = static_cast<mm::Dir>(i);
@@ -90,8 +88,7 @@ bool MazeSolver::recompute()
                 continue;
             }
             dist_[ny][nx] = static_cast<uint16_t>(dist_[cy][cx] + 1);
-            queueX[tail] = static_cast<uint8_t>(nx);
-            queueY[tail] = static_cast<uint8_t>(ny);
+            queue[tail] = static_cast<uint8_t>(ny * w + nx);
             tail++;
         }
     }

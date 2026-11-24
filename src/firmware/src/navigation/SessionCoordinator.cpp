@@ -1,4 +1,4 @@
-#include "navigation/SessionCoordinator.h"
+#include "SessionCoordinator.h"
 
 namespace mm {
 

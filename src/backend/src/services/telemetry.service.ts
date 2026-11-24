@@ -61,9 +61,7 @@ function finite(v: unknown, field: string): number {
   return v;
 }
 
-export function createTelemetryService(db: TelemetryDb) {
-  return {
-    async registrarTelemetria(raw: unknown): Promise<TelemetriaValidada> {
+export function validateTelemetry(raw: unknown): TelemetriaValidada {
       if (!isRecord(raw)) throw new TelemetryInvalidaError("pacote de telemetria inválido");
       const sessionId = raw.session_id;
       if (!Number.isInteger(sessionId) || Number(sessionId) <= 0 || Number(sessionId) > 0xffffffff) {
@@ -94,6 +92,27 @@ export function createTelemetryService(db: TelemetryDb) {
         throw new TelemetryInvalidaError("robot_state inválido");
       }
 
+      return {
+        session_id: Number(sessionId),
+        timestamp_ms: timestamp,
+        battery_voltage: batteryVoltage,
+        battery_current_a: batteryCurrent,
+        pid_error: pidError,
+        wheels_speed: { left, right },
+        heading_deg: heading,
+        robot_state: raw.robot_state,
+        sensor_distances_mm: sensorDistances,
+        ...(typeof raw.error_reason === "string" ? { error_reason: raw.error_reason.slice(0, 240) } : {}),
+      };
+}
+
+export function createTelemetryService(db: TelemetryDb) {
+  return {
+    async registrarTelemetria(raw: unknown): Promise<TelemetriaValidada> {
+      const validated = validateTelemetry(raw);
+      const { session_id:sessionId, timestamp_ms:timestamp, battery_voltage:batteryVoltage,
+        battery_current_a:batteryCurrent, pid_error:pidError, wheels_speed:{left,right},
+        heading_deg:heading, sensor_distances_mm:sensorDistances } = validated;
       const session = await db.sessaoNavegacao.findUnique({ where: { id_dispositivo: BigInt(Number(sessionId)) } });
       if (!session) throw new TelemetryInvalidaError("sessão do dispositivo inexistente; envie session_start antes da telemetria");
       await db.registroTelemetria.create({ data: {
@@ -110,18 +129,7 @@ export function createTelemetryService(db: TelemetryDb) {
         angulo_orientacao: heading,
       } });
 
-      return {
-        session_id: Number(sessionId),
-        timestamp_ms: timestamp,
-        battery_voltage: batteryVoltage,
-        battery_current_a: batteryCurrent,
-        pid_error: pidError,
-        wheels_speed: { left, right },
-        heading_deg: heading,
-        robot_state: raw.robot_state,
-        sensor_distances_mm: sensorDistances,
-        ...(typeof raw.error_reason === "string" ? { error_reason: raw.error_reason.slice(0, 240) } : {}),
-      };
+      return validated;
     },
   };
 }

@@ -18,3 +18,15 @@ Evite incluir:
 
 > [!WARNING]
 > **Não acrescente arquivos referentes ao _backend_ nesta pasta.** Eles deverão ser armazenados na pasta [backend](https://github.com/fcte-pi1/template/tree/main/src/backend) deste repositório.
+
+## Painel Bluetooth real
+
+Execute o backend em modo monitor, depois `npm run dev:bluetooth` nesta pasta. Abra `http://127.0.0.1:5173/?fonte=bluetooth` para ver as medidas reais da IMU, sequência e estado de atualização, sem simular bateria/mapa ou criar uma corrida.
+
+[Configuração e guia completo](../backend/BLUETOOTH.md). O modo normal de corrida/histórico e a opção de simulação foram preservados.
+
+## Iniciar e parar pelo dashboard original
+
+Abra `/` na fonte Robô. O cartão **Missão no labirinto** permite selecionar tamanho, canto e orientação para a próxima missão. **Iniciar missão** depende de estado recente da ESP, firmware de navegação e liberação no firmware; **Parar robô** aguarda confirmação Bluetooth. Reconectar painel não inicia nem zera a ESP. A simulação continua separada e não apresenta os comandos físicos.
+
+Enquanto a ESP estiver com BluetoothTelemetry, o início fica desabilitado e a parada pode ser testada com os motores já desativados. Consulte `../backend/BLUETOOTH.md` para preparação do firmware final e limites. O destino é o canto oposto ao início. A seleção para uma próxima missão não altera o mapa recebido da atual.

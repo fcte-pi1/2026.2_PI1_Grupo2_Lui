@@ -4,6 +4,8 @@ import type {
   EstadoRobo,
   Paredes,
   MensagemDashboard,
+  BluetoothDiagnostic,
+  BluetoothLinkStatus,
 } from "../types/telemetry";
 
 // Estado global do dashboard. Fica fora dos componentes para não se perder
@@ -15,6 +17,8 @@ export interface PontoPid {
 }
 
 export interface EstadoDashboard {
+  bluetoothTelemetry: BluetoothDiagnostic | null;
+  bluetoothLink: BluetoothLinkStatus | null;
   largura: number;
   altura: number;
   celulas: Celula[][]; // celulas[y][x]
@@ -49,6 +53,8 @@ export function criarGrade(largura: number, altura: number): Celula[][] {
 
 export function estadoInicial(largura = 4, altura = 4): EstadoDashboard {
   return {
+    bluetoothTelemetry:null,
+    bluetoothLink:null,
     largura,
     altura,
     celulas: criarGrade(largura, altura),
@@ -76,6 +82,10 @@ export function aplicarMensagem(
   msg: MensagemDashboard,
 ): EstadoDashboard {
   switch (msg.type) {
+    case "bt_telemetry_test":
+      return {...e,bluetoothTelemetry:msg,estadoRobo:"STOPPED",ultimaAtualizacao:msg.received_at_ms};
+    case "bt_link_status":
+      return {...e,bluetoothLink:msg};
     case "maze":
       return estadoInicial(msg.width, msg.height);
 
@@ -140,6 +150,7 @@ export function aplicarMensagem(
       ].slice(-MAX_PONTOS_PID);
       return {
         ...e,
+        bluetoothTelemetry:null,
         tensaoBateria: msg.battery_voltage,
         correnteBateriaA: msg.battery_current_a ?? null,
         leiturasSensorMm: msg.sensor_distances_mm

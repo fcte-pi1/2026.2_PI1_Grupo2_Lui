@@ -90,7 +90,7 @@ export function StatusPanel({ estado }: { estado: EstadoDashboard }) {
         <div className="grid grid-cols-3 gap-2 rounded-xl border border-slate-300 p-3 dark:border-slate-700">
           {([["Frente", estado.leiturasSensorMm.frente], ["Esquerda", estado.leiturasSensorMm.esquerda], ["Direita", estado.leiturasSensorMm.direita]] as const).map(([rotulo, distancia]) => (
             <div key={rotulo}>
-              <p className="text-xs text-slate-500">US-100 · {rotulo}</p>
+              <p className="text-xs text-slate-500">Ultrassom · {rotulo}</p>
               <p className="text-sm font-semibold">{distancia === null ? "sem leitura" : `${distancia.toFixed(0)} mm`}</p>
             </div>
           ))}

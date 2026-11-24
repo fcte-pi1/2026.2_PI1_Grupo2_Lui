@@ -255,9 +255,28 @@ static void test_update_computation_latency_budget(void) {
     TEST_ASSERT_LESS_THAN_UINT32(1000000u, averageNanos);
 }
 
+static void test_new_mission_clears_old_distances_and_accepts_same_timestamp(void) {
+    MockWallSensor sensor;
+    WallPerception perception(sensor);
+    for(int i=0;i<3;++i) {
+        sensor.enqueue(Direction::Front, RawEcho{1000,true,static_cast<uint32_t>(i)});
+        sensor.enqueue(Direction::Left, RawEcho{1000,true,static_cast<uint32_t>(i)});
+        sensor.enqueue(Direction::Right, RawEcho{1000,true,static_cast<uint32_t>(i)});
+        perception.update();
+    }
+    perception.reset();
+    TEST_ASSERT_FALSE(perception.currentState().frontValid);
+    for(auto direction:{Direction::Front,Direction::Left,Direction::Right})
+        sensor.enqueue(direction,RawEcho{30,true,2});
+    perception.update();
+    TEST_ASSERT_TRUE(perception.currentState().wallFront);
+    TEST_ASSERT_EQUAL_UINT16(30,perception.currentState().distFrontMm);
+}
+
 int main(int argc, char** argv) {
     UNITY_BEGIN();
 
+    RUN_TEST(test_new_mission_clears_old_distances_and_accepts_same_timestamp);
     RUN_TEST(test_mock_wall_sensor_returns_enqueued_reading);
     RUN_TEST(test_fault_state_set_after_five_consecutive_invalid_readings);
     RUN_TEST(test_wall_detection_binary_flags_per_direction);

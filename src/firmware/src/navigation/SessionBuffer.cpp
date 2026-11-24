@@ -1,4 +1,4 @@
-#include "navigation/SessionBuffer.h"
+#include "SessionBuffer.h"
 
 #include <cinttypes>
 #include <cmath>

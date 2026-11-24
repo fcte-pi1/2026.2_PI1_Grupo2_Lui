@@ -15,34 +15,36 @@ function mensagemErro(erro: unknown): string {
  * o WebSocket nem descarta o estado vivo do mapa e da telemetria (HU-08/09).
  */
 function App() {
+  const diagnosticOnly=new URLSearchParams(window.location.search).get("fonte")==="bluetooth";
   const [tela, setTela] = useState<Tela>("dashboard");
   const [sessoes, setSessoes] = useState<Sessao[] | null>(null);
   const [erroSessoes, setErroSessoes] = useState<string | null>(null);
-  const [carregandoSessoes, setCarregandoSessoes] = useState(true);
+  const [carregandoSessoes, setCarregandoSessoes] = useState(!diagnosticOnly);
   const [versaoSessoes, setVersaoSessoes] = useState(0);
 
-  const atualizarSessoes = useCallback(async () => {
+  const [pedidoSessoes,setPedidoSessoes]=useState(0);
+  const atualizarSessoes=useCallback(()=>{
+    if(diagnosticOnly)return;
     setCarregandoSessoes(true);
     setErroSessoes(null);
-    try {
-      const dados = await getSessions();
-      setSessoes(dados);
-      setVersaoSessoes((versao) => versao + 1);
-    } catch (erro) {
-      setErroSessoes(mensagemErro(erro));
-    } finally {
-      setCarregandoSessoes(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    void atualizarSessoes();
-  }, [atualizarSessoes]);
+    setPedidoSessoes(value=>value+1);
+  },[diagnosticOnly]);
+  useEffect(()=>{
+    if(diagnosticOnly)return;
+    let active=true;
+    void getSessions().then(dados=>{
+      if(!active)return;
+      setSessoes(dados);setVersaoSessoes(value=>value+1);
+    }).catch(erro=>{if(active)setErroSessoes(mensagemErro(erro));})
+      .finally(()=>{if(active)setCarregandoSessoes(false);});
+    return()=>{active=false;};
+  },[diagnosticOnly,pedidoSessoes]);
 
   return (
     <>
       <div className={tela === "dashboard" ? "block" : "hidden"}>
         <Dashboard
+          diagnosticOnly={diagnosticOnly}
           onAbrirHistorico={() => setTela("historico")}
           sessoes={sessoes}
           erroSessoes={erroSessoes}

@@ -1,575 +1,489 @@
 #include "motion_controller.hpp"
+#include "../config/mechanical_config.hpp"
+#include "front_approach_policy.hpp"
 #include <Arduino.h>
-
 #include <math.h>
 
 namespace {
-constexpr float kPiRadians = 3.14159265358979323846f;
-
-float absValue(float value) { return value < 0.0f ? -value : value; }
-
-float clampValue(float value, float low, float high) {
-    if (value < low) return low;
-    if (value > high) return high;
-    return value;
-}
-
-float signOf(float value) {
-    if (value > 0.0f) return 1.0f;
-    if (value < 0.0f) return -1.0f;
-    return 0.0f;
-}
-
-float approach(float current, float target, float maxDelta) {
-    const float difference = target - current;
-    if (difference > maxDelta) return current + maxDelta;
-    if (difference < -maxDelta) return current - maxDelta;
-    return target;
-}
-
-float wrapDegrees(float angle) {
-    while (angle > 180.0f) angle -= 360.0f;
-    while (angle < -180.0f) angle += 360.0f;
-    return angle;
-}
+constexpr float pi = 3.14159265358979323846f;
+constexpr float guidedPivotToleranceDeg = 1.2f;
+constexpr float guidedPivotMaxDriftMm = 6.0f;
+float clamp(float x, float lo, float hi) { return fminf(hi, fmaxf(lo, x)); }
+float sign(float x) { return x < 0 ? -1.0f : 1.0f; }
+float wrap(float x) { while (x >= 180) x -= 360; while (x < -180) x += 360; return x; }
 }
 
 MotionControllerConfig::MotionControllerConfig()
-    : leftCountsPerMm(6.74f),
-      rightCountsPerMm(6.74f),
-      wheelTrackMm(90.0f),
-      cellSizeMm(0.0f),
-      maxLinearSpeedMmS(100.0f),
-      minLinearSpeedMmS(20.0f),
-      linearAccelerationMmS2(250.0f),
-      maxAngularSpeedDegS(75.0f),
-      minAngularSpeedDegS(15.0f),
-      angularAccelerationDegS2(240.0f),
-      turnKpDegPerSecPerDeg(2.0f),
-      positionToleranceMm(4.0f),
-      angleToleranceDeg(2.5f),
-      settledSpeedMmS(8.0f),
-      settledGyroDegS(5.0f),
-      straightCorrectionKp(1.0f),
-      wallAlignmentKp(1.0f),
-      leftFeedForwardPwmPerMmS(0.8f),
-      rightFeedForwardPwmPerMmS(0.8f),
-      leftStaticFrictionPwm(20.0f),
-      rightStaticFrictionPwm(20.0f),
-      imuYawSign(1.0f),
-      forwardTimeoutMs(5000),
-      turnTimeoutMs(3500),
-      stallTimeoutMs(500),
-      stallMinSpeedMmS(25.0f) {
-}
+    : leftCountsPerMm(MechanicalSettings::LEFT_COUNTS_PER_MM),
+      rightCountsPerMm(MechanicalSettings::RIGHT_COUNTS_PER_MM),
+      wheelTrackMm(MechanicalSettings::WHEEL_TRACK_MM), cellSizeMm(180),
+      maxLinearSpeedMmS(100), minLinearSpeedMmS(8), linearAccelerationMmS2(160),
+      maxAngularSpeedDegS(55), minAngularSpeedDegS(10), angularAccelerationDegS2(240),
+      turnKpDegPerSecPerDeg(3), positionToleranceMm(1), angleToleranceDeg(0.6f),
+      settledSpeedMmS(8), settledGyroDegS(4), straightCorrectionKp(5),
+      wallAlignmentKp(0.6f), wallAlignmentDeadbandMm(3.0f), leftFeedForwardPwmPerMmS(0.4f), rightFeedForwardPwmPerMmS(0.4f),
+      leftStaticFrictionPwm(90), rightStaticFrictionPwm(90), imuYawSign(1),
+      forwardTimeoutMs(6000), turnTimeoutMs(11000), stallTimeoutMs(700), stallMinSpeedMmS(5) {}
 
-MotionController::MotionController(MotorDRV8833& motors,
-                                   EncoderN20& leftEncoder,
-                                   EncoderN20& rightEncoder,
-                                   IMUMPU6500& imu,
-                                   Odometry& odometry,
-                                   PIDController& leftPid,
-                                   PIDController& rightPid)
-    : motors_(motors), leftEncoder_(leftEncoder),
-      rightEncoder_(rightEncoder), imu_(imu), odometry_(odometry),
-      leftPid_(leftPid), rightPid_(rightPid) {
-}
+MotionController::MotionController(MotorDRV8833& m, EncoderN20& l, EncoderN20& r,
+    IMUMPU6500& i, Odometry& o, PIDController& lp, PIDController& rp)
+    : motors_(m), leftEncoder_(l), rightEncoder_(r), imu_(i), odometry_(o), leftPid_(lp), rightPid_(rp) {}
 
-bool MotionController::begin(const MotionControllerConfig& config,
-                             const Pose2D& initialPose) {
-    if (config.leftCountsPerMm <= 0.0f ||
-        config.rightCountsPerMm <= 0.0f ||
-        config.wheelTrackMm <= 0.0f ||
-        config.cellSizeMm <= 0.0f ||
-        config.maxLinearSpeedMmS <= 0.0f ||
-        config.minLinearSpeedMmS <= 0.0f ||
-        config.minLinearSpeedMmS > config.maxLinearSpeedMmS ||
-        config.linearAccelerationMmS2 <= 0.0f ||
-        config.maxAngularSpeedDegS <= 0.0f ||
-        config.minAngularSpeedDegS <= 0.0f ||
-        config.minAngularSpeedDegS > config.maxAngularSpeedDegS ||
-        config.angularAccelerationDegS2 <= 0.0f ||
-        config.turnKpDegPerSecPerDeg <= 0.0f ||
-        config.straightCorrectionKp < 0.0f ||
-        config.wallAlignmentKp < 0.0f ||
-        config.positionToleranceMm <= 0.0f ||
-        config.angleToleranceDeg <= 0.0f ||
-        config.imuYawSign == 0.0f ||
-        config.forwardTimeoutMs == 0 || config.turnTimeoutMs == 0 ||
-        config.stallTimeoutMs == 0) {
-        return false;
-    }
-
-    if (!leftEncoder_.isInitialized() || !rightEncoder_.isInitialized()) {
-        return false;
-    }
-
-    int32_t leftCount = 0;
-    int32_t rightCount = 0;
-    if (!leftEncoder_.readCount(leftCount) ||
-        !rightEncoder_.readCount(rightCount)) {
-        return false;
-    }
-
-    OdometryConfig odometryConfig;
-    odometryConfig.leftCountsPerMm = config.leftCountsPerMm;
-    odometryConfig.rightCountsPerMm = config.rightCountsPerMm;
-    odometryConfig.wheelTrackMm = config.wheelTrackMm;
-
-    if (!odometry_.begin(odometryConfig, initialPose, leftCount, rightCount)) {
-        return false;
-    }
-
-    config_ = config;
-    previousLeftCount_ = leftCount;
-    previousRightCount_ = rightCount;
-    initialized_ = true;
-    status_ = MotionStatus::Idle;
-    motionType_ = MotionType::None;
-    failureReason_ = MotionFailureReason::None;
+bool MotionController::begin(const MotionControllerConfig& c, const Pose2D& pose) {
+    if (!isfinite(c.leftCountsPerMm) || !isfinite(c.rightCountsPerMm) ||
+        c.leftCountsPerMm <= 0 || c.rightCountsPerMm <= 0 || c.wheelTrackMm <= 0 ||
+        c.cellSizeMm <= 0 || c.maxLinearSpeedMmS <= 0 || c.maxLinearSpeedMmS > 100 ||
+        c.linearAccelerationMmS2 <= 0 || c.maxAngularSpeedDegS <= 0 || c.maxAngularSpeedDegS > 55 ||
+        c.minLinearSpeedMmS <= 0 || c.minAngularSpeedDegS <= 0 || c.turnKpDegPerSecPerDeg <= 0 ||
+        c.positionToleranceMm <= 0 || c.angleToleranceDeg <= 0 || fabsf(c.imuYawSign) != 1 ||
+        !isfinite(c.wallAlignmentKp) || c.wallAlignmentKp < 0 ||
+        !isfinite(c.wallAlignmentDeadbandMm) || c.wallAlignmentDeadbandMm < 0 ||
+        !c.forwardTimeoutMs || !c.turnTimeoutMs || !c.stallTimeoutMs ||
+        !leftEncoder_.isInitialized() || !rightEncoder_.isInitialized() || !imu_.isInitialized()) return false;
+    int32_t l = 0, r = 0;
+    if (!leftEncoder_.readCount(l) || !rightEncoder_.readCount(r)) return false;
+    OdometryConfig oc;
+    oc.leftCountsPerMm = c.leftCountsPerMm; oc.rightCountsPerMm = c.rightCountsPerMm; oc.wheelTrackMm = c.wheelTrackMm;
+    if (!odometry_.begin(oc, pose, l, r)) return false;
+    MPU6500Reading initialReading{};
+    if (!imu_.read(initialReading) || !isfinite(initialReading.yawDegrees)) return false;
+    straightReferenceYawDeg_ = initialReading.yawDegrees * c.imuYawSign;
+    frontApproachMode_ = false;
+    config_ = c; initialized_ = true; status_ = MotionStatus::Idle; motionType_ = MotionType::None;
+    failureReason_ = MotionFailureReason::None; braking_ = false; sensorPaused_ = false;
+    startLeftCount_ = previousLeftCount_ = l;
+    startRightCount_ = previousRightCount_ = r;
     return true;
 }
 
-bool MotionController::prepareMotion(MotionType type, uint32_t timeoutMs) {
-    if (!initialized_) {
-        failureReason_ = MotionFailureReason::NotInitialized;
-        status_ = MotionStatus::Failed;
-        return false;
-    }
-    if (status_ == MotionStatus::Running) {
-        // Não interromper/substituir uma operação ainda em andamento.
-        return false;
-    }
-    if (!motors_.isEnabled()) {
-        failureReason_ = MotionFailureReason::MotorsDisabled;
-        status_ = MotionStatus::Failed;
-        motionType_ = MotionType::None;
-        motors_.stop();
-        return false;
-    }
-
-    int32_t leftCount = 0;
-    int32_t rightCount = 0;
-    if (!leftEncoder_.readCount(leftCount) ||
-        !rightEncoder_.readCount(rightCount)) {
-        fail(MotionFailureReason::EncoderReadFailed);
-        return false;
-    }
-
-    startLeftCount_ = leftCount;
-    startRightCount_ = rightCount;
-    previousLeftCount_ = leftCount;
-    previousRightCount_ = rightCount;
-
-    motionStartedMs_ = millis();
-    motionTimeoutMs_ = timeoutMs;
-    lastLeftProgressMs_ = motionStartedMs_;
-    lastRightProgressMs_ = motionStartedMs_;
-    settledSamples_ = 0;
-
-    profiledLinearSpeedMmS_ = 0.0f;
-    profiledAngularSpeedDegS_ = 0.0f;
-    wallAlignmentValid_ = false;
-    lastLeftTargetMmS_ = 0.0f;
-    lastRightTargetMmS_ = 0.0f;
-    distanceTravelledMm_ = 0.0f;
-    turnAngleDeg_ = 0.0f;
-
-    leftPid_.reset();
-    rightPid_.reset();
-
-    motionType_ = type;
-    failureReason_ = MotionFailureReason::None;
-    status_ = MotionStatus::Running;
-    return true;
-}
-
-bool MotionController::startMoveForwardOneCell() {
-    return startMoveLinear(config_.cellSizeMm);
-}
-
-bool MotionController::startMoveBackwardOneCell() {
-    return startMoveLinear(-config_.cellSizeMm);
-}
-
-bool MotionController::startMoveLinear(float signedDistanceMm) {
-    // Como as demais ações, não substitui uma operação que ainda está rodando.
+bool MotionController::prepareMotion(MotionType type, uint32_t timeout) {
     if (status_ == MotionStatus::Running) return false;
-    if (!isfinite(signedDistanceMm) || absValue(signedDistanceMm) < 0.5f) {
-        failureReason_ = MotionFailureReason::InvalidDistance;
-        if (status_ != MotionStatus::Running) status_ = MotionStatus::Failed;
-        motors_.stop();
-        return false;
+    if (!initialized_) { fail(MotionFailureReason::NotInitialized); return false; }
+    if (!motors_.isEnabled()) { fail(MotionFailureReason::MotorsDisabled); return false; }
+    if (!leftEncoder_.readCount(startLeftCount_) || !rightEncoder_.readCount(startRightCount_)) {
+        fail(MotionFailureReason::EncoderReadFailed); return false;
     }
-    if (!prepareMotion(MotionType::ForwardCell, config_.forwardTimeoutMs)) {
-        return false;
-    }
-    targetDistanceMm_ = signedDistanceMm;
-    return true;
-}
-
-void MotionController::setWallAlignmentFeedback(float leftDistanceMm,
-                                                float rightDistanceMm,
-                                                bool valid) {
-    wallAlignmentValid_ = valid && isfinite(leftDistanceMm) &&
-        isfinite(rightDistanceMm) && leftDistanceMm > 0.0f &&
-        rightDistanceMm > 0.0f;
-    if (wallAlignmentValid_) {
-        leftWallDistanceMm_ = leftDistanceMm;
-        rightWallDistanceMm_ = rightDistanceMm;
-    }
-}
-
-bool MotionController::startTurn(float targetAngleDeg, MotionType type) {
-    if (!initialized_) {
-        failureReason_ = MotionFailureReason::NotInitialized;
-        status_ = MotionStatus::Failed;
-        motors_.stop();
-        return false;
-    }
-    if (!imu_.isInitialized()) {
-        fail(MotionFailureReason::ImuReadFailed);
-        return false;
-    }
-    if (!prepareMotion(type, config_.turnTimeoutMs)) return false;
-
     MPU6500Reading reading{};
-    if (!imu_.read(reading)) {
-        fail(MotionFailureReason::ImuReadFailed);
-        return false;
-    }
-
-    targetAngleDeg_ = targetAngleDeg;
-    turnAngleDeg_ = 0.0f;
+    if (!imu_.read(reading) || !isfinite(reading.yawDegrees) || !isfinite(reading.gyroZdps)) { fail(MotionFailureReason::ImuReadFailed); return false; }
+    // Preserve absolute yaw for PositionTracker. Each segment uses a relative delta.
     lastImuYawDeg_ = reading.yawDegrees;
     turnStartHeadingRad_ = odometry_.getPose().headingRad;
+    previousLeftCount_ = startLeftCount_; previousRightCount_ = startRightCount_;
+    motionStartedMs_ = lastLeftProgressMs_ = lastRightProgressMs_ = millis();
+    sensorPaused_ = false;
+    motionTimeoutMs_ = timeout; wallAlignmentValid_ = false; braking_ = false; brakeFailure_ = MotionFailureReason::None;
+    guidedSteering_ = false;
+    guidedRetreat_ = guidedPivot_ = pivotTrimUsed_ = false;
+    arcPathWarning_=false;arcHardLimit_=0;
+    distanceTravelledMm_ = turnAngleDeg_ = profiledLinearSpeedMmS_ = profiledAngularSpeedDegS_ = 0;
+    leftIntegralPwm_ = rightIntegralPwm_ = 0;
+    lastLeftMeasuredMmS_ = lastRightMeasuredMmS_ = 0;
+    lastLeftTargetMmS_ = lastRightTargetMmS_ = 0;
+    lastAngularProgress_ = 0; lastAngularProgressMs_ = motionStartedMs_;
+    leftPid_.reset(); rightPid_.reset();
+    motionType_ = type; failureReason_ = MotionFailureReason::None; status_ = MotionStatus::Running;
+    return true;
+}
+bool MotionController::startMoveForwardOneCell() { return startMoveLinear(config_.cellSizeMm); }
+bool MotionController::startMoveBackwardOneCell() { return startMoveLinear(-config_.cellSizeMm); }
+bool MotionController::startMoveLinear(float mm) {
+    if (status_ == MotionStatus::Running) return false;
+    if (!isfinite(mm) || fabsf(mm) < 0.5f || fabsf(mm) > config_.cellSizeMm) {
+        fail(MotionFailureReason::InvalidDistance); return false;
+    }
+    const uint32_t timeout=frontApproachMode_ && config_.forwardTimeoutMs<FrontApproach::TIMEOUT_MS
+        ? FrontApproach::TIMEOUT_MS : config_.forwardTimeoutMs;
+    if (!prepareMotion(MotionType::ForwardCell, timeout)) return false;
+    targetDistanceMm_ = mm; return true;
+}
+bool MotionController::startTurn(float angle, MotionType type) {
+    if (!prepareMotion(type, config_.turnTimeoutMs)) return false;
+    targetAngleDeg_ = angle; return true;
+}
+bool MotionController::startTurnLeft90() { return startTurn(90, MotionType::TurnLeft90); }
+bool MotionController::startGuidedPivot(float degrees) {
+    const float magnitude = fabsf(degrees);
+    if (!isfinite(degrees) || magnitude < 10.0f || magnitude > 90.0f ||
+        !startTurn(degrees, degrees > 0.0f ? MotionType::TurnLeft90 : MotionType::TurnRight90)) return false;
+    guidedPivot_ = true;
+    guidedPivotHeadingStepDeg_ = degrees;
+    targetAngleDeg_ = wrap(straightReferenceYawDeg_ + degrees - lastImuYawDeg_ * config_.imuYawSign);
+    const float directedTarget = targetAngleDeg_ * sign(degrees);
+    if (directedTarget < fmaxf(3.0f, magnitude - 20.0f) || directedTarget > magnitude + 20.0f) {
+        fail(MotionFailureReason::SafetyLimit);
+        return false;
+    }
     return true;
 }
 
-bool MotionController::startTurnLeft90() {
-    return startTurn(90.0f, MotionType::TurnLeft90);
+bool MotionController::startRollingArc90(float degrees, float radiusMm) {
+    // Mantém ambas as rodas em movimento; raio pequeno inclui ré na interna.
+    if (!isfinite(degrees) || fabsf(fabsf(degrees)-90.0f)>0.01f ||
+        !isfinite(radiusMm) || radiusMm<10.0f || radiusMm>40.0f) return false;
+    if (!startTurn(degrees, degrees>0 ? MotionType::ArcLeft90 : MotionType::ArcRight90)) return false;
+    arcRadiusMm_=radiusMm;arcStartPose_=odometry_.getPose();
+    return true;
 }
 
-bool MotionController::startTurnRight90() {
-    return startTurn(-90.0f, MotionType::TurnRight90);
+bool MotionController::startGuidedPivotReturn() {
+    const float degrees = -turnAngleDeg_;
+    if (!guidedPivot_ || status_ != MotionStatus::Failed || failureReason_ != MotionFailureReason::Obstacle ||
+        fabsf(degrees) < 1.2f ||
+        fabsf(degrees) > 75.0f || fabsf(distanceTravelledMm_) > guidedPivotMaxDriftMm ||
+        !startTurn(degrees, degrees > 0.0f ? MotionType::TurnLeft90 : MotionType::TurnRight90)) return false;
+    guidedPivot_ = true;
+    guidedPivotHeadingStepDeg_ = 0.0f;
+    pivotTrimUsed_ = true; // Restauração lenta, até 10 graus/s.
+    return true;
 }
 
-bool MotionController::startTurnAround180() {
-    // Escolha determinística: meia-volta para a esquerda.
-    return startTurn(180.0f, MotionType::TurnAround180);
+bool MotionController::startGuidedRetreat(float distanceMm) {
+    if (distanceMm <= 0.0f || !startMoveLinear(-distanceMm)) return false;
+    guidedRetreat_ = true;
+    retreatHeadingDeg_ = lastImuYawDeg_ * config_.imuYawSign;
+    return true;
+}
+bool MotionController::startTurnRight90() { return startTurn(-90, MotionType::TurnRight90); }
+bool MotionController::startTurnAround180() { return startTurn(-180, MotionType::TurnAround180); }
+void MotionController::setFrontApproachMode(bool enabled) {
+    if(status_!=MotionStatus::Running){frontApproachMode_=enabled;return;}
+    if(enabled && isMovingForward() && !frontApproachMode_) {
+        frontApproachMode_=true;
+        profiledLinearSpeedMmS_=fminf(profiledLinearSpeedMmS_,FrontApproach::MAX_SPEED_MM_S);
+        if(motionTimeoutMs_<FrontApproach::TIMEOUT_MS)motionTimeoutMs_=FrontApproach::TIMEOUT_MS;
+        wallAlignmentValid_=false;
+    }
 }
 
-void MotionController::update(float dtSeconds) {
+bool MotionController::refineFrontApproachTarget(float frontCm, float previousProgressMm) {
+    if(status_!=MotionStatus::Running || !isMovingForward() || !frontApproachMode_ ||
+       braking_ || sensorPaused_ || !isfinite(frontCm) ||
+       frontCm<=FrontApproach::TARGET_CM+FrontApproach::TOLERANCE_CM || frontCm>5.0f)return false;
+    const float target=distanceTravelledMm_+(frontCm-FrontApproach::TARGET_CM)*10.0f;
+    if(!FrontApproach::positionMatchesCell(previousProgressMm + distanceTravelledMm_,config_.cellSizeMm) ||
+       !FrontApproach::positionMatchesCell(previousProgressMm + target,config_.cellSizeMm))return false;
+    targetDistanceMm_=target;
+    return true;
+}
+
+void MotionController::setWallAlignmentFeedback(float l, float r, bool valid) {
+    // Only close, plausible corridor walls may steer; openings never pull
+    // the chassis sideways. IMU still controls heading when this is unavailable.
+    valid = valid && isfinite(l) && isfinite(r) && l >= 20 && r >= 20 &&
+            l <= 80 && r <= 80 && l + r >= 40 && l + r <= 120;
+    // Caller supplies a median from distinct fresh hardware frames.
+    if (valid) { leftWallDistanceMm_ = l; rightWallDistanceMm_ = r; }
+    wallAlignmentValid_ = valid;
+}
+
+void MotionController::setGuidedLateralSteering(bool slow, float yawOffsetDeg) {
+    guidedSteering_ = true;
+    guidedLateralSlow_ = slow;
+    guidedYawOffsetDeg_ = isfinite(yawOffsetDeg) ? clamp(yawOffsetDeg, -6.0f, 6.0f) : 0.0f;
+}
+
+void MotionController::beginBrake(uint32_t now, MotionFailureReason reason) {
+    if (braking_) return;
+    motors_.brake(); braking_ = true; brakeStartedMs_ = quietSinceMs_ = now; brakeFailure_ = reason;
+}
+bool MotionController::sensorPauseSettled() const {
+    return sensorPaused_ && millis()-sensorPausedAtMs_>=200 && millis()-quietSinceMs_>=100 &&
+        fabsf(lastLeftMeasuredMmS_)<=config_.settledSpeedMmS &&
+        fabsf(lastRightMeasuredMmS_)<=config_.settledSpeedMmS &&
+        fabsf(currentGyroDps_)<config_.settledGyroDegS;
+}
+bool MotionController::setSensorPaused(bool paused) {
+    if(status_!=MotionStatus::Running)return false;
+    if(paused==sensorPaused_)return true;
+    const uint32_t now=millis();
+    if(paused) {
+        sensorPaused_=true;sensorPausedAtMs_=now;
+        motors_.brake();
+    } else {
+        if(!sensorPauseSettled())return false;
+        const uint32_t duration=now-sensorPausedAtMs_;
+        motionStartedMs_+=duration;
+        if(braking_)brakeStartedMs_+=duration;
+        lastLeftProgressMs_=lastRightProgressMs_=lastAngularProgressMs_=now;
+        sensorPaused_=false;
+    }
+    profiledLinearSpeedMmS_=profiledAngularSpeedDegS_=0;
+    lastLeftTargetMmS_=lastRightTargetMmS_=0;
+    leftIntegralPwm_=rightIntegralPwm_=0;leftPid_.reset();rightPid_.reset();
+    wallAlignmentValid_=false;
+    return true;
+}
+
+void MotionController::update(float dt) {
     if (status_ != MotionStatus::Running) return;
-
-    if (dtSeconds <= 0.0f || dtSeconds > 0.1f || !isfinite(dtSeconds)) {
-        fail(MotionFailureReason::InvalidTimeStep);
-        return;
-    }
-
-    int32_t leftCount = 0;
-    int32_t rightCount = 0;
-    if (!leftEncoder_.readCount(leftCount) ||
-        !rightEncoder_.readCount(rightCount)) {
-        fail(MotionFailureReason::EncoderReadFailed);
-        return;
-    }
-
-    const int32_t deltaLeftCount = leftCount - previousLeftCount_;
-    const int32_t deltaRightCount = rightCount - previousRightCount_;
-
-    const float leftDeltaMm =
-        static_cast<float>(deltaLeftCount) / config_.leftCountsPerMm;
-    const float rightDeltaMm =
-        static_cast<float>(deltaRightCount) / config_.rightCountsPerMm;
-    const float leftSpeedMmS = leftDeltaMm / dtSeconds;
-    const float rightSpeedMmS = rightDeltaMm / dtSeconds;
-    lastLeftMeasuredMmS_ = leftSpeedMmS;
-    lastRightMeasuredMmS_ = rightSpeedMmS;
-
-    previousLeftCount_ = leftCount;
-    previousRightCount_ = rightCount;
-
-    if (!odometry_.update(leftCount, rightCount)) {
-        fail(MotionFailureReason::EncoderReadFailed);
-        return;
-    }
-
-    const uint32_t now = millis();
-    updateStallTimers(deltaLeftCount, deltaRightCount, now);
-
-    if (motionType_ == MotionType::ForwardCell) {
-        updateForward(dtSeconds, leftCount, rightCount,
-                      leftSpeedMmS, rightSpeedMmS, now);
-    } else if (motionType_ == MotionType::TurnLeft90 ||
-               motionType_ == MotionType::TurnRight90 ||
-               motionType_ == MotionType::TurnAround180) {
-        updateTurn(dtSeconds, leftSpeedMmS, rightSpeedMmS, now);
-    } else {
-        fail(MotionFailureReason::Cancelled);
-    }
-}
-
-void MotionController::updateForward(float dtSeconds,
-                                     int32_t leftCount,
-                                     int32_t rightCount,
-                                     float leftSpeedMmS,
-                                     float rightSpeedMmS,
-                                     uint32_t nowMs) {
-    const float leftTravelMm =
-        static_cast<float>(leftCount - startLeftCount_) /
-        config_.leftCountsPerMm;
-    const float rightTravelMm =
-        static_cast<float>(rightCount - startRightCount_) /
-        config_.rightCountsPerMm;
-    distanceTravelledMm_ = (leftTravelMm + rightTravelMm) / 2.0f;
-
-    const float remainingMm = targetDistanceMm_ - distanceTravelledMm_;
-    float desiredSpeed = 0.0f;
-
-    if (absValue(remainingMm) > 0.5f) {
-        const float stoppingSpeed = sqrtf(
-            2.0f * config_.linearAccelerationMmS2 * absValue(remainingMm));
-        float magnitude = stoppingSpeed < config_.maxLinearSpeedMmS
-            ? stoppingSpeed : config_.maxLinearSpeedMmS;
-        // Não impõe velocidade mínima perto do alvo, para permitir frenagem suave.
-        if (absValue(remainingMm) > config_.positionToleranceMm * 2.0f &&
-            magnitude < config_.minLinearSpeedMmS) {
-            magnitude = config_.minLinearSpeedMmS;
-        }
-        desiredSpeed = signOf(remainingMm) * magnitude;
-    }
-
-    profiledLinearSpeedMmS_ = approach(
-        profiledLinearSpeedMmS_, desiredSpeed,
-        config_.linearAccelerationMmS2 * dtSeconds);
-
-    // Se a roda esquerda avançou mais que a direita, reduz a referência da
-    // esquerda e aumenta a da direita. A correção some quando a velocidade zera.
-    float correction = config_.straightCorrectionKp *
-                       (leftTravelMm - rightTravelMm);
-    if (wallAlignmentValid_) {
-        // Diferença positiva significa que há mais espaço à esquerda; para
-        // alinhar, a correção muda de sinal quando o robô está em marcha à ré.
-        float wallCorrection = config_.wallAlignmentKp *
-            (leftWallDistanceMm_ - rightWallDistanceMm_);
-        if (profiledLinearSpeedMmS_ < 0.0f) wallCorrection = -wallCorrection;
-        correction += wallCorrection;
-    }
-    const float correctionLimit = config_.maxLinearSpeedMmS * 0.35f;
-    correction = clampValue(correction, -correctionLimit, correctionLimit);
-    if (absValue(profiledLinearSpeedMmS_) < config_.settledSpeedMmS) {
-        correction = 0.0f;
-    } else {
-        const float scale = absValue(profiledLinearSpeedMmS_) /
-                            config_.maxLinearSpeedMmS;
-        correction *= scale > 1.0f ? 1.0f : scale;
-    }
-
-    float leftTarget = profiledLinearSpeedMmS_ - correction;
-    float rightTarget = profiledLinearSpeedMmS_ + correction;
-    leftTarget = clampValue(leftTarget, -config_.maxLinearSpeedMmS,
-                            config_.maxLinearSpeedMmS);
-    rightTarget = clampValue(rightTarget, -config_.maxLinearSpeedMmS,
-                             config_.maxLinearSpeedMmS);
-
-    applyWheelSpeedTargets(leftTarget, rightTarget,
-                           leftSpeedMmS, rightSpeedMmS, dtSeconds);
-
-    if (absValue(remainingMm) <= config_.positionToleranceMm &&
-        absValue(leftSpeedMmS) <= config_.settledSpeedMmS &&
-        absValue(rightSpeedMmS) <= config_.settledSpeedMmS &&
-        absValue(profiledLinearSpeedMmS_) <= config_.settledSpeedMmS) {
-        if (++settledSamples_ >= 3) {
-            succeed();
-            return;
-        }
-    } else {
-        settledSamples_ = 0;
-    }
-
-    if (checkTimeoutAndStall(nowMs, leftTarget, rightTarget)) return;
-}
-
-void MotionController::updateTurn(float dtSeconds,
-                                  float leftSpeedMmS,
-                                  float rightSpeedMmS,
-                                  uint32_t nowMs) {
+    if (!isfinite(dt) || dt <= 0 || dt > 0.1f) { fail(MotionFailureReason::InvalidTimeStep); return; }
+    int32_t l = 0, r = 0;
+    if (!leftEncoder_.readCount(l) || !rightEncoder_.readCount(r)) { fail(MotionFailureReason::EncoderReadFailed); return; }
     MPU6500Reading reading{};
-    if (!imu_.read(reading)) {
-        fail(MotionFailureReason::ImuReadFailed);
+    if (!imu_.read(reading) || !isfinite(reading.yawDegrees) || !isfinite(reading.gyroZdps)) { fail(MotionFailureReason::ImuReadFailed); return; }
+    const uint32_t now = millis();
+    const int32_t dl = l - previousLeftCount_, dr = r - previousRightCount_;
+    if (dl || dr) quietSinceMs_ = now;
+    if (motionType_ == MotionType::ForwardCell) {
+        const float direction = sign(targetDistanceMm_);
+        updateStallTimers(dl * direction > 0.0f ? dl : 0, dr * direction > 0.0f ? dr : 0, now);
+    } else {
+        updateStallTimers(dl, dr, now);
+    }
+    const float alpha = dt / (0.035f + dt);
+    lastLeftMeasuredMmS_ += alpha * (dl / config_.leftCountsPerMm / dt - lastLeftMeasuredMmS_);
+    lastRightMeasuredMmS_ += alpha * (dr / config_.rightCountsPerMm / dt - lastRightMeasuredMmS_);
+    previousLeftCount_ = l; previousRightCount_ = r;
+    turnAngleDeg_ += wrap(reading.yawDegrees - lastImuYawDeg_) * config_.imuYawSign;
+    lastImuYawDeg_ = reading.yawDegrees;
+    currentGyroDps_ = reading.gyroZdps * config_.imuYawSign;
+    if (!odometry_.update(l, r)) { fail(MotionFailureReason::EncoderReadFailed); return; }
+    odometry_.setHeadingRad(turnStartHeadingRad_ + turnAngleDeg_ * pi / 180.0f);
+    const auto travel = getWheelTravel();
+    distanceTravelledMm_ = (travel.leftMm + travel.rightMm) * 0.5f;
+    if(sensorPaused_) { motors_.brake();return; }
+    if (braking_) {
+        const bool settled = now - brakeStartedMs_ >= 300 && now - quietSinceMs_ >= 100 && fabsf(currentGyroDps_) < 4;
+        if (settled) {
+            if (guidedPivot_ && brakeFailure_ == MotionFailureReason::None) {
+                const float error = fabsf(targetAngleDeg_ - turnAngleDeg_);
+                if (fabsf(distanceTravelledMm_) > guidedPivotMaxDriftMm ||
+                    (error > guidedPivotToleranceDeg && (pivotTrimUsed_ || error > 5.0f))) {
+                    fail(MotionFailureReason::SafetyLimit);
+                    return;
+                }
+                if (error > guidedPivotToleranceDeg) {
+                    pivotTrimUsed_ = true;
+                    braking_ = false;
+                    lastLeftProgressMs_ = lastRightProgressMs_ = lastAngularProgressMs_ = now;
+                    lastAngularProgress_ = turnAngleDeg_;
+                    leftIntegralPwm_ = rightIntegralPwm_ = 0;
+                    profiledAngularSpeedDegS_ = 0;
+                    return;
+                }
+            }
+            if (brakeFailure_ == MotionFailureReason::None) succeed(); else fail(brakeFailure_);
+        } else if (now - brakeStartedMs_ >= 1000) fail(MotionFailureReason::BrakeNotSettled);
         return;
     }
+    if (motionType_ == MotionType::ForwardCell) updateForward(dt, l, r, lastLeftMeasuredMmS_, lastRightMeasuredMmS_, now);
+    else if (motionType_ == MotionType::ArcLeft90 || motionType_ == MotionType::ArcRight90)
+        updateArc(dt, lastLeftMeasuredMmS_, lastRightMeasuredMmS_, now);
+    else updateTurn(dt, lastLeftMeasuredMmS_, lastRightMeasuredMmS_, now);
+}
 
-    const float wrappedDelta = wrapDegrees(reading.yawDegrees - lastImuYawDeg_);
-    turnAngleDeg_ += wrappedDelta * config_.imuYawSign;
-    lastImuYawDeg_ = reading.yawDegrees;
-
-    const float measuredGyroDegS = reading.gyroZdps * config_.imuYawSign;
-    const float errorDeg = targetAngleDeg_ - turnAngleDeg_;
-    float desiredAngularSpeed = 0.0f;
-
-    if (absValue(errorDeg) > 0.5f) {
-        // Limite de velocidade baseado na distância angular restante para frear.
-        const float stoppingRate = sqrtf(
-            2.0f * config_.angularAccelerationDegS2 * absValue(errorDeg));
-        float magnitude = stoppingRate < config_.maxAngularSpeedDegS
-            ? stoppingRate : config_.maxAngularSpeedDegS;
-
-        // O termo proporcional impede uma velocidade excessiva perto do alvo.
-        const float proportionalLimit =
-            config_.turnKpDegPerSecPerDeg * absValue(errorDeg);
-        if (magnitude > proportionalLimit) {
-            magnitude = proportionalLimit;
-        }
-        // Só impõe velocidade mínima quando ainda está longe do alvo.
-        if (absValue(errorDeg) > config_.angleToleranceDeg * 2.0f &&
-            magnitude < config_.minAngularSpeedDegS) {
-            magnitude = config_.minAngularSpeedDegS;
-        }
-        desiredAngularSpeed = signOf(errorDeg) * magnitude;
+void MotionController::updateForward(float dt, int32_t l, int32_t r, float ls, float rs, uint32_t now) {
+    const float dir = sign(targetDistanceMm_);
+    const float lt = (l - startLeftCount_) / config_.leftCountsPerMm * dir;
+    const float rt = (r - startRightCount_) / config_.rightCountsPerMm * dir;
+    const float target = fabsf(targetDistanceMm_);
+    if (lt < -5 || rt < -5) {
+        beginBrake(now, MotionFailureReason::WrongDirection); return;
     }
+    if (lt > target + 20 || rt > target + 20 ||
+        fabsf(rt - lt) > 20 || fabsf(turnAngleDeg_) > (guidedRetreat_ ? 5.0f : 15.0f)) {
+        beginBrake(now, MotionFailureReason::SafetyLimit); return;
+    }
+    if (checkTimeoutAndStall(now, 1, 1)) return;
+    const float remaining = target - (lt + rt) * 0.5f;
+    const float lead = fmaxf(config_.positionToleranceMm, fmaxf(0, (ls + rs) * 0.5f * dir) * 0.07f);
+    if (remaining <= lead) { beginBrake(now); return; }
+    const bool guided = dir > 0.0f && guidedSteering_;
+    const float segmentMaxSpeed = frontApproachMode_ ? FrontApproach::MAX_SPEED_MM_S : config_.maxLinearSpeedMmS;
+    float maxSpeed = guided && guidedLateralSlow_ ? fminf(segmentMaxSpeed, 35.0f) : segmentMaxSpeed;
+    if (guidedRetreat_) maxSpeed = fminf(maxSpeed, 18.0f);
+    const float acceleration = frontApproachMode_ ? 40.0f : config_.linearAccelerationMmS2;
+    const float deceleration = frontApproachMode_ ? 40.0f : 120.0f;
+    const float desired = fminf(maxSpeed, fmaxf(config_.minLinearSpeedMmS, sqrtf(2 * deceleration * remaining)));
+    const float wheelSpeedFloor = guided || guidedRetreat_ ? fminf(config_.minLinearSpeedMmS, desired) : 0.0f;
+    profiledLinearSpeedMmS_ = fminf(desired, fmaxf(wheelSpeedFloor, profiledLinearSpeedMmS_ + acceleration * dt));
+    // Keep a common heading reference over consecutive cells; resetting it
+    // at every cell would retain any previous angular error.
+    const float headingOffset = guided ? guidedYawOffsetDeg_ : 0.0f;
+    const float reference = guidedRetreat_ ? retreatHeadingDeg_ : straightReferenceYawDeg_;
+    const float headingError = wrap(lastImuYawDeg_ * config_.imuYawSign - reference - headingOffset);
+    const float wallError = leftWallDistanceMm_ - rightWallDistanceMm_;
+    const float outsideDeadband = sign(wallError) *
+        fmaxf(0, fabsf(wallError) - config_.wallAlignmentDeadbandMm);
+    const float wallCorrection = wallAlignmentValid_ && !frontApproachMode_ && !guided
+        ? clamp(dir * config_.wallAlignmentKp * outsideDeadband, -6, 6) : 0;
+    // Durante a rampa, preserve tração nas duas rodas ao corrigir o rumo.
+    const float correctionLimit = guided || guidedRetreat_
+        ? fminf(guidedRetreat_ ? 4.0f : (frontApproachMode_ ? 8.0f : 12.0f),
+                profiledLinearSpeedMmS_ - wheelSpeedFloor)
+        : 12.0f;
+    const float correction = clamp(headingError * config_.straightCorrectionKp - wallCorrection,
+                                   -correctionLimit, correctionLimit);
+    const float leftTarget = dir * fmaxf(0, profiledLinearSpeedMmS_ + dir * correction);
+    const float rightTarget = dir * fmaxf(0, profiledLinearSpeedMmS_ - dir * correction);
+    applyWheelSpeedTargets(leftTarget, rightTarget, ls, rs, dt);
+}
 
-    profiledAngularSpeedDegS_ = approach(
-        profiledAngularSpeedDegS_, desiredAngularSpeed,
-        config_.angularAccelerationDegS2 * dtSeconds);
+float MotionController::getArcPathErrorMm() const {
+    return arcRadiusMm_*fmaxf(0.0f,turnAngleDeg_*sign(targetAngleDeg_))*pi/180.0f-distanceTravelledMm_;
+}
+float MotionController::getArcExitProgressMm() const {
+    const auto pose=odometry_.getPose();
+    const float exitHeading=turnStartHeadingRad_+sign(targetAngleDeg_)*pi*0.5f;
+    return (pose.xMm-arcStartPose_.xMm)*cosf(exitHeading)+(pose.yMm-arcStartPose_.yMm)*sinf(exitHeading);
+}
 
-    // Convenção: omega positivo = giro anti-horário/esquerda.
-    // dR - dL = omega * wheelTrack. Portanto a roda esquerda vai para trás
-    // e a direita para frente durante um giro positivo no próprio eixo.
-    const float omegaRadS = profiledAngularSpeedDegS_ * kPiRadians / 180.0f;
-    const float leftTarget = -omegaRadS * config_.wheelTrackMm / 2.0f;
-    const float rightTarget = omegaRadS * config_.wheelTrackMm / 2.0f;
+void MotionController::updateArc(float dt,float ls,float rs,uint32_t now) {
+    const float dir=sign(targetAngleDeg_), angle=turnAngleDeg_*dir;
+    const auto travel=getWheelTravel();
+    const float expectedCentre=arcRadiusMm_*fmaxf(0.0f,angle)*pi/180.0f;
+    const float leftSign=sign(arcRadiusMm_-dir*config_.wheelTrackMm*0.5f);
+    const float rightSign=sign(arcRadiusMm_+dir*config_.wheelTrackMm*0.5f);
+    if (travel.leftMm*leftSign < -4 || travel.rightMm*rightSign < -4) {
+        beginBrake(now,MotionFailureReason::WrongDirection);return;
+    }
+    // Diferença para o arco ideal é diagnóstico e realimentação, não colisão.
+    const float pathError=expectedCentre-distanceTravelledMm_;
+    if(fabsf(pathError)>12.0f)arcPathWarning_=true;
+    if(angle < -4 || angle>100){
+        arcHardLimit_=1;beginBrake(now,MotionFailureReason::SafetyLimit);return;
+    }
+    if(fabsf(travel.leftMm)>180 || fabsf(travel.rightMm)>180){
+        arcHardLimit_=2;beginBrake(now,MotionFailureReason::SafetyLimit);return;
+    }
+    if (angle>lastAngularProgress_+0.5f) {lastAngularProgress_=angle;lastAngularProgressMs_=now;}
+    if (now-lastAngularProgressMs_>=700) {beginBrake(now,MotionFailureReason::MotionTimeout);return;}
+    if (checkTimeoutAndStall(now,leftSign,rightSign)) return;
+    const float remaining=90.0f-angle;
+    if (remaining<=fmaxf(0.5f,fmaxf(0.0f,currentGyroDps_*dir)*0.035f)) {beginBrake(now);return;}
+    const float maxRate=fminf(16.0f,config_.maxAngularSpeedDegS);
+    const float rate=clamp(remaining*config_.turnKpDegPerSecPerDeg,6.0f,maxRate);
+    profiledAngularSpeedDegS_=fminf(rate,fmaxf(6.0f,profiledAngularSpeedDegS_+60.0f*dt));
+    const float omega=profiledAngularSpeedDegS_*pi/180.0f;
+    // Mais avanço por grau, principalmente se o eixo estiver atrasado no arco.
+    const float effectiveRadius=clamp(arcRadiusMm_+3.0f+0.6f*pathError,
+                                     fmaxf(10.0f,arcRadiusMm_-5.0f),fminf(45.0f,arcRadiusMm_+10.0f));
+    applyWheelSpeedTargets(omega*(effectiveRadius-dir*config_.wheelTrackMm*0.5f),
+                          omega*(effectiveRadius+dir*config_.wheelTrackMm*0.5f),ls,rs,dt);
+}
 
-    applyWheelSpeedTargets(leftTarget, rightTarget,
-                           leftSpeedMmS, rightSpeedMmS, dtSeconds);
-
-    if (absValue(errorDeg) <= config_.angleToleranceDeg &&
-        absValue(measuredGyroDegS) <= config_.settledGyroDegS &&
-        absValue(leftSpeedMmS) <= config_.settledSpeedMmS &&
-        absValue(rightSpeedMmS) <= config_.settledSpeedMmS &&
-        absValue(profiledAngularSpeedDegS_) <= config_.settledGyroDegS) {
-        if (++settledSamples_ >= 3) {
-            // Corrige a orientação da odometria com o ângulo relativo medido
-            // pela IMU durante este giro. x/y continuam baseados nos encoders.
-            odometry_.setHeadingRad(
-                turnStartHeadingRad_ + turnAngleDeg_ * kPiRadians / 180.0f);
-            succeed();
+void MotionController::updateTurn(float dt, float ls, float rs, uint32_t now) {
+    const float dir = sign(targetAngleDeg_);
+    const float angle = turnAngleDeg_ * dir;
+    const float target = fabsf(targetAngleDeg_);
+    const float l = (previousLeftCount_ - startLeftCount_) / config_.leftCountsPerMm * -dir;
+    const float r = (previousRightCount_ - startRightCount_) / config_.rightCountsPerMm * dir;
+    const float arc = target * pi / 180 * config_.wheelTrackMm * 0.5f;
+    if ((guidedPivot_ && fabsf(distanceTravelledMm_) > 10.0f) ||
+        angle < -4 || angle > target + 30 || l < -20 / config_.leftCountsPerMm ||
+        r < -20 / config_.rightCountsPerMm || fabsf(l) > arc * 1.5f + 40 / config_.leftCountsPerMm ||
+        fabsf(r) > arc * 1.5f + 40 / config_.rightCountsPerMm) {
+        beginBrake(now, MotionFailureReason::SafetyLimit); return;
+    }
+    if (angle > lastAngularProgress_ + 0.5f ||
+        (guidedPivot_ && angle < lastAngularProgress_ - 0.5f)) {
+        lastAngularProgress_ = angle;
+        lastAngularProgressMs_ = now;
+    }
+    if (now - lastAngularProgressMs_ >= 700) { beginBrake(now, MotionFailureReason::MotionTimeout); return; }
+    if (checkTimeoutAndStall(now, 1, 1)) return;
+    const float remaining = target - angle;
+    if (guidedPivot_) {
+        const float travelDirection = dir * sign(remaining);
+        const float lead = fmaxf(0.5f, fmaxf(0.0f, currentGyroDps_ * travelDirection) * 0.035f);
+        if (fabsf(remaining) <= lead || (!pivotTrimUsed_ && remaining < 0.0f)) {
+            beginBrake(now);
             return;
         }
-    } else {
-        settledSamples_ = 0;
+        const float maxRate = fminf(config_.maxAngularSpeedDegS, pivotTrimUsed_ ? 10.0f : 25.0f);
+        const float minRate = fminf(8.0f, maxRate);
+        const float rate = clamp(fabsf(remaining) * config_.turnKpDegPerSecPerDeg, minRate, maxRate);
+        profiledAngularSpeedDegS_ = fminf(rate, fmaxf(minRate, profiledAngularSpeedDegS_ + 90.0f * dt));
+        const float base = profiledAngularSpeedDegS_ * pi / 180 * config_.wheelTrackMm * 0.5f;
+        // Mesma distância em sentidos opostos mantém o ponto médio do eixo parado.
+        const float correction = clamp((r - l) * sign(remaining) * 2.0f, -0.4f * base, 0.4f * base);
+        // Ajude a roda que avança se ela atrasar nos primeiros milímetros.
+        // A compensação sai gradualmente e não interfere na rampa do giro.
+        const float forwardMm = dir > 0.0f ? r : l;
+        const float reverseMm = dir > 0.0f ? l : r;
+        const float assistPwm = !pivotTrimUsed_ && now - motionStartedMs_ < 500
+            ? clamp((reverseMm - forwardMm - 0.5f) * 6.0f, 0.0f, 16.0f) *
+                clamp((4.0f - forwardMm) * 0.5f, 0.0f, 1.0f)
+            : 0.0f;
+        applyWheelSpeedTargets(-travelDirection * (base + correction),
+                               travelDirection * (base - correction), ls, rs, dt,
+                               false, false, assistPwm);
+        return;
     }
-
-    if (checkTimeoutAndStall(nowMs, leftTarget, rightTarget)) return;
+    const float lead = fmaxf(config_.angleToleranceDeg, fmaxf(0, currentGyroDps_ * dir) * 0.04f);
+    if (remaining <= lead) { beginBrake(now); return; }
+    const float rate = fminf(config_.maxAngularSpeedDegS, fmaxf(config_.minAngularSpeedDegS, remaining * config_.turnKpDegPerSecPerDeg));
+    const float base = rate * pi / 180 * config_.wheelTrackMm * 0.5f;
+    const float correction = clamp((r - l) * 2, -20, 20);
+    const bool brakeLeft = r - l < -5, brakeRight = r - l > 5;
+    applyWheelSpeedTargets(-dir * fmaxf(5, base + correction), dir * fmaxf(5, base - correction), ls, rs, dt,
+                          brakeLeft, brakeRight);
 }
 
-void MotionController::applyWheelSpeedTargets(float leftTargetMmS,
-                                              float rightTargetMmS,
-                                              float leftMeasuredMmS,
-                                              float rightMeasuredMmS,
-                                              float dtSeconds) {
-    lastLeftTargetMmS_ = leftTargetMmS;
-    lastRightTargetMmS_ = rightTargetMmS;
-
-    const float leftCorrection = leftPid_.update(
-        leftTargetMmS, leftMeasuredMmS, dtSeconds);
-    const float rightCorrection = rightPid_.update(
-        rightTargetMmS, rightMeasuredMmS, dtSeconds);
-
-    // Feed-forward fornece a atuação necessária em regime permanente; o PID
-    // corrige o erro. Sem feed-forward, uma saída PID puramente baseada no
-    // erro tende a cair para zero quando a velocidade chega ao setpoint.
-    float leftFeedForward = 0.0f;
-    if (absValue(leftTargetMmS) > 0.5f) {
-        leftFeedForward = config_.leftFeedForwardPwmPerMmS * leftTargetMmS +
-            signOf(leftTargetMmS) * config_.leftStaticFrictionPwm;
-    }
-    float rightFeedForward = 0.0f;
-    if (absValue(rightTargetMmS) > 0.5f) {
-        rightFeedForward = config_.rightFeedForwardPwmPerMmS * rightTargetMmS +
-            signOf(rightTargetMmS) * config_.rightStaticFrictionPwm;
-    }
-
-    const float leftOutput = leftFeedForward + leftCorrection;
-    const float rightOutput = rightFeedForward + rightCorrection;
-
-    const int16_t leftPwm = static_cast<int16_t>(
-        clampValue(leftOutput, -255.0f, 255.0f));
-    const int16_t rightPwm = static_cast<int16_t>(
-        clampValue(rightOutput, -255.0f, 255.0f));
-
-    motors_.setSpeeds(leftPwm, rightPwm);
+void MotionController::applyWheelSpeedTargets(float lt, float rt, float lm, float rm, float dt, bool bl, bool br,
+                                              float forwardAssistPwm) {
+    lastLeftTargetMmS_ = lt; lastRightTargetMmS_ = rt;
+    const float le = fabsf(lt) - lm * sign(lt), re = fabsf(rt) - rm * sign(rt);
+    if (!bl) leftIntegralPwm_ = clamp(leftIntegralPwm_ + 5 * le * dt, -80, 100);
+    if (!br) rightIntegralPwm_ = clamp(rightIntegralPwm_ + 5 * re * dt, -80, 100);
+    const float leftAssist = lt > 0.0f ? forwardAssistPwm : 0.0f;
+    const float rightAssist = rt > 0.0f ? forwardAssistPwm : 0.0f;
+    const int lp = static_cast<int>(clamp(config_.leftStaticFrictionPwm +
+        config_.leftFeedForwardPwmPerMmS * fabsf(lt) + 1.5f * le + leftIntegralPwm_ + leftAssist, 0, 220));
+    const int rp = static_cast<int>(clamp(config_.rightStaticFrictionPwm +
+        config_.rightFeedForwardPwmPerMmS * fabsf(rt) + 1.5f * re + rightIntegralPwm_ + rightAssist, 0, 220));
+    motors_.setControlledSpeeds(static_cast<int16_t>(sign(lt) * lp), static_cast<int16_t>(sign(rt) * rp),
+                               bl || fabsf(lt) < 0.01f || (!guidedPivot_ && !lp),
+                               br || fabsf(rt) < 0.01f || (!guidedPivot_ && !rp));
 }
-
-void MotionController::updateStallTimers(int32_t leftDeltaCount,
-                                         int32_t rightDeltaCount,
-                                         uint32_t nowMs) {
-    if (leftDeltaCount != 0) lastLeftProgressMs_ = nowMs;
-    if (rightDeltaCount != 0) lastRightProgressMs_ = nowMs;
+void MotionController::updateStallTimers(int32_t l, int32_t r, uint32_t now) {
+    if (l) lastLeftProgressMs_ = now; if (r) lastRightProgressMs_ = now;
 }
-
-bool MotionController::checkTimeoutAndStall(uint32_t nowMs,
-                                            float leftTargetMmS,
-                                            float rightTargetMmS) {
-    if (static_cast<uint32_t>(nowMs - motionStartedMs_) >= motionTimeoutMs_) {
-        fail(MotionFailureReason::MotionTimeout);
-        return true;
-    }
-
-    if (absValue(leftTargetMmS) >= config_.stallMinSpeedMmS &&
-        static_cast<uint32_t>(nowMs - lastLeftProgressMs_) >= config_.stallTimeoutMs) {
-        fail(MotionFailureReason::LeftWheelStalled);
-        return true;
-    }
-
-    if (absValue(rightTargetMmS) >= config_.stallMinSpeedMmS &&
-        static_cast<uint32_t>(nowMs - lastRightProgressMs_) >= config_.stallTimeoutMs) {
-        fail(MotionFailureReason::RightWheelStalled);
-        return true;
-    }
-
-    return false;
+bool MotionController::checkTimeoutAndStall(uint32_t now, float, float) {
+    MotionFailureReason reason = MotionFailureReason::None;
+    if (now - motionStartedMs_ >= motionTimeoutMs_) reason = MotionFailureReason::MotionTimeout;
+    else if (now - lastLeftProgressMs_ >= config_.stallTimeoutMs) reason = MotionFailureReason::LeftWheelStalled;
+    else if (now - lastRightProgressMs_ >= config_.stallTimeoutMs) reason = MotionFailureReason::RightWheelStalled;
+    if (reason == MotionFailureReason::None) return false;
+    beginBrake(now, reason); return true;
 }
-
 void MotionController::fail(MotionFailureReason reason) {
-    // Falha/cancelamento exige rearmamento explícito antes de novo movimento.
-    motors_.stop();
-    motors_.setEnabled(false);
-    leftPid_.reset();
-    rightPid_.reset();
-    status_ = MotionStatus::Failed;
-    // Preserva motionType_ para diagnóstico do movimento que falhou.
-    failureReason_ = reason;
-    profiledLinearSpeedMmS_ = 0.0f;
-    profiledAngularSpeedDegS_ = 0.0f;
+    sensorPaused_=false;
+    motors_.setEnabled(false); status_ = MotionStatus::Failed; failureReason_ = reason; braking_ = false;
+    lastLeftTargetMmS_ = lastRightTargetMmS_ = 0;
+    leftPid_.reset(); rightPid_.reset();
 }
-
+void MotionController::brakeAtFrontTarget() {
+    if (status_ == MotionStatus::Running && frontApproachMode_ && isMovingForward()) beginBrake(millis());
+}
+void MotionController::brakeForObstacle() {
+    if (status_ != MotionStatus::Running) return;
+    sensorPaused_ = false;
+    if (!braking_) beginBrake(millis(), MotionFailureReason::Obstacle);
+    else if (brakeFailure_ == MotionFailureReason::None) brakeFailure_ = MotionFailureReason::Obstacle;
+}
 void MotionController::succeed() {
-    motors_.stop();
-    leftPid_.reset();
-    rightPid_.reset();
-    status_ = MotionStatus::Succeeded;
-    // Preserva motionType_ para que o chamador saiba qual operação terminou.
-    failureReason_ = MotionFailureReason::None;
-    profiledLinearSpeedMmS_ = 0.0f;
-    profiledAngularSpeedDegS_ = 0.0f;
+    sensorPaused_=false;
+    if (guidedPivot_)
+        straightReferenceYawDeg_ = wrap(straightReferenceYawDeg_ + guidedPivotHeadingStepDeg_);
+    else if (motionType_ != MotionType::ForwardCell)
+        straightReferenceYawDeg_ = lastImuYawDeg_ * config_.imuYawSign;
+    motors_.setEnabled(false); status_ = MotionStatus::Succeeded; failureReason_ = MotionFailureReason::None; braking_ = false;
+    lastLeftTargetMmS_ = lastRightTargetMmS_ = 0;
+    leftPid_.reset(); rightPid_.reset();
 }
-
-void MotionController::stop() {
-    fail(MotionFailureReason::Cancelled);
-}
-
+void MotionController::stop() { fail(MotionFailureReason::Cancelled); }
 MotionStatus MotionController::getStatus() const { return status_; }
 MotionType MotionController::getMotionType() const { return motionType_; }
 MotionFailureReason MotionController::getFailureReason() const { return failureReason_; }
 Pose2D MotionController::getPose() const { return odometry_.getPose(); }
+WheelTravel MotionController::getWheelTravel() const {
+    const int32_t left = previousLeftCount_ - startLeftCount_;
+    const int32_t right = previousRightCount_ - startRightCount_;
+    return {left, right, left / config_.leftCountsPerMm, right / config_.rightCountsPerMm};
+}
 float MotionController::getDistanceTravelledMm() const { return distanceTravelledMm_; }
 float MotionController::getTurnAngleDeg() const { return turnAngleDeg_; }
 float MotionController::getLeftSpeedMmS() const { return lastLeftMeasuredMmS_; }
 float MotionController::getRightSpeedMmS() const { return lastRightMeasuredMmS_; }
-float MotionController::getPidErrorMmS() const {
-    const float leftError = lastLeftTargetMmS_ - lastLeftMeasuredMmS_;
-    const float rightError = lastRightTargetMmS_ - lastRightMeasuredMmS_;
-    return (leftError + rightError) * 0.5f;
-}
+float MotionController::getPidErrorMmS() const { return ((lastLeftTargetMmS_ - lastLeftMeasuredMmS_) + (lastRightTargetMmS_ - lastRightMeasuredMmS_)) * 0.5f; }

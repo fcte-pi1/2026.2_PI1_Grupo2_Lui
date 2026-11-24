@@ -1,4 +1,4 @@
-#include "navigation/WallPerception.h"
+#include "WallPerception.h"
 
 #include <array>
 
@@ -25,6 +25,14 @@ uint16_t MovingAverageFilter3::push(uint16_t rawValue) {
 void applyReading(SensorReading& reading, const RawEcho& echo, MovingAverageFilter3& filter) {
     reading.timestampMs = echo.timestampMs;
 
+    if (!echo.valid) {
+        reading.valid = false;
+        reading.rawDistanceMm = echo.rawDistanceMm;
+        reading.filteredDistanceMm = 0;
+        filter = MovingAverageFilter3{};
+        return;
+    }
+
     if (!echo.hasEcho) {
         // Sem eco = fora de alcance = "caminho livre" (Edge Cases do spec),
         // NÃO é uma leitura inválida (FR-005).
@@ -37,13 +45,16 @@ void applyReading(SensorReading& reading, const RawEcho& echo, MovingAverageFilt
     if (!isPhysicallyPlausible(echo.rawDistanceMm)) {
         reading.valid = false;
         reading.rawDistanceMm = echo.rawDistanceMm;
-        // Leitura fisicamente impossível: não alimenta o filtro.
+        // Break the history across an invalid acquisition: old open-space
+        // values must not mask the first nearby wall after recovery.
+        reading.filteredDistanceMm = 0;
+        filter = MovingAverageFilter3{};
         return;
     }
 
     reading.valid = true;
     reading.rawDistanceMm = echo.rawDistanceMm;
-    reading.filteredDistanceMm = filter.push(echo.rawDistanceMm);
+    reading.filteredDistanceMm = echo.preFiltered ? echo.rawDistanceMm : filter.push(echo.rawDistanceMm);
 }
 
 void updateFaultState(SensorFaultState& fault, bool readingValid) {
@@ -64,6 +75,15 @@ void updateFaultState(SensorFaultState& fault, bool readingValid) {
 WallPerception::WallPerception(IWallSensor& sensor, uint16_t thresholdMm)
     : sensor_(sensor), thresholdMm_(thresholdMm) {}
 
+void WallPerception::reset() {
+    filters_ = {};
+    readings_ = {};
+    faults_ = {};
+    state_ = {};
+    lastProcessedTimestampMs_ = 0;
+    hasProcessedSample_ = false;
+}
+
 void WallPerception::update() {
     static constexpr std::array<Direction, kDirectionCount> kDirections{
         Direction::Front, Direction::Left, Direction::Right};
@@ -75,16 +95,19 @@ void WallPerception::update() {
     // HardwareWallSensor pode expor um snapshot em cache. Processar o mesmo
     // timestamp mais de uma vez inflaria artificialmente a média móvel.
     const uint32_t sampleTimestamp = echoes[indexOf(Direction::Front)].timestampMs;
-    if (hasProcessedSample_ && sampleTimestamp == lastProcessedTimestampMs_) return;
+    const bool repeatedSample = hasProcessedSample_ && sampleTimestamp == lastProcessedTimestampMs_;
     hasProcessedSample_ = true;
     lastProcessedTimestampMs_ = sampleTimestamp;
 
     for (Direction direction : kDirections) {
         const std::size_t idx = indexOf(direction);
+        // A cached frame can expire without changing its timestamp. Honor
+        // invalidation immediately, but do not filter/count the sample again.
+        if (repeatedSample && echoes[idx].valid) continue;
         readings_[idx].direction = direction;
         applyReading(readings_[idx], echoes[idx], filters_[idx]);
         faults_[idx].direction = direction;
-        updateFaultState(faults_[idx], readings_[idx].valid);
+        if (!repeatedSample) updateFaultState(faults_[idx], readings_[idx].valid);
     }
 
     const SensorReading& front = readings_[indexOf(Direction::Front)];

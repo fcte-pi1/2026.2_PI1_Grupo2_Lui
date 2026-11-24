@@ -20,7 +20,9 @@ enum class MotionType : uint8_t {
     ForwardCell,
     TurnLeft90,
     TurnRight90,
-    TurnAround180
+    TurnAround180,
+    ArcLeft90,
+    ArcRight90
 };
 
 enum class MotionFailureReason : uint8_t {
@@ -34,7 +36,11 @@ enum class MotionFailureReason : uint8_t {
     LeftWheelStalled,
     RightWheelStalled,
     Cancelled,
-    InvalidDistance
+    InvalidDistance,
+    SafetyLimit,
+    BrakeNotSettled,
+    Obstacle,
+    WrongDirection
 };
 
 struct MotionControllerConfig {
@@ -57,11 +63,12 @@ struct MotionControllerConfig {
     float settledSpeedMmS;
     float settledGyroDegS;
 
-    // Corrige a diferença entre distâncias das rodas durante avanço.
-    // Unidade aproximada: (mm/s de correção) / mm de diferença.
+    // Ganho de correção de rumo por yaw da IMU; fatores de encoder são provisórios.
+    // Unidade: (mm/s de correcao diferencial) / grau de yaw.
     float straightCorrectionKp;
-    // Correção diferencial a partir da diferença de distância dos sensores laterais.
+    // Correção lateral limitada, com entrada filtrada por amostras novas.
     float wallAlignmentKp;
+    float wallAlignmentDeadbandMm;
 
     // Feed-forward aproximado do motor: PWM por mm/s + compensação de atrito
     // estático. Calibrar para cada roda.
@@ -79,6 +86,13 @@ struct MotionControllerConfig {
     float stallMinSpeedMmS;
 
     MotionControllerConfig();
+};
+
+struct WheelTravel {
+    int32_t leftTicks;
+    int32_t rightTicks;
+    float leftMm;
+    float rightMm;
 };
 
 class MotionController {
@@ -101,28 +115,56 @@ public:
     bool startMoveBackwardOneCell();
     // Distância assinada em milímetros: positiva avança, negativa dá ré.
     bool startMoveLinear(float signedDistanceMm);
+    bool startGuidedRetreat(float distanceMm);
 
     // Feedback atualizado pelo subsistema de sensores, em milímetros.
     // Leituras inválidas/desatualizadas devem ser enviadas com valid=false.
     void setWallAlignmentFeedback(float leftDistanceMm,
                                   float rightDistanceMm,
                                   bool valid);
+    // Rumo e redução de velocidade dos avanços guiados.
+    void setGuidedLateralSteering(bool slow, float yawOffsetDeg);
+    // May enable during a forward segment; cannot disable mid-segment and accelerate again.
+    void setFrontApproachMode(bool enabled);
+    bool isFrontApproachMode() const { return frontApproachMode_; }
+    // Refine the final centimetres only within the cell-position tolerance.
+    bool refineFrontApproachTarget(float frontCm, float previousProgressMm = 0.0f);
+    void brakeAtFrontTarget();
+    void brakeForObstacle();
+    // Positivo gira à esquerda, negativo gira à direita.
+    bool startGuidedPivot(float degrees);
+    // Raio do ponto médio do eixo; positivo gira à esquerda.
+    bool startRollingArc90(float degrees, float radiusMm);
+    bool startGuidedPivotReturn();
     bool startTurnLeft90();
     bool startTurnRight90();
-    bool startTurnAround180(); // por convenção, gira para a esquerda (+180 graus)
+    bool startTurnAround180(); // meia-volta à direita, como na bancada
 
     // Chamar periodicamente pela Task_PID_Control (por exemplo, a cada 5 ms).
     void update(float dtSeconds);
+    // Brake while continuing encoder/IMU tracking. Resume preserves the target.
+    bool setSensorPaused(bool paused);
+    bool isSensorPaused() const { return sensorPaused_; }
+    bool sensorPauseSettled() const;
 
     // Interrompe o movimento. Status passa a Failed com motivo Cancelled.
     void stop();
 
+    bool isMovingForward() const { return motionType_ == MotionType::ForwardCell && targetDistanceMm_ > 0; }
     MotionStatus getStatus() const;
     MotionType getMotionType() const;
     MotionFailureReason getFailureReason() const;
     Pose2D getPose() const;
+    WheelTravel getWheelTravel() const;
     float getDistanceTravelledMm() const;
+    float getLinearTargetMm() const { return targetDistanceMm_; }
     float getTurnAngleDeg() const;
+    bool arcPathWarning() const { return arcPathWarning_; }
+    uint8_t arcHardLimit() const { return arcHardLimit_; }
+    float getArcPathErrorMm() const;
+    float getArcExitProgressMm() const;
+    float getLeftTargetMmS() const { return lastLeftTargetMmS_; }
+    float getRightTargetMmS() const { return lastRightTargetMmS_; }
     float getLeftSpeedMmS() const;
     float getRightSpeedMmS() const;
     float getPidErrorMmS() const;
@@ -133,13 +175,16 @@ private:
     void updateForward(float dtSeconds, int32_t leftCount,
                        int32_t rightCount, float leftSpeedMmS,
                        float rightSpeedMmS, uint32_t nowMs);
+    void updateArc(float dtSeconds, float leftSpeedMmS, float rightSpeedMmS, uint32_t nowMs);
     void updateTurn(float dtSeconds, float leftSpeedMmS,
                     float rightSpeedMmS, uint32_t nowMs);
     void applyWheelSpeedTargets(float leftTargetMmS,
                                 float rightTargetMmS,
                                 float leftMeasuredMmS,
                                 float rightMeasuredMmS,
-                                float dtSeconds);
+                                float dtSeconds, bool brakeLeft = false, bool brakeRight = false,
+                                float forwardAssistPwm = 0.0f);
+    void beginBrake(uint32_t now, MotionFailureReason reason = MotionFailureReason::None);
     void fail(MotionFailureReason reason);
     void succeed();
     void updateStallTimers(int32_t leftDeltaCount,
@@ -162,6 +207,16 @@ private:
     MotionType motionType_ = MotionType::None;
     MotionFailureReason failureReason_ = MotionFailureReason::None;
     bool initialized_ = false;
+    bool sensorPaused_ = false;
+    uint32_t sensorPausedAtMs_ = 0;
+    bool braking_ = false;
+    bool frontApproachMode_ = false;
+    float straightReferenceYawDeg_ = 0;
+    uint32_t brakeStartedMs_ = 0, quietSinceMs_ = 0;
+    uint32_t lastAngularProgressMs_ = 0;
+    float lastAngularProgress_ = 0, currentGyroDps_ = 0;
+    float leftIntegralPwm_ = 0, rightIntegralPwm_ = 0;
+    MotionFailureReason brakeFailure_ = MotionFailureReason::None;
 
     int32_t startLeftCount_ = 0;
     int32_t startRightCount_ = 0;
@@ -173,10 +228,22 @@ private:
     uint32_t lastRightProgressMs_ = 0;
     uint8_t settledSamples_ = 0;
 
+    float arcRadiusMm_ = 0.0f;
+    Pose2D arcStartPose_{};
+    bool arcPathWarning_ = false;
+    uint8_t arcHardLimit_ = 0; // 1: ângulo; 2: percurso máximo de roda.
     float targetDistanceMm_ = 0.0f;
     float leftWallDistanceMm_ = 0.0f;
     float rightWallDistanceMm_ = 0.0f;
     bool wallAlignmentValid_ = false;
+    bool guidedSteering_ = false;
+    bool guidedRetreat_ = false;
+    bool guidedPivot_ = false;
+    bool pivotTrimUsed_ = false;
+    float guidedPivotHeadingStepDeg_ = 0.0f;
+    float retreatHeadingDeg_ = 0.0f;
+    bool guidedLateralSlow_ = false;
+    float guidedYawOffsetDeg_ = 0.0f;
     float distanceTravelledMm_ = 0.0f;
     float targetAngleDeg_ = 0.0f;
     float turnAngleDeg_ = 0.0f;

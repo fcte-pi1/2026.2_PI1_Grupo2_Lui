@@ -1,11 +1,11 @@
 #ifdef ARDUINO
 
-#include "communication/TelemetryClient.h"
+#include "TelemetryClient.h"
 
 #include <Arduino.h>
 #include <cstring>
 
-#include "config/network_config.hpp"
+#include "../config/network_config.hpp"
 
 namespace mm {
 namespace {
@@ -48,6 +48,21 @@ bool TelemetryClient::begin() {
 
     Serial.printf("HU-10: Bluetooth Classic SPP anunciado como '%s'; aguardando pareamento.\n",
                   MM_BT_DEVICE_NAME);
+    return true;
+}
+
+bool TelemetryClient::resetMissionCache() {
+    // Never overwrite a closed route while the BT task is exporting it.
+    portENTER_CRITICAL(&stateMux_);
+    const bool busy = pendingSessionEnd_ != nullptr || sessionActive_ || sessionStartPending_ || snapshotReplayPending_.load();
+    portEXIT_CRITICAL(&stateMux_);
+    if (busy || (queue_ && uxQueueMessagesWaiting(queue_) != 0)) return false;
+    portENTER_CRITICAL(&stateMux_);
+    mazeLength_ = latestCellLength_ = sessionStartLength_ = 0;
+    memset(cellValid_, 0, sizeof(cellValid_));
+    memset(cellLengths_, 0, sizeof(cellLengths_));
+    sessionClosedLocally_ = false;
+    portEXIT_CRITICAL(&stateMux_);
     return true;
 }
 

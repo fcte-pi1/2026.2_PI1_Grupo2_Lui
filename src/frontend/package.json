@@ -11,7 +11,8 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:report": "playwright show-report",
-    "test:e2e:backend": "E2E_REAL_BACKEND=1 playwright test e2e/integracao.spec.ts"
+    "test:e2e:backend": "E2E_REAL_BACKEND=1 playwright test e2e/integracao.spec.ts",
+    "dev:bluetooth": "VITE_API_URL=http://127.0.0.1:3000 VITE_WS_URL=ws://127.0.0.1:3000/ws?role=dashboard vite --host 127.0.0.1 --port 5173 --strictPort"
   },
   "dependencies": {
     "chart.js": "^4.5.1",

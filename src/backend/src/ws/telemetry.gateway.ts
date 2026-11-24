@@ -2,7 +2,9 @@ import { WebSocketServer, WebSocket } from "ws";
 import type { IncomingMessage, Server } from "node:http";
 import { LogInvalidoError, type LogEventoService } from "../services/logEvento.service";
 import { SessionNavigationError, type SessionNavigationService } from "../services/sessionNavigation.service";
-import { TelemetryInvalidaError, type TelemetryService } from "../services/telemetry.service";
+import { TelemetryInvalidaError, validateTelemetry, type TelemetryService } from "../services/telemetry.service";
+
+import { BluetoothDiagnosticError, validateBluetoothDiagnostic } from "../communication/bluetoothDiagnostic";
 
 type GatewayServices = {
   logs: LogEventoService;
@@ -24,12 +26,13 @@ const BLUETOOTH_MESSAGE_EVENT = "bluetooth_device_message";
 
 /** Encaminha uma linha JSON recebida pela porta Bluetooth para o mesmo pipeline do WebSocket. */
 export function ingestBluetoothMessage(gateway: WebSocketServer, line: string): void {
+  gateway.emit("robot_control_packet",line);
   gateway.emit(BLUETOOTH_MESSAGE_EVENT, line);
 }
 
 async function processDevicePacket(
   raw: string,
-  services: GatewayServices,
+  services: GatewayServices | undefined,
   broadcast: (packet: Packet) => void,
   onDomainError: (message: string) => void,
 ): Promise<void> {
@@ -37,6 +40,27 @@ async function processDevicePacket(
     const parsed: unknown = JSON.parse(raw);
     if (!isPacket(parsed)) throw new Error("Mensagem deve ser um objeto JSON");
     const packet = parsed;
+
+    if (packet.type === "bt_telemetry_test") {
+      broadcast({ ...validateBluetoothDiagnostic(packet) });
+      return;
+    }
+    if (packet.type === "bt_link_status") {
+      if (!["connecting", "connected", "disconnected"].includes(String(packet.status)))
+        throw new BluetoothDiagnosticError("Estado de enlace Bluetooth inválido");
+      broadcast({type:"bt_link_status",status:packet.status,received_at_ms:Date.now()});
+      return;
+    }
+    if (["bt_test_info","pong","robot_status","robot_ack"].includes(String(packet.type))) return;
+    if (!services) {
+      if (packet.type === "telemetry") {
+        const valid=validateTelemetry(packet);
+        broadcast({...valid,type:"telemetry",timestamp:valid.timestamp_ms});
+      } else if (packet.type === "maze" || packet.type === "cell" || packet.type === "position" || !packet.type) {
+        broadcast(packet);
+      }
+      return;
+    }
 
     if (packet.type === "session_start") {
       const deviceSessionId = Number(packet.device_session_id);
@@ -93,7 +117,7 @@ async function processDevicePacket(
       broadcast(packet);
     }
   } catch (error) {
-    if (error instanceof LogInvalidoError || error instanceof SessionNavigationError || error instanceof TelemetryInvalidaError) {
+    if (error instanceof LogInvalidoError || error instanceof SessionNavigationError || error instanceof TelemetryInvalidaError || error instanceof BluetoothDiagnosticError) {
       console.error("Pacote de telemetria rejeitado:", error.message);
       onDomainError(error.message);
       return;
@@ -112,15 +136,20 @@ export function connectionRole(request: Pick<IncomingMessage, "url">): "device" 
 
 /** HU-10: recebe do dispositivo, persiste os dados de domínio e retransmite
  * apenas mensagens permitidas aos navegadores conectados. */
-export function createTelemetryGateway(server: Server, services: GatewayServices) {
+export function createTelemetryGateway(server: Server, services?: GatewayServices) {
   const wss = new WebSocketServer({ server, path: "/ws" });
   const dashboards = new Set<WebSocket>();
   let latestMaze: Packet | null = null;
   let latestTelemetry: Packet | null = null;
   let latestRobot: Packet | null = null;
+  let latestDiagnostic: Packet | null = null;
+  let latestBluetoothStatus: Packet | null = null;
   const latestCells = new Map<string, Packet>();
 
   const broadcast = (packet: Packet) => {
+    if (packet.type === "bt_telemetry_test") latestDiagnostic = packet;
+    if (packet.type === "bt_link_status") latestBluetoothStatus = packet;
+    if (["maze", "session_started", "telemetry"].includes(String(packet.type))) latestDiagnostic = null;
     if (packet.type === "maze") {
       // Uma nova configuração inicia outra corrida: nunca misturar células ou
       // telemetria da sessão anterior no snapshot servido a um dashboard novo.
@@ -171,12 +200,15 @@ export function createTelemetryGateway(server: Server, services: GatewayServices
         socket.send(JSON.stringify(cellOnly));
       }
       if (latestTelemetry) socket.send(JSON.stringify(latestTelemetry));
+      if (latestBluetoothStatus) socket.send(JSON.stringify(latestBluetoothStatus));
+      if (latestDiagnostic) socket.send(JSON.stringify(latestDiagnostic));
     }
 
     // Serializa o processamento por conexão: session_start deve ser persistido
     // antes dos logs/telemetria e session_end, inclusive no transporte WebSocket.
     let processing = Promise.resolve();
     socket.on("message", (data) => {
+      if (role === "dashboard") return; // browsers consume; only devices ingest packets
       processing = processing.then(() => processDevicePacket(
         data.toString(),
         services,

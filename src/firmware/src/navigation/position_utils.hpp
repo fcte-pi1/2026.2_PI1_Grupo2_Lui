@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common/robot_types.hpp"
+#include "../common/robot_types.hpp"
 
 inline bool getNextCell(
     CellPosition current,

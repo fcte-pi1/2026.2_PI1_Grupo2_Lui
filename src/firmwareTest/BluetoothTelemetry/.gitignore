@@ -1,0 +1,4 @@
+.pio/
+__pycache__/
+*.jsonl
+tools/receber_mac

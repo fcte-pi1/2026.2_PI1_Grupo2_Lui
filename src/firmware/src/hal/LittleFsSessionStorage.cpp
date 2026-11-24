@@ -1,6 +1,6 @@
 #ifdef ARDUINO
 
-#include "hal/LittleFsSessionStorage.h"
+#include "LittleFsSessionStorage.h"
 
 #include <LittleFS.h>
 

@@ -28,3 +28,12 @@ MM_BLUETOOTH_SERIAL_BAUD_RATE=115200
 ```
 
 No Windows, use a porta `COM` de saída do serviço SPP; no macOS, use o dispositivo serial Bluetooth disponibilizado pelo sistema (geralmente `/dev/cu.*`). A variável `MM_BLUETOOTH_SERIAL_PORT` é obrigatória para habilitar a ponte. O backend reconecta a porta automaticamente em caso de falha. O firmware transmite objetos JSON terminados por `\n`; a ponte encaminha cada linha ao mesmo gateway que atende os dispositivos WebSocket. O dashboard continua conectado a `ws://localhost:3000/ws?role=dashboard`.
+
+
+## Monitor Bluetooth ao vivo no Mac
+
+A integração de diagnóstico parado permite receber o pacote real `bt_telemetry_test` sem criar uma corrida nem depender de PostgreSQL. No macOS, usa o receptor IOBluetooth nativo, com reconexão; o transporte serial SPP anterior continua disponível.
+
+Preparação: `npm ci`, copiar `.env.bluetooth.example` para `.env.bluetooth.local`, preencher o endereço da ESP e executar `npm run bluetooth:build`. Depois, `npm run dev:bluetooth`. No frontend, use o script de mesmo nome e abra `http://127.0.0.1:5173/?fonte=bluetooth`.
+
+[Guia de operação, configuração e verificações](BLUETOOTH.md).

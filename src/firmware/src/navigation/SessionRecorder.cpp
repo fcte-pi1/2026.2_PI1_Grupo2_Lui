@@ -1,4 +1,4 @@
-#include "navigation/SessionRecorder.h"
+#include "SessionRecorder.h"
 
 namespace mm {
 
